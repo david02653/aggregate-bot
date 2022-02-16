@@ -1,0 +1,33 @@
+serviceList:
+  - name: Cinema
+    type: system
+    description: simple cinema system
+    jenkinsConfig:
+      endpoint: http://soselab.asuscomm.com:10000
+      username: linux
+      accessToken: 11eb26ac2812dda2527594fc7a423a98fd
+    subService:
+      - name: Ordering
+        type: service
+        description: ordering service
+        jenkinsConfig:
+          endpoint: http://soselab.asuscomm.com:10000
+          username: linux
+          accessToken: 11eb26ac2812dda2527594fc7a423a98fd
+      - name: Payment
+        type: service
+        description: payment service
+      - name: Notification
+        type: service
+        description: notification service
+  - name: Fake-System
+    type: system
+    description: fake system
+    jenkinsConfig:
+      endpoint: url
+      username: me
+      accessToken: toKen
+    subService:
+      - name: FakeOne
+        type: service
+        description: try to use get method

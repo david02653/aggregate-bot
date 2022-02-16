@@ -1,0 +1,15 @@
+agentList:
+  - name: Jenkins
+    type: agent
+    description: "jenkins function model"
+    content:
+      skillList:
+        - Jenkins-health
+        - Jenkins-test-report
+  - name: fakeAgent
+    type: fake
+    description: "fake agent"
+    content:
+      skillList:
+        - fakeSkill-a
+        - fakeSkill-b

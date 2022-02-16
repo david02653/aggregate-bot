@@ -1,0 +1,39 @@
+availableSkillList:
+  - name: Jenkins-health
+    type: skill
+    description: check job health status on jenkins server
+    method: POST
+    correspondIntent: ask_job_health_report
+    endpoint: http://localhost:8888/skill/jenkins-health
+    input:
+      - username
+      - accessToken
+      - endpoint
+      - targetService
+    output:
+      type: text
+      # rendering: rendering-type
+  - name: Jenkins-test-report
+    type: skill
+    description: check test report of specific job on jenkins server
+    method: POST
+    correspondIntent: ask_job_test_report
+    endpoint: skill-url
+    input:
+      - username
+      - accessToken
+      - endpoint
+      - targetService
+    output:
+      type: text
+  - name: Fake-test-skill
+    type: skill
+    description: try to use get method
+    method: GET
+    correspondIntent: get_this
+    endpoint: http://localhost:8888/skill/fake
+    input:
+      - username
+      - accessToken
+    output:
+      type: text
