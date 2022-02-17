@@ -70,13 +70,13 @@ class AggregateBotApplicationTest {
 
     @Test
     void testSkillSelector(){
-        RasaIntent intent = new RasaIntent("ask_job_health_report", "Payment");
+        RasaIntent intent = new RasaIntent("ask_job_health_report", "Cinema");
         orchestrator.skillSelector(intent);
     }
 
     @Test
     void testUserInput(){
-        String userUtterance = "health report of Cinema";
+        String userUtterance = "test report of Ordering";
         RasaIntent intent = rasaService.restrictedIntentParsing(rasaService.analyze(userUtterance));
         orchestrator.skillSelector(intent);
     }
@@ -85,5 +85,11 @@ class AggregateBotApplicationTest {
     void testGetMethod(){
         RasaIntent intent = new RasaIntent("get_this", "FakeOne");
         orchestrator.skillSelector(intent);
+    }
+
+    @Test
+    void testTestReport(){
+        JenkinsConfig testConfig = new JenkinsConfig("linux", "11eb26ac2812dda2527594fc7a423a98fd", "http://soselab.asuscomm.com:10000");
+        jenkinsService.getJenkinsTestReport(testConfig, "k8s-pdas-ContractService");
     }
 }

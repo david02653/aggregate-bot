@@ -8,7 +8,11 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soselab.msdobot.aggregatebot.Entity.Service.JenkinsConfig;
+import soselab.msdobot.aggregatebot.Entity.Skill.SkillOutput;
 import soselab.msdobot.aggregatebot.Exception.JenkinsRequestException;
+
+import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * declaration of jenkins skill
@@ -59,6 +63,30 @@ public class JenkinsService {
             je.printStackTrace();
             System.out.println("[DEBUG] failed requesting jenkins health data.");
             return "error occurred while requesting health data";
+        }
+    }
+
+    public String getJenkinsTestReport(JenkinsConfig config, String targetService){
+        // retrieve the latest build number
+        String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
+        System.out.println("[DEBUG] try to request latest build data from " + buildStatusRequestUrl);
+        try {
+            ResponseEntity<String> buildResp = basicJenkinsRequest(buildStatusRequestUrl, config.username, config.accessToken);
+            // extract build data
+            Gson gson = new Gson();
+            JsonObject statusObj = gson.fromJson(buildResp.getBody(), JsonObject.class);
+            String buildNumber = statusObj.getAsJsonObject("lastBuild").get("number").getAsString();
+            // declare test report request url
+            String testReportRequestUrl = config.endpoint + "/job/" + targetService + "/" + buildNumber + "/testReport/api/json";
+            System.out.println("[DEBUG] try to request test report data from " + testReportRequestUrl);
+            ResponseEntity<String> testResp = basicJenkinsRequest(testReportRequestUrl, config.username, config.accessToken);
+            System.out.println(">>> raw test report of " + targetService + ": " + gson.toJson(testResp.getBody()));
+            System.out.println("-----");
+            return gson.toJson(testResp.getBody());
+        }catch (JenkinsRequestException je){
+            je.printStackTrace();
+            System.out.println("[DEBUG] failed requesting jenkins build status.");
+            return "error occurred while requesting build data / test report data";
         }
     }
 }

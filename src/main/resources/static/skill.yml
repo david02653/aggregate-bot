@@ -18,7 +18,7 @@ availableSkillList:
     description: check test report of specific job on jenkins server
     method: POST
     correspondIntent: ask_job_test_report
-    endpoint: skill-url
+    endpoint: http://localhost:8888/skill/jenkins-testReport
     input:
       - username
       - accessToken

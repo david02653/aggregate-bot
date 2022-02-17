@@ -36,6 +36,13 @@ public class SkillController {
         return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(config, requestBody.targetService));
     }
 
+    @PostMapping(value = "/jenkins-testReport")
+    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody JenkinsRequest requestBody){
+        System.out.println(new Gson().toJson(requestBody));
+        JenkinsConfig config = new JenkinsConfig(requestBody.username, requestBody.accessToken, requestBody.endpoint);
+        return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(config, requestBody.targetService));
+    }
+
     @GetMapping(value = "/fake")
     public ResponseEntity<String> requestFakeGetSkill(@RequestParam(required = false) String username, @RequestParam(required = false) String accessToken){
         return ResponseEntity.ok("[GET Method] username=" + username + ", token=" + accessToken);
