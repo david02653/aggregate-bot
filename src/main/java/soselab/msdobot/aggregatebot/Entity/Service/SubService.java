@@ -6,28 +6,28 @@ public class SubService {
     public String name;
     public String type;
     public String description;
-    public JenkinsConfig jenkinsConfig;
+    public Config config;
     public HashMap<String, String> jenkinsConfigMap;
 
     public SubService(){}
-    public SubService(String serviceName, String type, String description, JenkinsConfig config){
+    public SubService(String serviceName, String type, String description, Config config){
         this.name = serviceName;
         this.type = type;
         this.description = description;
-        this.jenkinsConfig = config;
+        this.config = config;
         updateJenkinsConfigMap();
     }
 
-    public void setJenkinsConfig(JenkinsConfig jenkinsConfig) {
-        this.jenkinsConfig = jenkinsConfig;
+    public void setJenkinsConfig(Config config) {
+        this.config = config;
         updateJenkinsConfigMap();
     }
 
     private void updateJenkinsConfigMap(){
         HashMap<String, String> map = new HashMap<>();
-        map.put("username", this.jenkinsConfig.username);
-        map.put("accessToken", this.jenkinsConfig.accessToken);
-        map.put("endpoint", this.jenkinsConfig.endpoint);
+        map.put("username", this.config.username);
+        map.put("accessToken", this.config.accessToken);
+        map.put("endpoint", this.config.endpoint);
         map.put("targetService", this.name);
         this.jenkinsConfigMap = map;
     }
@@ -36,8 +36,8 @@ public class SubService {
         return jenkinsConfigMap;
     }
 
-    public SubService overrideJenkinsConfig(JenkinsConfig newConfig){
-        SubService updatedService = new SubService(this.name, this.type, this.description, this.jenkinsConfig);
+    public SubService overrideJenkinsConfig(Config newConfig){
+        SubService updatedService = new SubService(this.name, this.type, this.description, this.config);
         if(newConfig != null)
             updatedService.setJenkinsConfig(newConfig);
         return updatedService;

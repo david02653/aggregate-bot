@@ -1,7 +1,5 @@
 package soselab.msdobot.aggregatebot.Entity.Agent;
 
-import soselab.msdobot.aggregatebot.Entity.BasicUnit;
-
 /**
  * definition of a single agent
  */

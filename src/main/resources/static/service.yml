@@ -2,7 +2,7 @@ serviceList:
   - name: Cinema
     type: system
     description: simple cinema system
-    jenkinsConfig:
+    config:
       endpoint: http://soselab.asuscomm.com:10000
       username: linux
       accessToken: 11eb26ac2812dda2527594fc7a423a98fd
@@ -10,7 +10,7 @@ serviceList:
       - name: Ordering
         type: service
         description: ordering service
-        jenkinsConfig:
+        config:
           endpoint: http://soselab.asuscomm.com:10000
           username: linux
           accessToken: 11eb26ac2812dda2527594fc7a423a98fd
@@ -23,7 +23,7 @@ serviceList:
   - name: Fake-System
     type: system
     description: fake system
-    jenkinsConfig:
+    config:
       endpoint: url
       username: me
       accessToken: toKen

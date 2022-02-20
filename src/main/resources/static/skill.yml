@@ -37,3 +37,14 @@ availableSkillList:
       - accessToken
     output:
       type: text
+  - name: illegal-skill
+    type: skill
+    description: dummy illegal skill
+    method: POST
+    correspondIntent: none
+    endpoint: url
+    input:
+      - fake-input
+      - username
+    output:
+      type: text
