@@ -17,7 +17,6 @@ import soselab.msdobot.aggregatebot.Entity.Skill.SkillList;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -138,8 +137,16 @@ public class ConfigLoader {
         Iterator<Skill> skillIterator = skillList.availableSkillList.iterator();
         while(skillIterator.hasNext()){
             Skill currentSkill = skillIterator.next();
-            if(currentSkill.input.stream().anyMatch(input -> !keywordList.keyword.contains(input))){
+            // check input type
+            if(currentSkill.input.stream().anyMatch(input -> !keywordList.input.contains(input))){
                 System.out.println("[DEBUG] illegal input found in Skill '" + currentSkill.name + "'.");
+                System.out.println("[DEBUG] auto remove illegal Skill '" + currentSkill.name + "'.");
+                skillIterator.remove();
+                continue; // move on to next skill if current one get removed
+            }
+            // check output type
+            if(!keywordList.output.contains(currentSkill.output.type)){
+                System.out.println("[DEBUG] illegal output found in Skill '" + currentSkill.name + "'.");
                 System.out.println("[DEBUG] auto remove illegal Skill '" + currentSkill.name + "'.");
                 skillIterator.remove();
             }

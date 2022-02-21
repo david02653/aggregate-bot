@@ -1,5 +1,7 @@
 package soselab.msdobot.aggregatebot;
 
+import com.google.gson.Gson;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,5 +145,14 @@ class AggregateBotApplicationTest {
     void autoRemoveIllegalSkillTest(){
         configLoader.loadSkillConfig();
         configLoader.verifySkillInputKeyword();
+    }
+
+    @Test
+    void testJsonPath(){
+        Gson gson = new Gson();
+        configLoader.loadSkillConfig();
+//        String dataPath = "$.availableSkillList[*].name";
+        String dataPath = "$.availableSkillList[0]";
+        System.out.println(JsonPath.read(gson.toJson(configLoader.skillList), dataPath).toString());
     }
 }

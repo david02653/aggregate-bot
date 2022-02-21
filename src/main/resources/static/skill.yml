@@ -11,7 +11,12 @@ availableSkillList:
       - endpoint
       - targetService
     output:
-      type: text
+      type: json
+      jsonInfo:
+        - jsonPath: $[0].description
+          name: health summary
+        - jsonPath: $[1].description
+          name: build summary
       # rendering: rendering-type
   - name: Jenkins-test-report
     type: skill

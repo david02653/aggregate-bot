@@ -1,5 +1,8 @@
-keyword:
+input:
   - accessToken
   - username
   - endpoint
   - targetService
+output:
+  - plainText
+  - json

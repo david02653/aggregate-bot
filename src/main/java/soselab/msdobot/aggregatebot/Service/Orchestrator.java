@@ -2,16 +2,23 @@ package soselab.msdobot.aggregatebot.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.jayway.jsonpath.JsonPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Entity.Service.SubService;
+import soselab.msdobot.aggregatebot.Entity.Skill.JsonInfo;
 import soselab.msdobot.aggregatebot.Entity.Skill.Skill;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 /**
  * define which intent activate which agent/skill
@@ -23,6 +30,8 @@ public class Orchestrator {
         String intentName = intent.getIntent();
         String jobName = intent.getJobName();
         Gson gson = new Gson();
+        final ExecutorService executor = Executors.newFixedThreadPool(5);
+        final List<Future<?>> futures = new ArrayList<>();
 
         // get correspond skill by intent name
         Skill skill = ConfigLoader.skillList.getSkill(intentName);
@@ -45,17 +54,36 @@ public class Orchestrator {
         }
 
         // fire skill request for every sub-service
+        // todo: check if every thread execute successfully, use future.get() and add return type
         if(skill.method.equals("POST")) {
             for (SubService subService : subServiceList) {
                 System.out.println("[DEBUG] current subService " + gson.toJson(subService));
-                postRequestSkill(skill, subService);
+//                postRequestSkill(skill, subService);
+
+                Future<?> future = executor.submit(() -> {
+                   postRequestSkill(skill, subService);
+                });
+                futures.add(future);
             }
         }else{
             // get method
             for (SubService subService : subServiceList) {
                 System.out.println("[DEBUG] current subService " + gson.toJson(subService));
-                getRequestSkill(skill, subService);
+//                getRequestSkill(skill, subService);
+
+                Future<?> future = executor.submit(() -> {
+                    getRequestSkill(skill, subService);
+                });
+                futures.add(future);
             }
+        }
+        // collect futures and check if every thread works fine
+        try{
+            for(Future<?> future: futures){
+                future.get();
+            }
+        }catch (InterruptedException | ExecutionException e){
+            e.printStackTrace();
         }
     }
 
@@ -74,25 +102,37 @@ public class Orchestrator {
         System.out.println("[DEBUG] try to request skill from " + skill.endpoint);
         ResponseEntity<String> resp = restTemplate.exchange(skill.endpoint, HttpMethod.POST, entity, String.class);
         System.out.println(service.name + " " + resp.getBody());
+        parseJsonResult(skill, service, resp.getBody());
     }
 
     public void getRequestSkill(Skill skill, SubService service){
-        String requestUrl = skill.endpoint;
+        StringBuilder requestUrl = new StringBuilder(skill.endpoint);
         HashMap<String, String> configMap = service.getJenkinsConfigMap();
         if(!skill.input.isEmpty()){
-            requestUrl = requestUrl + "?";
+            requestUrl.append("?");
             for(String input: skill.input){
-                requestUrl = requestUrl + input + "=" + configMap.get(input) + "&";
+                requestUrl.append(input).append("=").append(configMap.get(input)).append("&");
             }
-            requestUrl = requestUrl.substring(0, requestUrl.length() - 1);
+            requestUrl = new StringBuilder(requestUrl.substring(0, requestUrl.length() - 1));
         }
         System.out.println("[DEBUG] request url : " + requestUrl);
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 //        headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<?> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> resp = template.exchange(requestUrl, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> resp = template.exchange(requestUrl.toString(), HttpMethod.GET, entity, String.class);
         System.out.println(resp.getBody());
+    }
+
+    /**
+     * parse output result, if output type is json, try to extract info by given json path
+     */
+    public void parseJsonResult(Skill skill, SubService service, String output){
+        if(!skill.output.type.equals("json")) return;
+        ArrayList<JsonInfo> targetInfoList = skill.output.jsonInfo;
+        for(JsonInfo jsonInfo: targetInfoList){
+            System.out.println(">>> [" + service.name + "] " + jsonInfo.name + " : " + JsonPath.read(output, jsonInfo.jsonPath).toString());
+        }
     }
 
     /**

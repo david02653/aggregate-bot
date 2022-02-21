@@ -5,13 +5,14 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 
 public class Keyword {
-    public ArrayList<String> keyword;
+    public ArrayList<String> input;
+    public ArrayList<String> output;
 
     public Keyword(){
     }
 
     @Override
     public String toString(){
-        return new Gson().toJson(this.keyword);
+        return new Gson().toJson(this.input);
     }
 }

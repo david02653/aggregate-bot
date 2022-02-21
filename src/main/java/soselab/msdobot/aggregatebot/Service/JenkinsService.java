@@ -8,7 +8,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import soselab.msdobot.aggregatebot.Entity.Service.Config;
-import soselab.msdobot.aggregatebot.Exception.JenkinsRequestException;
+import soselab.msdobot.aggregatebot.Exception.RequestException;
 
 /**
  * declaration of jenkins skill
@@ -23,7 +23,7 @@ public class JenkinsService {
     private RestTemplate template;
     private RestTemplateBuilder templateBuilder;
 
-    private ResponseEntity<String> basicJenkinsRequest(String url, String user, String token) throws JenkinsRequestException {
+    private ResponseEntity<String> basicJenkinsRequest(String url, String user, String token) throws RequestException {
         template = templateBuilder.basicAuthentication(user, token).build();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -34,7 +34,7 @@ public class JenkinsService {
 //            System.out.println(resp);
         }catch (Exception e){
             e.printStackTrace();
-            throw new JenkinsRequestException();
+            throw new RequestException();
         }
         return resp;
     }
@@ -55,7 +55,7 @@ public class JenkinsService {
             JsonArray healthReport = body.getAsJsonArray("healthReport");
             System.out.println(gson.toJson(healthReport));
             return gson.toJson(healthReport);
-        }catch (JenkinsRequestException je){
+        }catch (RequestException je){
             je.printStackTrace();
             System.out.println("[DEBUG] failed requesting jenkins health data.");
             return "error occurred while requesting health data";
@@ -79,7 +79,7 @@ public class JenkinsService {
             System.out.println(">>> raw test report of " + targetService + ": " + gson.toJson(testResp.getBody()));
             System.out.println("-----");
             return gson.toJson(testResp.getBody());
-        }catch (JenkinsRequestException je){
+        }catch (RequestException je){
             je.printStackTrace();
             System.out.println("[DEBUG] failed requesting jenkins build status.");
             return "error occurred while requesting build data / test report data";
