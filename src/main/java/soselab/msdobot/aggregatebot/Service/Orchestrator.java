@@ -60,9 +60,7 @@ public class Orchestrator {
                 System.out.println("[DEBUG] current subService " + gson.toJson(subService));
 //                postRequestSkill(skill, subService);
 
-                Future<?> future = executor.submit(() -> {
-                   postRequestSkill(skill, subService);
-                });
+                Future<?> future = executor.submit(() -> postRequestSkill(skill, subService));
                 futures.add(future);
             }
         }else{
@@ -71,9 +69,11 @@ public class Orchestrator {
                 System.out.println("[DEBUG] current subService " + gson.toJson(subService));
 //                getRequestSkill(skill, subService);
 
-                Future<?> future = executor.submit(() -> {
-                    getRequestSkill(skill, subService);
-                });
+                Future<?> future;
+                if(!hasPathVariable(skill.endpoint))
+                    future = executor.submit(() -> getRequestSkill(skill, subService));
+                else
+                    future = executor.submit(() -> getRequestSkillViaPathVariable(skill, subService));
                 futures.add(future);
             }
         }
@@ -122,6 +122,33 @@ public class Orchestrator {
         HttpEntity<?> entity = new HttpEntity<>(headers);
         ResponseEntity<String> resp = template.exchange(requestUrl.toString(), HttpMethod.GET, entity, String.class);
         System.out.println(resp.getBody());
+    }
+
+    /**
+     * request get method skill with path variable
+     * @param skill
+     * @param service
+     */
+    public void getRequestSkillViaPathVariable(Skill skill, SubService service){
+        String variablePattern;
+        String requestUrl = skill.endpoint;
+        HashMap<String, String> configMap = service.getJenkinsConfigMap();
+        if(!skill.input.isEmpty()){
+            for(String input: skill.input){
+                variablePattern = "\\{" + input + "}";
+                requestUrl = requestUrl.replaceAll(variablePattern, configMap.get(input));
+            }
+        }
+        System.out.println("[DEBUG] request url: " + requestUrl);
+        RestTemplate template = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> resp = template.exchange(requestUrl, HttpMethod.GET, entity, String.class);
+        System.out.println(resp.getBody());
+    }
+
+    public boolean hasPathVariable(String url){
+        return url.contains("{") && url.contains("}");
     }
 
     /**

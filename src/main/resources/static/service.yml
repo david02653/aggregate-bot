@@ -3,6 +3,7 @@ serviceList:
     type: system
     description: simple cinema system
     config:
+      # this endpoint is one of the parameter, used by SKILL, not requesting skill
       endpoint: http://soselab.asuscomm.com:10000
       username: linux
       accessToken: 11eb26ac2812dda2527594fc7a423a98fd
@@ -31,3 +32,10 @@ serviceList:
       - name: FakeOne
         type: service
         description: try to use get method
+        config:
+          username: fake one
+      - name: FakeTwo
+        type: service
+        description: fake service
+        config:
+          username: fake two

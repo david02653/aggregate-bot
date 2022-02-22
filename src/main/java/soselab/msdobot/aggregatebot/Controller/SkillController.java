@@ -41,8 +41,24 @@ public class SkillController {
         return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(config, requestBody.targetService));
     }
 
+    /**
+     * fake get method skill, expect request url with parameter concat by '?'
+     * @param username
+     * @param accessToken
+     * @return
+     */
     @GetMapping(value = "/fake")
     public ResponseEntity<String> requestFakeGetSkill(@RequestParam(required = false) String username, @RequestParam(required = false) String accessToken){
-        return ResponseEntity.ok("[GET Method] username=" + username + ", token=" + accessToken);
+        return ResponseEntity.ok("[GET Method][RequestParam] username=" + username + ", token=" + accessToken);
+    }
+
+    /**
+     * fake get method skill, expect request url with parameter display in url
+     * @param username
+     * @return
+     */
+    @GetMapping(value = "/fake-variable/{username}")
+    public ResponseEntity<String> requestFakeGetSkillByPathVariable(@PathVariable String username){
+        return ResponseEntity.ok("[Get Method][PathVariable] username=" + username);
     }
 }

@@ -30,10 +30,10 @@ availableSkillList:
       - endpoint
       - targetService
     output:
-      type: text
+      type: json
   - name: Fake-test-skill
     type: skill
-    description: try to use get method
+    description: try to use get method with request param
     method: GET
     correspondIntent: get_this
     endpoint: http://localhost:8888/skill/fake
@@ -41,7 +41,17 @@ availableSkillList:
       - username
       - accessToken
     output:
-      type: text
+      type: plaintext
+  - name: Fake-skill-pathvariable
+    type: skill
+    description: try to use get method with path variable
+    method: GET
+    correspondIntent: get_path
+    endpoint: http://localhost:8888/skill/fake-variable/{username}
+    input:
+      - username
+    output:
+      type: plainText
   - name: illegal-skill
     type: skill
     description: dummy illegal skill
@@ -52,4 +62,4 @@ availableSkillList:
       - fake-input
       - username
     output:
-      type: text
+      type: plainText

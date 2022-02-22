@@ -105,7 +105,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void testSkillSelector(){
-        RasaIntent intent = new RasaIntent("ask_job_health_report", "Cinema");
+        RasaIntent intent = new RasaIntent("get_path", "Fake-System");
         orchestrator.skillSelector(intent);
     }
 
@@ -154,5 +154,15 @@ class AggregateBotApplicationTest {
 //        String dataPath = "$.availableSkillList[*].name";
         String dataPath = "$.availableSkillList[0]";
         System.out.println(JsonPath.read(gson.toJson(configLoader.skillList), dataPath).toString());
+    }
+
+    @Test
+    void testRegexReplace(){
+        String temp = "username";
+        String pattern = "{" + temp + "}";
+        String normalizedPattern = pattern.replace("{", "\\{").replace("}", "\\}");
+        String testPattern = "\\{" + temp + "}";
+        String testExample = "regex replace test [{username}]";
+        System.out.println(testExample.replaceAll(testPattern, "content"));
     }
 }
