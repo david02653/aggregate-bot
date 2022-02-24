@@ -32,6 +32,7 @@ public class Orchestrator {
         Gson gson = new Gson();
         final ExecutorService executor = Executors.newFixedThreadPool(5);
         final List<Future<?>> futures = new ArrayList<>();
+        Future<?> future;
 
         // get correspond skill by intent name
         Skill skill = ConfigLoader.skillList.getSkill(intentName);
@@ -58,18 +59,13 @@ public class Orchestrator {
         if(skill.method.equals("POST")) {
             for (SubService subService : subServiceList) {
                 System.out.println("[DEBUG] current subService " + gson.toJson(subService));
-//                postRequestSkill(skill, subService);
-
-                Future<?> future = executor.submit(() -> postRequestSkill(skill, subService));
+                future = executor.submit(() -> postRequestSkill(skill, subService));
                 futures.add(future);
             }
         }else{
             // get method
             for (SubService subService : subServiceList) {
                 System.out.println("[DEBUG] current subService " + gson.toJson(subService));
-//                getRequestSkill(skill, subService);
-
-                Future<?> future;
                 if(!hasPathVariable(skill.endpoint))
                     future = executor.submit(() -> getRequestSkill(skill, subService));
                 else
@@ -79,8 +75,8 @@ public class Orchestrator {
         }
         // collect futures and check if every thread works fine
         try{
-            for(Future<?> future: futures){
-                future.get();
+            for(Future<?> executeResult: futures){
+                executeResult.get();
             }
         }catch (InterruptedException | ExecutionException e){
             e.printStackTrace();
@@ -147,6 +143,11 @@ public class Orchestrator {
         System.out.println(resp.getBody());
     }
 
+    /**
+     * check if url contains '{}', if contains then return true
+     * @param url skill url
+     * @return true if skill url contains '{}'
+     */
     public boolean hasPathVariable(String url){
         return url.contains("{") && url.contains("}");
     }
