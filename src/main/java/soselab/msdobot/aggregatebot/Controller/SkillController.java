@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import soselab.msdobot.aggregatebot.Entity.JenkinsRequest;
+import soselab.msdobot.aggregatebot.Entity.RequestConfig;
 import soselab.msdobot.aggregatebot.Entity.Service.Config;
 import soselab.msdobot.aggregatebot.Service.JenkinsService;
 
@@ -28,17 +28,30 @@ public class SkillController {
      * @param requestBody
      */
     @PostMapping(value = "/jenkins-health")
-    public ResponseEntity<String> requestJenkinsHealthData(@RequestBody JenkinsRequest requestBody){
+    public ResponseEntity<String> requestJenkinsHealthData(@RequestBody RequestConfig requestBody){
         System.out.println(new Gson().toJson(requestBody));
         Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
         return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(config, requestBody.targetService));
     }
 
     @PostMapping(value = "/jenkins-testReport")
-    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody JenkinsRequest requestBody){
+    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody RequestConfig requestBody){
         System.out.println(new Gson().toJson(requestBody));
         Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(config, requestBody.targetService));
+        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(config, requestBody.targetService));
+    }
+
+    @PostMapping(value = "/jenkins-buildNumber")
+    public ResponseEntity<String> requestJenkinsBuildNumber(@RequestBody RequestConfig requestBody){
+        System.out.println(new Gson().toJson(requestBody));
+        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
+        return ResponseEntity.ok(jenkinsService.getJenkinsLatestBuildNumber(config, requestBody.targetService));
+    }
+
+    @PostMapping(value = "/jenkins-testReport-semi")
+    public ResponseEntity<String> requestJenkinsSemiTestReport(@RequestBody Config requestBody){
+        System.out.println(new Gson().toJson(requestBody));
+        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(requestBody, requestBody.targetService));
     }
 
     /**

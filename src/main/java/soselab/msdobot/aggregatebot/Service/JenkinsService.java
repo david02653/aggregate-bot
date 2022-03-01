@@ -23,6 +23,14 @@ public class JenkinsService {
     private RestTemplate template;
     private RestTemplateBuilder templateBuilder;
 
+    /**
+     * request data from jenkins endpoint, require jenkins-username and jenkins-accessToken
+     * @param url jenkins endpoint
+     * @param user jenkins username
+     * @param token jenkins access token
+     * @return response from jenkins endpoint
+     * @throws RequestException
+     */
     private ResponseEntity<String> basicJenkinsRequest(String url, String user, String token) throws RequestException {
         template = templateBuilder.basicAuthentication(user, token).build();
         HttpHeaders headers = new HttpHeaders();
@@ -62,7 +70,47 @@ public class JenkinsService {
         }
     }
 
+    /**
+     * get latest jenkins job build number
+     * @param config jenkins config
+     * @param targetService service name
+     * @return latest job build number
+     */
+    public String getJenkinsLatestBuildNumber(Config config, String targetService){
+        String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
+        System.out.println("[DEBUG] try to request latest build data from " + buildStatusRequestUrl);
+        try{
+            ResponseEntity<String> resp = basicJenkinsRequest(buildStatusRequestUrl, config.username, config.accessToken);
+            Gson gson  = new Gson();
+            JsonObject json = gson.fromJson(resp.getBody(), JsonObject.class);
+            return json.getAsJsonObject("lastBuild").get("number").getAsString();
+        }catch (RequestException je){
+            je.printStackTrace();
+            System.out.println("[DEBUG] failed requesting jenkins build status.");
+            return "error occurred while requesting build data / test report data";
+        }
+    }
+
+    /**
+     * get latest jenkins job test report
+     * @param config jenkins config, expect build number and jenkins account data
+     * @param targetService service name
+     * @return latest jenkins job test report
+     */
     public String getJenkinsTestReport(Config config, String targetService){
+        String requestUrl = config.endpoint + "/job/" + targetService + "/" + config.buildNumber + "/testReport/api/json";
+        System.out.println("[DEBUG] try to request test report data from " + requestUrl);
+        try{
+            ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, config.username, config.accessToken);
+            return new Gson().toJson(resp.getBody());
+        }catch (RequestException je){
+            je.printStackTrace();
+            System.out.println("[DEBUG] failed requesting jenkins test report");
+            return "error occurred while requesting test report data";
+        }
+    }
+
+    public String getDirectJenkinsTestReport(Config config, String targetService){
         // retrieve the latest build number
         String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
         System.out.println("[DEBUG] try to request latest build data from " + buildStatusRequestUrl);

@@ -3,6 +3,7 @@ input:
   - username
   - endpoint
   - targetService
+  - buildNumber
 output:
   - plainText
   - json

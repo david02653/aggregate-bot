@@ -1,6 +1,7 @@
 package soselab.msdobot.aggregatebot;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -57,6 +58,14 @@ class AggregateBotApplicationTest {
     @Test
     void loadSkillConfigTest(){
         configLoader.loadSkillConfig();
+    }
+
+    /**
+     * test if big intent yaml setting file load successfully
+     */
+    @Test
+    void loadBigIntentConfigTest(){
+        configLoader.loadBigIntentConfig();
     }
 
     /**
@@ -135,7 +144,7 @@ class AggregateBotApplicationTest {
     @Test
     void testTestReport(){
         Config testConfig = new Config("linux", "11eb26ac2812dda2527594fc7a423a98fd", "http://soselab.asuscomm.com:10000");
-        jenkinsService.getJenkinsTestReport(testConfig, "k8s-pdas-ContractService");
+        jenkinsService.getDirectJenkinsTestReport(testConfig, "k8s-pdas-ContractService");
     }
 
     /**
@@ -164,5 +173,13 @@ class AggregateBotApplicationTest {
         String testPattern = "\\{" + temp + "}";
         String testExample = "regex replace test [{username}]";
         System.out.println(testExample.replaceAll(testPattern, "content"));
+    }
+
+    @Test
+    void testGsonJsonObjectAddProperty(){
+        JsonObject obj = new JsonObject();
+        obj.addProperty("test", "raw content");
+        obj.addProperty("test", "fixed content");
+        System.out.println(obj);
     }
 }

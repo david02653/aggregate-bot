@@ -14,9 +14,9 @@ availableSkillList:
       type: json
       jsonInfo:
         - jsonPath: $[0].description
-          name: health summary
+          description: health summary
         - jsonPath: $[1].description
-          name: build summary
+          description: build summary
       # rendering: rendering-type
   - name: Jenkins-test-report
     type: skill
@@ -31,6 +31,33 @@ availableSkillList:
       - targetService
     output:
       type: json
+  - name: Jenkins-latest-build-number
+    type: skill
+    description: get latest jenkins job build number
+    method: POST
+    correspondIntent: ask_jenkins_job_build_number
+    endpoint: http://localhost:8888/skill/jenkins-buildNumber
+    input:
+      - username
+      - accessToken
+      - endpoint
+      - targetService
+    output:
+      type: plainText
+  - name: Jenkins-semi-test-report
+    type: skill
+    description: get jenkins test report
+    method: POST
+    correspondIntent: ask_jenkins_semi_test_report
+    endpoint: http://localhost:8888/skill/jenkins-testReport-semi
+    input:
+      - username
+      - accessToken
+      - endpoint
+      - targetService
+      - buildNumber
+    output:
+      type: plainText
   - name: Fake-test-skill
     type: skill
     description: try to use get method with request param

@@ -1,0 +1,11 @@
+crossSkillList:
+  - name: test-jenkins-health
+    correspondIntent: test-jenkins-health
+    sequencedSkillList:
+      # please use skills that are already exist !
+      - name: jenkins-latest-build-number
+        order: 0
+        description: get latest job build number
+      - name: jenkins-latest-test-report
+        order: 1
+        description: get latest job test report

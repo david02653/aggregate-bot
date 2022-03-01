@@ -7,7 +7,7 @@ public class SubService {
     public String type;
     public String description;
     public Config config;
-    public HashMap<String, String> jenkinsConfigMap;
+    public HashMap<String, String> configMap;
 
     public SubService(){}
     public SubService(String serviceName, String type, String description, Config config){
@@ -29,11 +29,11 @@ public class SubService {
         map.put("accessToken", this.config.accessToken);
         map.put("endpoint", this.config.endpoint);
         map.put("targetService", this.name);
-        this.jenkinsConfigMap = map;
+        this.configMap = map;
     }
 
-    public HashMap<String, String> getJenkinsConfigMap() {
-        return jenkinsConfigMap;
+    public HashMap<String, String> getConfigMap() {
+        return configMap;
     }
 
     public SubService overrideJenkinsConfig(Config newConfig){

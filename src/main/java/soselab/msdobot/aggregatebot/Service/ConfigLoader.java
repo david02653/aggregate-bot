@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import soselab.msdobot.aggregatebot.Entity.Agent.AgentList;
+import soselab.msdobot.aggregatebot.Entity.BigIntent.BigIntent;
+import soselab.msdobot.aggregatebot.Entity.BigIntent.BigIntentList;
 import soselab.msdobot.aggregatebot.Entity.Keyword.Keyword;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceList;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceSystem;
@@ -32,11 +34,13 @@ public class ConfigLoader {
     private final String agentConfigPath;
     private final String serviceConfigPath;
     private final String skillConfigPath;
+    private final String bigIntentConfigPath;
     private final String keywordConfigPath;
 
     public static AgentList agentList;
     public static ServiceList serviceList;
     public static SkillList skillList;
+    public static BigIntentList bigIntentList;
     public static Keyword keywordList;
 
     @Autowired
@@ -46,6 +50,7 @@ public class ConfigLoader {
         agentConfigPath = env.getProperty("bot.config.agent");
         serviceConfigPath = env.getProperty("bot.config.service");
         skillConfigPath = env.getProperty("bot.config.skill");
+        bigIntentConfigPath = env.getProperty("bot.config.bigIntent");
         keywordConfigPath = env.getProperty("bot.config.keyword");
 
         loadKeywordConfig();
@@ -76,6 +81,18 @@ public class ConfigLoader {
         }catch (IOException ioe){
             ioe.printStackTrace();
             System.out.println("> [DEBUG] skill config file load failed.");
+        }
+    }
+
+    public void loadBigIntentConfig(){
+        try{
+            System.out.println("> try to parse big intent config from " + bigIntentConfigPath);
+            parser = yamlFactory.createParser(new File(bigIntentConfigPath));
+            bigIntentList = mapper.readValue(parser, BigIntentList.class);
+            System.out.println(bigIntentList);
+        }catch (IOException ioe){
+            ioe.printStackTrace();
+            System.out.println("> [DEBUG] big intent config file load failed.");
         }
     }
 
