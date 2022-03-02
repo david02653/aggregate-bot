@@ -1,5 +1,7 @@
 package soselab.msdobot.aggregatebot.Entity.Service;
 
+import com.google.gson.Gson;
+
 public class Config {
     public String username;
     public String accessToken;
@@ -19,5 +21,10 @@ public class Config {
         this.username = username;
         this.accessToken = accessToken;
         this.endpoint = endpoint;
+    }
+
+    @Override
+    public String toString(){
+        return new Gson().toJson(this);
     }
 }

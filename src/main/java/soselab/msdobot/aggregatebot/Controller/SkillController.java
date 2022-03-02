@@ -34,24 +34,39 @@ public class SkillController {
         return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(requestBody, requestBody.targetService));
     }
 
+    /**
+     * request job test report from jenkins endpoint, this version only need to assign target service name
+     * @param requestBody config setting used to request jenkins endpoint
+     * @return response from jenkins endpoint
+     */
     @PostMapping(value = "/jenkins-testReport")
-    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody RequestConfig requestBody){
+    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody Config requestBody){
         System.out.println(new Gson().toJson(requestBody));
-        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(config, requestBody.targetService));
+//        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
+        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(requestBody, requestBody.targetService));
     }
 
+    /**
+     * request latest build number from jenkins endpoint
+     * @param requestBody config setting used to request jenkins endpoint
+     * @return response from jenkins endpoint
+     */
     @PostMapping(value = "/jenkins-buildNumber")
-    public ResponseEntity<String> requestJenkinsBuildNumber(@RequestBody RequestConfig requestBody){
+    public ResponseEntity<String> requestJenkinsBuildNumber(@RequestBody Config requestBody){
         System.out.println(new Gson().toJson(requestBody));
-        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getJenkinsLatestBuildNumber(config, requestBody.targetService));
+//        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
+        return ResponseEntity.ok(jenkinsService.getJenkinsLatestBuildNumber(requestBody, requestBody.targetService));
     }
 
+    /**
+     * request job test report from jenkins endpoint, require build number in parameter
+     * @param requestBody config setting used to request jenkins endpoint
+     * @return response from jenkins endpoint
+     */
     @PostMapping(value = "/jenkins-testReport-semi")
     public ResponseEntity<String> requestJenkinsSemiTestReport(@RequestBody Config requestBody){
         System.out.println(new Gson().toJson(requestBody));
-        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(requestBody, requestBody.targetService));
+        return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(requestBody, requestBody.targetService));
     }
 
     /**

@@ -114,7 +114,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void testSkillSelector(){
-        RasaIntent intent = new RasaIntent("ask_job_health_report", "Payment");
+        RasaIntent intent = new RasaIntent("test-jenkins-health", "Payment");
         orchestrator.skillSelector(intent);
     }
 

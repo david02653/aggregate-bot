@@ -28,6 +28,19 @@ public class SkillList {
         return new ArrayList<>();
     }
 
+    public ArrayList<Skill> getCompleteSkill(ArrayList<Skill> semiSkillList){
+        ArrayList<Skill> resultList = new ArrayList<>();
+        for(Skill semiSkill: semiSkillList){
+            for(Skill skill: availableSkillList){
+                if(skill.name.equals(semiSkill.name)){
+                    resultList.add(skill);
+                    break;
+                }
+            }
+        }
+        return resultList;
+    }
+
     @Override
     public String toString(){
         Gson gson = new Gson();

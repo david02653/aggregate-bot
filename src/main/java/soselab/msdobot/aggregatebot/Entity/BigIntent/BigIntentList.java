@@ -12,10 +12,10 @@ public class BigIntentList {
     public BigIntentList(){
     }
 
-    public ArrayList<Skill> getSkillList(String intent){
+    public ArrayList<Skill> getSemiSkillList(String intent){
         for(BigIntent bigIntent: crossSkillList){
             if(bigIntent.correspondIntent.equals(intent)) {
-                return bigIntent.getSequencedSkillList();
+                return bigIntent.getSequencedSemiSkillList();
             }
         }
         return new ArrayList<>();

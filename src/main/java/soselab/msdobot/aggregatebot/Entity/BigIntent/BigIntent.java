@@ -2,10 +2,8 @@ package soselab.msdobot.aggregatebot.Entity.BigIntent;
 
 import com.google.gson.Gson;
 import soselab.msdobot.aggregatebot.Entity.Skill.Skill;
-import soselab.msdobot.aggregatebot.Entity.Skill.SkillList;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 
 public class BigIntent {
@@ -17,7 +15,7 @@ public class BigIntent {
     public BigIntent(){
     }
 
-    public ArrayList<Skill> getSequencedSkillList(){
+    public ArrayList<Skill> getSequencedSemiSkillList(){
         sortSequencedSkillList();
         return new ArrayList<>(sequencedSkillList);
     }

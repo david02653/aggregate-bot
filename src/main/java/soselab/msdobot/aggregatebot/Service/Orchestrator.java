@@ -15,6 +15,7 @@ import soselab.msdobot.aggregatebot.Entity.Skill.Skill;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -96,10 +97,17 @@ public class Orchestrator {
 
     }
 
+    /**
+     * get complete correspond skill list
+     * @param intent
+     * @return
+     */
     public ArrayList<Skill> getCorrespondSkillList(String intent){
         ArrayList<Skill> resultList = ConfigLoader.skillList.getSkill(intent);
-        if(resultList.isEmpty())
-            resultList = ConfigLoader.bigIntentList.getSkillList(intent);
+        if(resultList.isEmpty()) {
+//            resultList = ConfigLoader.bigIntentList.getSemiSkillList(intent);
+            resultList = ConfigLoader.skillList.getCompleteSkill(ConfigLoader.bigIntentList.getSemiSkillList(intent));
+        }
         return resultList;
     }
 
@@ -135,6 +143,7 @@ public class Orchestrator {
                     requestBody.addProperty(key, previousConfig.content.get(key));
             }
         }
+        System.out.println("[DEBUG][orchestrator][POST] requestBody: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody.toString(), headers);
         System.out.println("[DEBUG] try to request skill with body " + new Gson().toJson(requestBody));
         System.out.println("[DEBUG] try to request skill from " + skill.endpoint);
@@ -208,9 +217,13 @@ public class Orchestrator {
      * parse output result, if output type is json, try to extract info by given json path, if output type is text and has tag, return a hash map data pair with tag as key and data as value
      */
     public HashMap<String, String> parseRequestResult(Skill skill, SubService service, String output){
+        Gson gson = new Gson();
+        System.out.println("[parse result] skill > " + gson.toJson(skill));
+        System.out.println("[parse result] service > " + gson.toJson(service));
+        System.out.println("[parse result] output > " + output);
         HashMap<String, String> result = new HashMap<>();
         result.put("targetService", service.name);
-        if(skill.output.type.equals("plaintext") && skill.output.tag != null){
+        if(skill.output.type.equals("plainText") && skill.output.tag != null){
             // contains plain text info
             System.out.println(">>> [" + skill.output.tag + "] " + output);
             result.put(skill.output.tag, output);
@@ -223,6 +236,12 @@ public class Orchestrator {
                 if(!jsonInfo.tag.isEmpty())
                     result.put(jsonInfo.tag, info);
             }
+        }
+        System.out.println("[parse result] result map: " + gson.toJson(result));
+        // add new config retrieved after skill execution
+        for(Map.Entry<String, String> skillEntry: result.entrySet()){
+            System.out.println("[parse result] key: " + skillEntry.getKey() + ", value: " + skillEntry.getValue() + " > " + service.name);
+            addServiceConfig(service.name, skillEntry.getKey(), skillEntry.getValue());
         }
         return result;
     }

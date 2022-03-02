@@ -78,7 +78,8 @@ public class JenkinsService {
      */
     public String getJenkinsLatestBuildNumber(Config config, String targetService){
         String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
-        System.out.println("[DEBUG] try to request latest build data from " + buildStatusRequestUrl);
+        System.out.println("[DEBUG][build number] received config : " + config);
+        System.out.println("[DEBUG][build number] try to request latest build data from " + buildStatusRequestUrl);
         try{
             ResponseEntity<String> resp = basicJenkinsRequest(buildStatusRequestUrl, config.username, config.accessToken);
             Gson gson  = new Gson();
@@ -99,7 +100,8 @@ public class JenkinsService {
      */
     public String getJenkinsTestReport(Config config, String targetService){
         String requestUrl = config.endpoint + "/job/" + targetService + "/" + config.buildNumber + "/testReport/api/json";
-        System.out.println("[DEBUG] try to request test report data from " + requestUrl);
+        System.out.println("[DEBUG][test report] received config : " + config);
+        System.out.println("[DEBUG][test report] try to request test report data from " + requestUrl);
         try{
             ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, config.username, config.accessToken);
             return new Gson().toJson(resp.getBody());
@@ -113,6 +115,7 @@ public class JenkinsService {
     public String getDirectJenkinsTestReport(Config config, String targetService){
         // retrieve the latest build number
         String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
+        System.out.println("[DEBUG] received config : " + config);
         System.out.println("[DEBUG] try to request latest build data from " + buildStatusRequestUrl);
         try {
             ResponseEntity<String> buildResp = basicJenkinsRequest(buildStatusRequestUrl, config.username, config.accessToken);

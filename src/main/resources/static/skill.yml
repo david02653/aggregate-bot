@@ -44,6 +44,7 @@ availableSkillList:
       - targetService
     output:
       type: plainText
+      tag: buildNumber
   - name: Jenkins-semi-test-report
     type: skill
     description: get jenkins test report
