@@ -56,6 +56,7 @@ public class ConfigLoader {
         loadKeywordConfig();
         loadAgentConfig();
         loadSkillConfig();
+        loadBigIntentConfig();
         loadServiceConfig();
         verifySkillInputKeyword();
     }
