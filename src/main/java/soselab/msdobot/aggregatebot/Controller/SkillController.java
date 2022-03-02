@@ -28,10 +28,10 @@ public class SkillController {
      * @param requestBody
      */
     @PostMapping(value = "/jenkins-health")
-    public ResponseEntity<String> requestJenkinsHealthData(@RequestBody RequestConfig requestBody){
+    public ResponseEntity<String> requestJenkinsHealthData(@RequestBody Config requestBody){
         System.out.println(new Gson().toJson(requestBody));
-        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(config, requestBody.targetService));
+//        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
+        return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(requestBody, requestBody.targetService));
     }
 
     @PostMapping(value = "/jenkins-testReport")

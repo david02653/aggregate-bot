@@ -114,7 +114,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void testSkillSelector(){
-        RasaIntent intent = new RasaIntent("get_path", "Fake-System");
+        RasaIntent intent = new RasaIntent("ask_job_health_report", "Payment");
         orchestrator.skillSelector(intent);
     }
 
