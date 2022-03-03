@@ -66,6 +66,8 @@ public class Orchestrator {
             // todo: store previous skill info, add output data mapping
             // fire skill request for every sub-service
             // todo: check if every thread execute successfully, use future.get() and add return type
+            // todo: sequenced get skill ?, sequenced skill request with custom data struct ?
+            // todo: any world changing skill ?
             if(skill.method.equals("POST")) {
                 for (SubService subService : subServiceList) {
                     System.out.println("[DEBUG] current subService " + gson.toJson(subService));
