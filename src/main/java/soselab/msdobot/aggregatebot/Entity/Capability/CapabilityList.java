@@ -16,18 +16,18 @@ public class CapabilityList {
 
     /**
      * get available skill by correspond intent
-     * @param correspondIntent
-     * @return correspond skill array list, otherwise empty array list
+     * @param correspondIntent correspond atomic intent
+     * @return correspond capability array list, otherwise empty array list
      */
-    public ArrayList<Capability> getSkill(String correspondIntent){
+    public ArrayList<Capability> getCapability(String correspondIntent){
         for(Capability capability : availableCapabilityList){
-            if(capability.correspondIntent.equals(correspondIntent))
+            if(capability.atomicIntent.equals(correspondIntent))
                 return new ArrayList<Capability>(Collections.singletonList(capability));
         }
         return new ArrayList<>();
     }
 
-    public ArrayList<Capability> getCompleteSkill(ArrayList<Capability> semiCapabilityList){
+    public ArrayList<Capability> getCompleteCapability(ArrayList<Capability> semiCapabilityList){
         ArrayList<Capability> resultList = new ArrayList<>();
         for(Capability semiCapability : semiCapabilityList){
             for(Capability capability : availableCapabilityList){

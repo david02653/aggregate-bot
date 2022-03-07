@@ -9,13 +9,13 @@ import java.util.Comparator;
 public class UpperIntent {
 
     public String name;
-    public String correspondIntent;
+    public String upperIntent;
     public ArrayList<Capability> sequencedCapabilityList;
 
     public UpperIntent(){
     }
 
-    public ArrayList<Capability> getSequencedSemiSkillList(){
+    public ArrayList<Capability> getSequencedSemiCapabilityList(){
         sortSequencedCapabilityList();
         return new ArrayList<>(sequencedCapabilityList);
     }

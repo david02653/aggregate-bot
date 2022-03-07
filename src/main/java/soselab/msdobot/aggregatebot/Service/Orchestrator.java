@@ -42,7 +42,7 @@ public class Orchestrator {
         Future<HashMap<String, String>> future;
 
         // get correspond skill by intent name
-        ArrayList<Capability> capabilityList = getCorrespondSkillList(intentName);
+        ArrayList<Capability> capabilityList = getCorrespondCapabilityList(intentName);
         if(capabilityList == null || capabilityList.isEmpty()) {
             System.out.println(">> [DEBUG] No available skill found.");
             return;
@@ -104,11 +104,11 @@ public class Orchestrator {
      * @param intent
      * @return
      */
-    public ArrayList<Capability> getCorrespondSkillList(String intent){
-        ArrayList<Capability> resultList = ConfigLoader.capabilityList.getSkill(intent);
+    public ArrayList<Capability> getCorrespondCapabilityList(String intent){
+        ArrayList<Capability> resultList = ConfigLoader.capabilityList.getCapability(intent);
         if(resultList.isEmpty()) {
 //            resultList = ConfigLoader.bigIntentList.getSemiSkillList(intent);
-            resultList = ConfigLoader.capabilityList.getCompleteSkill(ConfigLoader.upperIntentList.getSemiCapabilityList(intent));
+            resultList = ConfigLoader.capabilityList.getCompleteCapability(ConfigLoader.upperIntentList.getSemiCapabilityList(intent));
         }
         return resultList;
     }

@@ -3,7 +3,7 @@ availableSkillList:
     type: skill
     description: check job health status on jenkins server
     method: POST
-    correspondIntent: ask_job_health_report
+    atomicIntent: ask_job_health_report
     apiEndpoint: http://localhost:8888/skill/jenkins-health
     input:
       - username
@@ -22,7 +22,7 @@ availableSkillList:
     type: skill
     description: check test report of specific job on jenkins server
     method: POST
-    correspondIntent: ask_job_test_report
+    atomicIntent: ask_job_test_report
     apiEndpoint: http://localhost:8888/skill/jenkins-testReport
     input:
       - username
@@ -35,7 +35,7 @@ availableSkillList:
     type: skill
     description: get latest jenkins job build number
     method: POST
-    correspondIntent: ask_jenkins_job_build_number
+    atomicIntent: ask_jenkins_job_build_number
     apiEndpoint: http://localhost:8888/skill/jenkins-buildNumber
     input:
       - username
@@ -49,7 +49,7 @@ availableSkillList:
     type: skill
     description: get jenkins test report
     method: POST
-    correspondIntent: ask_jenkins_semi_test_report
+    atomicIntent: ask_jenkins_semi_test_report
     apiEndpoint: http://localhost:8888/skill/jenkins-testReport-semi
     input:
       - username
@@ -63,7 +63,7 @@ availableSkillList:
     type: skill
     description: try to use get method with request param
     method: GET
-    correspondIntent: get_this
+    atomicIntent: get_this
     apiEndpoint: http://localhost:8888/skill/fake
     input:
       - username
@@ -74,7 +74,7 @@ availableSkillList:
     type: skill
     description: try to use get method with path variable
     method: GET
-    correspondIntent: get_path
+    atomicIntent: get_path
     apiEndpoint: http://localhost:8888/skill/fake-variable/{username}
     input:
       - username
@@ -84,7 +84,7 @@ availableSkillList:
     type: skill
     description: dummy illegal skill
     method: POST
-    correspondIntent: none
+    atomicIntent: none
     apiEndpoint: url
     input:
       - fake-input

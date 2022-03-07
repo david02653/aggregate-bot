@@ -14,8 +14,8 @@ public class UpperIntentList {
 
     public ArrayList<Capability> getSemiCapabilityList(String intent){
         for(UpperIntent upperIntent : crossCapabilityList){
-            if(upperIntent.correspondIntent.equals(intent)) {
-                return upperIntent.getSequencedSemiSkillList();
+            if(upperIntent.upperIntent.equals(intent)) {
+                return upperIntent.getSequencedSemiCapabilityList();
             }
         }
         return new ArrayList<>();

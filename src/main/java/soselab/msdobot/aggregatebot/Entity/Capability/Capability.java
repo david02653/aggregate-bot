@@ -8,7 +8,7 @@ public class Capability {
     public String order;
     public String description;
     public String method;
-    public String correspondIntent;
+    public String atomicIntent;
     public String apiEndpoint;
     public ArrayList<String> input;
     public CapabilityOutput output;
