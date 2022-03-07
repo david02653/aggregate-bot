@@ -4,7 +4,7 @@ availableSkillList:
     description: check job health status on jenkins server
     method: POST
     correspondIntent: ask_job_health_report
-    endpoint: http://localhost:8888/skill/jenkins-health
+    apiEndpoint: http://localhost:8888/skill/jenkins-health
     input:
       - username
       - accessToken
@@ -23,7 +23,7 @@ availableSkillList:
     description: check test report of specific job on jenkins server
     method: POST
     correspondIntent: ask_job_test_report
-    endpoint: http://localhost:8888/skill/jenkins-testReport
+    apiEndpoint: http://localhost:8888/skill/jenkins-testReport
     input:
       - username
       - accessToken
@@ -36,7 +36,7 @@ availableSkillList:
     description: get latest jenkins job build number
     method: POST
     correspondIntent: ask_jenkins_job_build_number
-    endpoint: http://localhost:8888/skill/jenkins-buildNumber
+    apiEndpoint: http://localhost:8888/skill/jenkins-buildNumber
     input:
       - username
       - accessToken
@@ -44,13 +44,13 @@ availableSkillList:
       - targetService
     output:
       type: plainText
-      tag: buildNumber
+      storedData: buildNumber
   - name: Jenkins-semi-test-report
     type: skill
     description: get jenkins test report
     method: POST
     correspondIntent: ask_jenkins_semi_test_report
-    endpoint: http://localhost:8888/skill/jenkins-testReport-semi
+    apiEndpoint: http://localhost:8888/skill/jenkins-testReport-semi
     input:
       - username
       - accessToken
@@ -64,7 +64,7 @@ availableSkillList:
     description: try to use get method with request param
     method: GET
     correspondIntent: get_this
-    endpoint: http://localhost:8888/skill/fake
+    apiEndpoint: http://localhost:8888/skill/fake
     input:
       - username
       - accessToken
@@ -75,7 +75,7 @@ availableSkillList:
     description: try to use get method with path variable
     method: GET
     correspondIntent: get_path
-    endpoint: http://localhost:8888/skill/fake-variable/{username}
+    apiEndpoint: http://localhost:8888/skill/fake-variable/{username}
     input:
       - username
     output:
@@ -85,7 +85,7 @@ availableSkillList:
     description: dummy illegal skill
     method: POST
     correspondIntent: none
-    endpoint: url
+    apiEndpoint: url
     input:
       - fake-input
       - username

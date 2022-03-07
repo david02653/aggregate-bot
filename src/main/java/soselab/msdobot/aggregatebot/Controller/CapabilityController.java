@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import soselab.msdobot.aggregatebot.Entity.RequestConfig;
 import soselab.msdobot.aggregatebot.Entity.Service.Config;
 import soselab.msdobot.aggregatebot.Service.JenkinsService;
 
@@ -13,12 +12,12 @@ import soselab.msdobot.aggregatebot.Service.JenkinsService;
  */
 @RestController
 @RequestMapping(value = "/skill")
-public class SkillController {
+public class CapabilityController {
 
     private final JenkinsService jenkinsService;
 
     @Autowired
-    public SkillController(JenkinsService jenkinsService){
+    public CapabilityController(JenkinsService jenkinsService){
         this.jenkinsService = jenkinsService;
     }
 

@@ -1,7 +1,7 @@
-crossSkillList:
+crossCapabilityList:
   - name: test-jenkins-health
     correspondIntent: test-jenkins-health
-    sequencedSkillList:
+    sequencedCapabilityList:
       # please use skills that are already exist !
       - name: Jenkins-latest-build-number
         order: 0

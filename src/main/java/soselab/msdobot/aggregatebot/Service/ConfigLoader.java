@@ -8,14 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import soselab.msdobot.aggregatebot.Entity.Agent.AgentList;
-import soselab.msdobot.aggregatebot.Entity.BigIntent.BigIntent;
-import soselab.msdobot.aggregatebot.Entity.BigIntent.BigIntentList;
-import soselab.msdobot.aggregatebot.Entity.Keyword.Keyword;
+import soselab.msdobot.aggregatebot.Entity.UpperIntent.UpperIntentList;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.Vocabulary;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceList;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceSystem;
 import soselab.msdobot.aggregatebot.Entity.Service.SubService;
-import soselab.msdobot.aggregatebot.Entity.Skill.Skill;
-import soselab.msdobot.aggregatebot.Entity.Skill.SkillList;
+import soselab.msdobot.aggregatebot.Entity.Capability.Capability;
+import soselab.msdobot.aggregatebot.Entity.Capability.CapabilityList;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,15 +32,15 @@ public class ConfigLoader {
     private YAMLParser parser;
     private final String agentConfigPath;
     private final String serviceConfigPath;
-    private final String skillConfigPath;
-    private final String bigIntentConfigPath;
-    private final String keywordConfigPath;
+    private final String capabilityConfigPath;
+    private final String upperIntentConfigPath;
+    private final String vocabularyConfigPath;
 
     public static AgentList agentList;
     public static ServiceList serviceList;
-    public static SkillList skillList;
-    public static BigIntentList bigIntentList;
-    public static Keyword keywordList;
+    public static CapabilityList capabilityList;
+    public static UpperIntentList upperIntentList;
+    public static Vocabulary vocabularyList;
 
     @Autowired
     public ConfigLoader(Environment env){
@@ -49,16 +48,16 @@ public class ConfigLoader {
         mapper = new ObjectMapper();
         agentConfigPath = env.getProperty("bot.config.agent");
         serviceConfigPath = env.getProperty("bot.config.service");
-        skillConfigPath = env.getProperty("bot.config.skill");
-        bigIntentConfigPath = env.getProperty("bot.config.bigIntent");
-        keywordConfigPath = env.getProperty("bot.config.keyword");
+        capabilityConfigPath = env.getProperty("bot.config.capability");
+        upperIntentConfigPath = env.getProperty("bot.config.upperIntent");
+        vocabularyConfigPath = env.getProperty("bot.config.vocabulary");
 
-        loadKeywordConfig();
+        loadVocabularyConfig();
         loadAgentConfig();
-        loadSkillConfig();
-        loadBigIntentConfig();
+        loadCapabilityConfig();
+        loadUpperIntentConfig();
         loadServiceConfig();
-        verifySkillInputKeyword();
+        verifyCapabilityInputKeyword();
     }
 
     public void loadAgentConfig(){
@@ -73,27 +72,27 @@ public class ConfigLoader {
         }
     }
 
-    public void loadSkillConfig(){
+    public void loadCapabilityConfig(){
         try{
-            System.out.println("> try to parse skill config from " + skillConfigPath);
-            parser = yamlFactory.createParser(new File(skillConfigPath));
-            skillList = mapper.readValue(parser, SkillList.class);
-            System.out.println(skillList);
+            System.out.println("> try to parse skill config from " + capabilityConfigPath);
+            parser = yamlFactory.createParser(new File(capabilityConfigPath));
+            capabilityList = mapper.readValue(parser, CapabilityList.class);
+            System.out.println(capabilityList);
         }catch (IOException ioe){
             ioe.printStackTrace();
-            System.out.println("> [DEBUG] skill config file load failed.");
+            System.out.println("> [DEBUG] capability config file load failed.");
         }
     }
 
-    public void loadBigIntentConfig(){
+    public void loadUpperIntentConfig(){
         try{
-            System.out.println("> try to parse big intent config from " + bigIntentConfigPath);
-            parser = yamlFactory.createParser(new File(bigIntentConfigPath));
-            bigIntentList = mapper.readValue(parser, BigIntentList.class);
-            System.out.println(bigIntentList);
+            System.out.println("> try to parse upper intent config from " + upperIntentConfigPath);
+            parser = yamlFactory.createParser(new File(upperIntentConfigPath));
+            upperIntentList = mapper.readValue(parser, UpperIntentList.class);
+            System.out.println(upperIntentList);
         }catch (IOException ioe){
             ioe.printStackTrace();
-            System.out.println("> [DEBUG] big intent config file load failed.");
+            System.out.println("> [DEBUG] upper intent config file load failed.");
         }
     }
 
@@ -110,12 +109,12 @@ public class ConfigLoader {
         }
     }
 
-    public void loadKeywordConfig(){
+    public void loadVocabularyConfig(){
         try{
             System.out.println("> try to parse keyword config from ");
-            parser = yamlFactory.createParser(new File(keywordConfigPath));
-            keywordList = mapper.readValue(parser,  Keyword.class);
-            System.out.println(new Gson().toJson(keywordList));
+            parser = yamlFactory.createParser(new File(vocabularyConfigPath));
+            vocabularyList = mapper.readValue(parser,  Vocabulary.class);
+            System.out.println(new Gson().toJson(vocabularyList));
         }catch (IOException ioe){
             ioe.printStackTrace();
             System.out.println("> [DEBUG] keyword config file load failed.");
@@ -149,27 +148,27 @@ public class ConfigLoader {
     }
 
     /**
-     * verify all listed keyword in skill specification file is legal
+     * verify all listed vocabulary in capability specification file is legal
      */
-    public void verifySkillInputKeyword(){
-        Iterator<Skill> skillIterator = skillList.availableSkillList.iterator();
-        while(skillIterator.hasNext()){
-            Skill currentSkill = skillIterator.next();
+    public void verifyCapabilityInputKeyword(){
+        Iterator<Capability> capabilityIterator = capabilityList.availableCapabilityList.iterator();
+        while(capabilityIterator.hasNext()){
+            Capability currentCapability = capabilityIterator.next();
             // check input type
-            if(currentSkill.input.stream().anyMatch(input -> !keywordList.input.contains(input))){
-                System.out.println("[DEBUG] illegal input found in Skill '" + currentSkill.name + "'.");
-                System.out.println("[DEBUG] auto remove illegal Skill '" + currentSkill.name + "'.");
-                skillIterator.remove();
+            if(currentCapability.input.stream().anyMatch(input -> !vocabularyList.input.contains(input))){
+                System.out.println("[DEBUG] illegal input found in Capability '" + currentCapability.name + "'.");
+                System.out.println("[DEBUG] auto remove illegal Capability '" + currentCapability.name + "'.");
+                capabilityIterator.remove();
                 continue; // move on to next skill if current one get removed
             }
             // check output type
-            if(!keywordList.output.contains(currentSkill.output.type)){
-                System.out.println("[DEBUG] illegal output found in Skill '" + currentSkill.name + "'.");
-                System.out.println("[DEBUG] auto remove illegal Skill '" + currentSkill.name + "'.");
-                skillIterator.remove();
+            if(!vocabularyList.output.contains(currentCapability.output.type)){
+                System.out.println("[DEBUG] illegal output found in Capability '" + currentCapability.name + "'.");
+                System.out.println("[DEBUG] auto remove illegal Capability '" + currentCapability.name + "'.");
+                capabilityIterator.remove();
             }
         }
-        System.out.println(new Gson().toJson(skillList));
+        System.out.println(new Gson().toJson(capabilityList));
 //        skillList.availableSkillList.removeIf(skill ->
 //            skill.input.stream().anyMatch(input -> !keywordList.keyword.contains(input)));
     }

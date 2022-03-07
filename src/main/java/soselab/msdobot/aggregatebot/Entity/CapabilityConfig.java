@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 
 import java.util.HashMap;
 
-public class SkillConfig {
+public class CapabilityConfig {
 
     public HashMap<String, String> content;
     // todo: add session timeout
 
-    public SkillConfig(){
+    public CapabilityConfig(){
         content = new HashMap<>();
     }
 

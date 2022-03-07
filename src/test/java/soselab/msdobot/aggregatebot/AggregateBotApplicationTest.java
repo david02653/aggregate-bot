@@ -57,7 +57,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void loadSkillConfigTest(){
-        configLoader.loadSkillConfig();
+        configLoader.loadCapabilityConfig();
     }
 
     /**
@@ -65,7 +65,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void loadBigIntentConfigTest(){
-        configLoader.loadBigIntentConfig();
+        configLoader.loadUpperIntentConfig();
     }
 
     /**
@@ -73,7 +73,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void loadKeywordConfigTest(){
-        configLoader.loadKeywordConfig();
+        configLoader.loadVocabularyConfig();
     }
 
     /**
@@ -114,8 +114,8 @@ class AggregateBotApplicationTest {
      */
     @Test
     void testSkillSelector(){
-        RasaIntent intent = new RasaIntent("test-jenkins-health", "Payment");
-        orchestrator.skillSelector(intent);
+        RasaIntent intent = new RasaIntent("test-jenkins-health", "Cinema");
+        orchestrator.capabilitySelector(intent);
     }
 
     /**
@@ -126,7 +126,7 @@ class AggregateBotApplicationTest {
     void testUserInput(){
         String userUtterance = "test report of Ordering";
         RasaIntent intent = rasaService.restrictedIntentParsing(rasaService.analyze(userUtterance));
-        orchestrator.skillSelector(intent);
+        orchestrator.capabilitySelector(intent);
     }
 
     /**
@@ -135,7 +135,7 @@ class AggregateBotApplicationTest {
     @Test
     void testGetMethod(){
         RasaIntent intent = new RasaIntent("get_this", "FakeOne");
-        orchestrator.skillSelector(intent);
+        orchestrator.capabilitySelector(intent);
     }
 
     /**
@@ -152,17 +152,17 @@ class AggregateBotApplicationTest {
      */
     @Test
     void autoRemoveIllegalSkillTest(){
-        configLoader.loadSkillConfig();
-        configLoader.verifySkillInputKeyword();
+        configLoader.loadCapabilityConfig();
+        configLoader.verifyCapabilityInputKeyword();
     }
 
     @Test
     void testJsonPath(){
         Gson gson = new Gson();
-        configLoader.loadSkillConfig();
+        configLoader.loadCapabilityConfig();
 //        String dataPath = "$.availableSkillList[*].name";
         String dataPath = "$.availableSkillList[0]";
-        System.out.println(JsonPath.read(gson.toJson(configLoader.skillList), dataPath).toString());
+        System.out.println(JsonPath.read(gson.toJson(configLoader.capabilityList), dataPath).toString());
     }
 
     @Test

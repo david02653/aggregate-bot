@@ -1,9 +1,9 @@
-package soselab.msdobot.aggregatebot.Entity.Skill;
+package soselab.msdobot.aggregatebot.Entity.Capability;
 
 public class JsonInfo {
     public String jsonPath;
     public String description;
-    public String tag = "";
+    public String storedData = "";
 
     public JsonInfo(){
     }

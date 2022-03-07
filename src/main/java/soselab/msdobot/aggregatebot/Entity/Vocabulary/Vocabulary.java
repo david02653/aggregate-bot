@@ -1,14 +1,14 @@
-package soselab.msdobot.aggregatebot.Entity.Keyword;
+package soselab.msdobot.aggregatebot.Entity.Vocabulary;
 
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class Keyword {
+public class Vocabulary {
     public ArrayList<String> input;
     public ArrayList<String> output;
 
-    public Keyword(){
+    public Vocabulary(){
     }
 
     @Override
