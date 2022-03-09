@@ -11,7 +11,7 @@ import soselab.msdobot.aggregatebot.Service.JenkinsService;
  * declare all skills unit
  */
 @RestController
-@RequestMapping(value = "/skill")
+@RequestMapping(value = "/capability")
 public class CapabilityController {
 
     private final JenkinsService jenkinsService;

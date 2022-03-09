@@ -1,10 +1,10 @@
-availableSkillList:
+availableCapabilityList:
   - name: Jenkins-health
-    type: skill
+    type: capability
     description: check job health status on jenkins server
     method: POST
     atomicIntent: ask_job_health_report
-    apiEndpoint: http://localhost:8888/skill/jenkins-health
+    apiEndpoint: http://localhost:8888/capability/jenkins-health
     input:
       - username
       - accessToken
@@ -19,11 +19,11 @@ availableSkillList:
           description: build summary
       # rendering: rendering-type
   - name: Jenkins-test-report
-    type: skill
+    type: capability
     description: check test report of specific job on jenkins server
     method: POST
     atomicIntent: ask_job_test_report
-    apiEndpoint: http://localhost:8888/skill/jenkins-testReport
+    apiEndpoint: http://localhost:8888/capability/jenkins-testReport
     input:
       - username
       - accessToken
@@ -32,11 +32,11 @@ availableSkillList:
     output:
       type: json
   - name: Jenkins-latest-build-number
-    type: skill
+    type: capability
     description: get latest jenkins job build number
     method: POST
     atomicIntent: ask_jenkins_job_build_number
-    apiEndpoint: http://localhost:8888/skill/jenkins-buildNumber
+    apiEndpoint: http://localhost:8888/capability/jenkins-buildNumber
     input:
       - username
       - accessToken
@@ -46,11 +46,11 @@ availableSkillList:
       type: plainText
       storedData: buildNumber
   - name: Jenkins-semi-test-report
-    type: skill
+    type: capability
     description: get jenkins test report
     method: POST
     atomicIntent: ask_jenkins_semi_test_report
-    apiEndpoint: http://localhost:8888/skill/jenkins-testReport-semi
+    apiEndpoint: http://localhost:8888/capability/jenkins-testReport-semi
     input:
       - username
       - accessToken
@@ -60,29 +60,29 @@ availableSkillList:
     output:
       type: plainText
   - name: Fake-test-skill
-    type: skill
+    type: capability
     description: try to use get method with request param
     method: GET
     atomicIntent: get_this
-    apiEndpoint: http://localhost:8888/skill/fake
+    apiEndpoint: http://localhost:8888/capability/fake
     input:
       - username
       - accessToken
     output:
       type: plaintext
   - name: Fake-skill-pathvariable
-    type: skill
+    type: capability
     description: try to use get method with path variable
     method: GET
     atomicIntent: get_path
-    apiEndpoint: http://localhost:8888/skill/fake-variable/{username}
+    apiEndpoint: http://localhost:8888/capability/fake-variable/{username}
     input:
       - username
     output:
       type: plainText
   - name: illegal-skill
-    type: skill
-    description: dummy illegal skill
+    type: capability
+    description: dummy illegal capability
     method: POST
     atomicIntent: none
     apiEndpoint: url

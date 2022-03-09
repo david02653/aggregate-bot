@@ -249,6 +249,14 @@ public class Orchestrator {
     }
 
     /**
+     * expire all current service session config
+     */
+    private void expireAllSessionData(){
+        Orchestrator.sessionData = new ConcurrentHashMap<>();
+        System.out.println("[DEBUG] all session config is expired !");
+    }
+
+    /**
      * check target service is on System level or sub-service level
      * @param serviceName target service name
      * @return if target service is a system or not, return true if true

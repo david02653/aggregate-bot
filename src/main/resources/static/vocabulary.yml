@@ -1,3 +1,4 @@
+availableVocabularyList:
 input:
   - accessToken
   - username
@@ -8,3 +9,10 @@ output:
   - plainText
   - json
 # todo: custom data struct ?
+customDataStructMapping:
+  - mappingName: patternA
+    description: custom mapping example
+    schema: {myDataUser: $username, myAccessToken: $accessToken}
+    vocabularyBinding:
+      - username
+      - accessToken
