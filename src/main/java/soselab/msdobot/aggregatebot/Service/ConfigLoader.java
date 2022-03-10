@@ -4,11 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import com.google.gson.Gson;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import soselab.msdobot.aggregatebot.Entity.Agent.AgentList;
 import soselab.msdobot.aggregatebot.Entity.UpperIntent.UpperIntentList;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
 import soselab.msdobot.aggregatebot.Entity.Vocabulary.Vocabulary;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceList;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceSystem;
@@ -18,6 +22,7 @@ import soselab.msdobot.aggregatebot.Entity.Capability.CapabilityList;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -53,11 +58,12 @@ public class ConfigLoader {
         vocabularyConfigPath = env.getProperty("bot.config.vocabulary");
 
         loadVocabularyConfig();
+        verifyCustomMappingVocabulary();
         loadAgentConfig();
         loadCapabilityConfig();
         loadUpperIntentConfig();
         loadServiceConfig();
-        verifyCapabilityInputKeyword();
+        verifyCapabilityInputVocabulary();
     }
 
     public void loadAgentConfig(){
@@ -147,15 +153,20 @@ public class ConfigLoader {
         System.out.println("---");
     }
 
+    private boolean isInputVocabularyLegal(String input){
+        return vocabularyList.input.contains(input) || vocabularyList.customMappingHashMap.containsKey(input);
+    }
+
     /**
      * verify all listed vocabulary in capability specification file is legal
      */
-    public void verifyCapabilityInputKeyword(){
+    public void verifyCapabilityInputVocabulary(){
         Iterator<Capability> capabilityIterator = capabilityList.availableCapabilityList.iterator();
         while(capabilityIterator.hasNext()){
             Capability currentCapability = capabilityIterator.next();
+            System.out.println(currentCapability);
             // check input type
-            if(currentCapability.input.stream().anyMatch(input -> !vocabularyList.input.contains(input))){
+            if(currentCapability.input.stream().anyMatch(input -> !isInputVocabularyLegal(input))){
                 System.out.println("[DEBUG] illegal input found in Capability '" + currentCapability.name + "'.");
                 System.out.println("[DEBUG] auto remove illegal Capability '" + currentCapability.name + "'.");
                 capabilityIterator.remove();
@@ -171,6 +182,44 @@ public class ConfigLoader {
         System.out.println(new Gson().toJson(capabilityList));
 //        skillList.availableSkillList.removeIf(skill ->
 //            skill.input.stream().anyMatch(input -> !keywordList.keyword.contains(input)));
+    }
+
+    public void verifyCustomMappingVocabulary(){
+        // check custom mapping binding vocabulary and schema
+        Iterator<CustomMapping> mappingsIterator = vocabularyList.customMappingList.iterator();
+        while(mappingsIterator.hasNext()){
+            CustomMapping mapping = mappingsIterator.next();
+            ArrayList<String> bindingVocabularyList = mapping.usedVocabulary;
+            // check binding vocabulary
+            if(!vocabularyList.input.containsAll(bindingVocabularyList)){
+                System.out.println("[DEBUG] illegal vocabulary found in mapping '" + mapping.mappingName + "'");
+                mappingsIterator.remove();
+                continue;
+            }
+            // check schema
+            String mappingSchema = mapping.schema;
+            for(String input: bindingVocabularyList)
+                mappingSchema = mappingSchema.replaceAll("\\$" + input, input);
+            if(!isValidJsonString(mappingSchema)){
+                System.out.println("[DEBUG] schema of mapping '" + mapping.mappingName + "' is not a json string");
+                mappingsIterator.remove();
+            }
+        }
+        vocabularyList.createCustomMappingHashMap();
+        System.out.println(new Gson().toJson(vocabularyList));
+    }
+
+    private boolean isValidJsonString(String raw){
+        try{
+            new JSONObject(raw);
+        }catch (JSONException e){
+            try{
+                new JSONArray(raw);
+            }catch (JSONException je){
+                return false;
+            }
+        }
+        return true;
     }
 
 }

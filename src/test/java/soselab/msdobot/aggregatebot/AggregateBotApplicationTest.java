@@ -3,6 +3,9 @@ package soselab.msdobot.aggregatebot;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.jayway.jsonpath.JsonPath;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +13,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Entity.Service.Config;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
 import soselab.msdobot.aggregatebot.Service.*;
+
+import java.util.ArrayList;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-dev.properties")
@@ -72,8 +78,42 @@ class AggregateBotApplicationTest {
      * test if keyword yaml setting file load successfully
      */
     @Test
-    void loadKeywordConfigTest(){
+    void loadVocabularyConfigTest(){
         configLoader.loadVocabularyConfig();
+    }
+
+    @Test
+    void testVocabularyCustomMappingFormat(){
+        configLoader.loadVocabularyConfig();
+        ArrayList<CustomMapping> customMappings = ConfigLoader.vocabularyList.customMappingList;
+        for(CustomMapping mapping: customMappings){
+            ArrayList<String> bindingList = mapping.usedVocabulary;
+            String schema = mapping.schema;
+            for(String input: bindingList){
+                schema = schema.replaceAll("\\$" + input, input);
+            }
+            System.out.println("[modified] " + schema);
+            System.out.println("[result] " + isValidJsonString(schema));
+        }
+    }
+
+    @Test
+    void testVocabularyCustomMappingValidation(){
+        configLoader.loadVocabularyConfig();
+        configLoader.verifyCustomMappingVocabulary();
+    }
+
+    private boolean isValidJsonString(String raw){
+        try{
+            new JSONObject(raw);
+        }catch (JSONException je){
+            try{
+                new JSONArray(raw);
+            }catch (JSONException jae){
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -138,6 +178,12 @@ class AggregateBotApplicationTest {
         orchestrator.capabilitySelector(intent);
     }
 
+    @Test
+    void testCustomMappingRequest(){
+        RasaIntent intent = new RasaIntent("ask_job_view_list", "Cinema");
+        orchestrator.capabilitySelector(intent);
+    }
+
     /**
      * test if jenkins test report code block works correctly
      */
@@ -153,7 +199,7 @@ class AggregateBotApplicationTest {
     @Test
     void autoRemoveIllegalSkillTest(){
         configLoader.loadCapabilityConfig();
-        configLoader.verifyCapabilityInputKeyword();
+        configLoader.verifyCapabilityInputVocabulary();
     }
 
     @Test

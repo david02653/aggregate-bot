@@ -1,4 +1,3 @@
-availableVocabularyList:
 input:
   - accessToken
   - username
@@ -9,10 +8,34 @@ output:
   - plainText
   - json
 # todo: custom data struct ?
-customDataStructMapping:
-  - mappingName: patternA
-    description: custom mapping example
-    schema: {myDataUser: $username, myAccessToken: $accessToken}
-    vocabularyBinding:
+customMappingList:
+  - mappingName: jsonObject
+    description: custom json object mapping example
+    schema: "{myDataUser: $username, myAccessToken: $accessToken}"
+    usedVocabulary:
       - username
       - accessToken
+  - mappingName: jsonArray
+    description: custom json array mapping example
+    schema: "[$username, $accessToken]"
+    usedVocabulary:
+      - username
+      - accessToken
+  - mappingName: illegal-pattern-1
+    description: fake mapping with illegal vocabulary
+    schema: "{}"
+    usedVocabulary:
+      - username
+      - error
+  - mappingName: illegal-pattern-2
+    description: fake mapping with illegal schema
+    schema: "{error: }"
+    usedVocabulary:
+      - username
+  - mappingName: Jenkins-info
+    description: basic jenkins info, include username, accessToken and endpoint
+    schema: "{name: \"$username\", token: \"$accessToken\", url: \"$endpoint\"}"
+    usedVocabulary:
+      - username
+      - accessToken
+      - endpoint

@@ -11,6 +11,7 @@ import soselab.msdobot.aggregatebot.Entity.CapabilityConfig;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Entity.Service.SubService;
 import soselab.msdobot.aggregatebot.Entity.Capability.JsonInfo;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ public class Orchestrator {
         final List<Future<HashMap<String, String>>> futures = new ArrayList<>();
         Future<HashMap<String, String>> future;
 
-        // get correspond skill by intent name
+        // get correspond capability by intent name
         ArrayList<Capability> capabilityList = getCorrespondCapabilityList(intentName);
         if(capabilityList == null || capabilityList.isEmpty()) {
             System.out.println(">> [DEBUG] No available skill found.");
@@ -49,11 +50,7 @@ public class Orchestrator {
         }
         System.out.println("[DEBUG] available skill detected : " + gson.toJson(capabilityList));
 
-        // check if target is on system level
-//        if(ConfigLoader.serviceList.serviceMap.get(jobName) == null) {
-//            System.out.println("[DEBUG] target service not exist.");
-//            return;
-//        }
+        // get service list
         ArrayList<SubService> subServiceList = ConfigLoader.serviceList.getSubServiceList(jobName);
         System.out.println("[DEBUG] todo subService list: " + gson.toJson(subServiceList));
         if(subServiceList.isEmpty()) {
@@ -61,28 +58,33 @@ public class Orchestrator {
             return;
         }
 
-        // execute sequenced skill list
+        // execute sequenced capability list
         for(Capability capability : capabilityList){
-            // todo: store previous skill info, add output data mapping
+            // todo: store previous capability info, add output data mapping
             // fire skill request for every sub-service
-            // todo: check if every thread execute successfully, use future.get() and add return type
-            // todo: sequenced get skill ?, sequenced skill request with custom data struct ?
-            // todo: any world changing skill ?
+            // todo: any world changing capability ?
+
+            // check capability access level
+
             if(capability.method.equals("POST")) {
                 for (SubService subService : subServiceList) {
-                    System.out.println("[DEBUG] current subService " + gson.toJson(subService));
-                    future = executor.submit(() -> postRequestCapability(capability, subService));
-                    futures.add(future);
+                    if(capability.accessLevel.equals(subService.type)) {
+                        System.out.println("[DEBUG] current subService " + gson.toJson(subService));
+                        future = executor.submit(() -> postRequestCapability(capability, subService));
+                        futures.add(future);
+                    }
                 }
             }else{
                 // get method
                 for (SubService subService : subServiceList) {
                     System.out.println("[DEBUG] current subService " + gson.toJson(subService));
-                    if(!hasPathVariable(capability.apiEndpoint))
-                        future = executor.submit(() -> getRequestCapability(capability, subService));
-                    else
-                        future = executor.submit(() -> getRequestCapabilityViaPathVariable(capability, subService));
-                    futures.add(future);
+                    if(capability.accessLevel.equals(subService.type)) {
+                        if (!hasPathVariable(capability.apiEndpoint))
+                            future = executor.submit(() -> getRequestCapability(capability, subService));
+                        else
+                            future = executor.submit(() -> getRequestCapabilityViaPathVariable(capability, subService));
+                        futures.add(future);
+                    }
                 }
             }
             // collect futures and check if every thread works fine
@@ -127,22 +129,38 @@ public class Orchestrator {
         sessionData.put(serviceName, tempSession);
     }
 
+    public String generateCustomMappingConfig(String mapName, HashMap<String, String> serviceConfigMap, CapabilityConfig sessionConfig){
+        CustomMapping mapping = ConfigLoader.vocabularyList.customMappingHashMap.get(mapName);
+        String mappingSchema = mapping.schema;
+        for(String usedVocabulary: mapping.usedVocabulary){
+            if(serviceConfigMap.containsKey(usedVocabulary))
+                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, serviceConfigMap.get(usedVocabulary));
+            else
+                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, sessionConfig.content.get(usedVocabulary));
+        }
+        return mappingSchema;
+    }
+
     public HashMap<String, String> postRequestCapability(Capability capability, SubService service){
         HashMap<String, String> configMap = service.getConfigMap();
+        CapabilityConfig sessionConfig = sessionData.get(service.name);
         System.out.println("[DEBUG] config map: " + new Gson().toJson(configMap));
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JsonObject requestBody = new JsonObject();
+        // load config from service default config
         for(String key: capability.input){
-            requestBody.addProperty(key, configMap.get(key));
+            if(!ConfigLoader.vocabularyList.customMappingHashMap.containsKey(key))
+                requestBody.addProperty(key, configMap.get(key));
+            else
+                requestBody.addProperty(key, generateCustomMappingConfig(key, configMap, sessionConfig));
         }
-        // load previous capability config
+        // load previous capability config from session
         if(sessionData.containsKey(service.name)){
-            CapabilityConfig previousConfig = sessionData.get(service.name);
             for(String key: capability.input){
-                if(previousConfig.content.containsKey(key))
-                    requestBody.addProperty(key, previousConfig.content.get(key));
+                if(sessionConfig.content.containsKey(key))
+                    requestBody.addProperty(key, sessionConfig.content.get(key));
             }
         }
         System.out.println("[DEBUG][orchestrator][POST] requestBody: " + requestBody);

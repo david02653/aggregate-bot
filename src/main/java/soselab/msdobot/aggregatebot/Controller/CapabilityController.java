@@ -88,4 +88,14 @@ public class CapabilityController {
     public ResponseEntity<String> requestFakeGetSkillByPathVariable(@PathVariable String username){
         return ResponseEntity.ok("[Get Method][PathVariable] username=" + username);
     }
+
+    /**
+     * request jenkins view list
+     * @param requestBody
+     * @return
+     */
+    @PostMapping(value = "/jenkins-view-list")
+    public ResponseEntity<String> requestJenkinsViewList(@RequestBody String requestBody){
+        return ResponseEntity.ok(jenkinsService.getJenkinsViewList(requestBody));
+    }
 }

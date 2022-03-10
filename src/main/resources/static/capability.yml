@@ -1,6 +1,6 @@
 availableCapabilityList:
   - name: Jenkins-health
-    type: capability
+    accessLevel: service
     description: check job health status on jenkins server
     method: POST
     atomicIntent: ask_job_health_report
@@ -19,7 +19,7 @@ availableCapabilityList:
           description: build summary
       # rendering: rendering-type
   - name: Jenkins-test-report
-    type: capability
+    accessLevel: service
     description: check test report of specific job on jenkins server
     method: POST
     atomicIntent: ask_job_test_report
@@ -32,7 +32,7 @@ availableCapabilityList:
     output:
       type: json
   - name: Jenkins-latest-build-number
-    type: capability
+    accessLevel: service
     description: get latest jenkins job build number
     method: POST
     atomicIntent: ask_jenkins_job_build_number
@@ -46,7 +46,7 @@ availableCapabilityList:
       type: plainText
       storedData: buildNumber
   - name: Jenkins-semi-test-report
-    type: capability
+    accessLevel: service
     description: get jenkins test report
     method: POST
     atomicIntent: ask_jenkins_semi_test_report
@@ -59,8 +59,18 @@ availableCapabilityList:
       - buildNumber
     output:
       type: plainText
+  - name: Jenkins-view-list
+    accessLevel: system
+    description: get jenkins view list
+    method: POST
+    atomicIntent: ask_job_view_list
+    apiEndpoint: http://localhost:8888/capability/jenkins-view-list
+    input:
+      - Jenkins-info
+    output:
+      type: plainText
   - name: Fake-test-skill
-    type: capability
+    accessLevel: service
     description: try to use get method with request param
     method: GET
     atomicIntent: get_this
@@ -71,7 +81,7 @@ availableCapabilityList:
     output:
       type: plaintext
   - name: Fake-skill-pathvariable
-    type: capability
+    accessLevel: service
     description: try to use get method with path variable
     method: GET
     atomicIntent: get_path
@@ -81,7 +91,7 @@ availableCapabilityList:
     output:
       type: plainText
   - name: illegal-skill
-    type: capability
+    accessLevel: service
     description: dummy illegal capability
     method: POST
     atomicIntent: none

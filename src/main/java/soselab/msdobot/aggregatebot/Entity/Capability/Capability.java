@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Capability {
     public String name;
-    public String type;
+    public String accessLevel;
     public String order;
     public String description;
     public String method;

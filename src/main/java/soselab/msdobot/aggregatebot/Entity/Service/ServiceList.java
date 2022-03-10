@@ -36,6 +36,9 @@ public class ServiceList {
             // system level
             for(ServiceSystem serviceSystem: serviceList){
                 if(serviceSystem.name.equals(serviceName)) {
+                    // add system level data as sub service
+                    subServiceList.add(serviceMap.get(serviceName));
+                    // add sub service of target system
                     for(SubService subService: serviceSystem.subService){
                         subServiceList.add(serviceMap.get(subService.name));
                     }
