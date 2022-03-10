@@ -3,6 +3,7 @@ package soselab.msdobot.aggregatebot.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.jayway.jsonpath.JsonPath;
+import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,14 +30,21 @@ public class Orchestrator {
      * config of each service
      */
     public static ConcurrentHashMap<String, CapabilityConfig> sessionData;
+    private final String expireTrigger;
 
-    public Orchestrator(){
+    public Orchestrator(Environment env){
         sessionData = new ConcurrentHashMap<>();
+        expireTrigger = env.getProperty("bot.session.expire.trigger");
     }
 
     public void capabilitySelector(RasaIntent intent){
         String intentName = intent.getIntent();
         String jobName = intent.getJobName();
+        // check if try to expire session
+        if(intentName.equals(expireTrigger)){
+            expireAllSessionData();
+            return;
+        }
         Gson gson = new Gson();
         final ExecutorService executor = Executors.newFixedThreadPool(5);
         final List<Future<HashMap<String, String>>> futures = new ArrayList<>();
@@ -63,9 +71,6 @@ public class Orchestrator {
             // todo: store previous capability info, add output data mapping
             // fire skill request for every sub-service
             // todo: any world changing capability ?
-
-            // check capability access level
-
             if(capability.method.equals("POST")) {
                 for (SubService subService : subServiceList) {
                     if(capability.accessLevel.equals(subService.type)) {
@@ -98,7 +103,6 @@ public class Orchestrator {
                 e.printStackTrace();
             }
         }
-
     }
 
     /**
