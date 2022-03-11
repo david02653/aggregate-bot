@@ -138,9 +138,9 @@ public class Orchestrator {
         String mappingSchema = mapping.schema;
         for(String usedVocabulary: mapping.usedVocabulary){
             if(serviceConfigMap.containsKey(usedVocabulary))
-                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, serviceConfigMap.get(usedVocabulary));
+                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, "\"" + serviceConfigMap.get(usedVocabulary) + "\"");
             else
-                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, sessionConfig.content.get(usedVocabulary));
+                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, "\"" + sessionConfig.content.get(usedVocabulary) + "\"");
         }
         return mappingSchema;
     }

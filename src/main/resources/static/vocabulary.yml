@@ -34,7 +34,7 @@ customMappingList:
       - username
   - mappingName: Jenkins-info
     description: basic jenkins info, include username, accessToken and endpoint
-    schema: "{name: \"$username\", token: \"$accessToken\", url: \"$endpoint\"}"
+    schema: "{name: $username, token: $accessToken, url: $endpoint}"
     usedVocabulary:
       - username
       - accessToken
