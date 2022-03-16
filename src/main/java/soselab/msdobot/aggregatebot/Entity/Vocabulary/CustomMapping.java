@@ -8,10 +8,10 @@ public class CustomMapping {
     public String mappingName;
     public String description;
     public String schema;
-    public ArrayList<String> usedVocabulary;
+    public ArrayList<Concept> usedConcept;
 
     public CustomMapping(){
-        this.usedVocabulary = new ArrayList<>();
+        this.usedConcept = new ArrayList<>();
     }
 
     @Override

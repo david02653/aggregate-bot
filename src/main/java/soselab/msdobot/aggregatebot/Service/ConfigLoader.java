@@ -12,6 +12,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import soselab.msdobot.aggregatebot.Entity.Agent.AgentList;
 import soselab.msdobot.aggregatebot.Entity.UpperIntent.UpperIntentList;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.Concept;
 import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
 import soselab.msdobot.aggregatebot.Entity.Vocabulary.Vocabulary;
 import soselab.msdobot.aggregatebot.Entity.Service.ServiceList;
@@ -25,6 +26,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * load config files
@@ -154,7 +157,7 @@ public class ConfigLoader {
     }
 
     private boolean isInputVocabularyLegal(String input){
-        return vocabularyList.input.contains(input) || vocabularyList.customMappingHashMap.containsKey(input);
+        return vocabularyList.general.contains(input) || vocabularyList.customMappingHashMap.containsKey(input);
     }
 
     /**
@@ -189,7 +192,16 @@ public class ConfigLoader {
         Iterator<CustomMapping> mappingsIterator = vocabularyList.customMappingList.iterator();
         while(mappingsIterator.hasNext()){
             CustomMapping mapping = mappingsIterator.next();
-            ArrayList<String> bindingVocabularyList = mapping.usedVocabulary;
+            ArrayList<Concept> bindingVocabularyList = mapping.usedConcept;
+            String mappingSchema = mapping.schema;
+            Pattern vocabularyPattern = Pattern.compile("%\\{([a-zA-Z0-9-]+)\\}");
+            Matcher vocabularyMatcher = vocabularyPattern.matcher(mappingSchema);
+            // check schema
+            while (vocabularyMatcher.find()){
+                System.out.println("[DEBUG] vocabulary '" + vocabularyMatcher.group(1) + "' detected in schema " + mapping.mappingName);
+                // retrieve vocabulary concept type
+            }
+            /*
             // check binding vocabulary
             if(!vocabularyList.input.containsAll(bindingVocabularyList)){
                 System.out.println("[DEBUG] illegal vocabulary found in mapping '" + mapping.mappingName + "'");
@@ -204,6 +216,7 @@ public class ConfigLoader {
                 System.out.println("[DEBUG] schema of mapping '" + mapping.mappingName + "' is not a json string");
                 mappingsIterator.remove();
             }
+             */
         }
         vocabularyList.createCustomMappingHashMap();
         System.out.println(new Gson().toJson(vocabularyList));

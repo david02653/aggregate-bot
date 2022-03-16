@@ -13,10 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Entity.Service.Config;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.Concept;
 import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
 import soselab.msdobot.aggregatebot.Service.*;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SpringBootTest
 @TestPropertySource("classpath:application-dev.properties")
@@ -87,10 +90,13 @@ class AggregateBotApplicationTest {
         configLoader.loadVocabularyConfig();
         ArrayList<CustomMapping> customMappings = ConfigLoader.vocabularyList.customMappingList;
         for(CustomMapping mapping: customMappings){
-            ArrayList<String> bindingList = mapping.usedVocabulary;
+            ArrayList<Concept> bindingList = mapping.usedConcept;
             String schema = mapping.schema;
-            for(String input: bindingList){
-                schema = schema.replaceAll("\\$" + input, input);
+            for(Concept concept: bindingList){
+//                schema = schema.replaceAll("\\$" + input, input);
+                String conceptName = concept.conceptName;
+                ArrayList<String> active = concept.usedVocabulary;
+
             }
             System.out.println("[modified] " + schema);
             System.out.println("[result] " + isValidJsonString(schema));
@@ -219,6 +225,16 @@ class AggregateBotApplicationTest {
         String testPattern = "\\{" + temp + "}";
         String testExample = "regex replace test [{username}]";
         System.out.println(testExample.replaceAll(testPattern, "content"));
+    }
+
+    @Test
+    void testRegexIterate(){
+        String test = "[ta][eb][sc][td][rf]e[777]";
+        Pattern pattern = Pattern.compile("\\[([a-z]+)\\]");
+        Matcher matcher = pattern.matcher(test);
+        while(matcher.find()){
+            System.out.println(matcher.group(1));
+        }
     }
 
     @Test

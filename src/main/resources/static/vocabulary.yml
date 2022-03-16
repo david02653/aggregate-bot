@@ -1,4 +1,4 @@
-input:
+general:
   - accessToken
   - username
   - endpoint
@@ -7,35 +7,45 @@ input:
 output:
   - plainText
   - json
-# todo: custom data struct ?
+conceptList:
+  - conceptName: jenkins
+    availableVocabulary:
+      - username
 customMappingList:
-  - mappingName: jsonObject
-    description: custom json object mapping example
-    schema: "{myDataUser: $username, myAccessToken: $accessToken}"
-    usedVocabulary:
-      - username
-      - accessToken
-  - mappingName: jsonArray
-    description: custom json array mapping example
-    schema: "[$username, $accessToken]"
-    usedVocabulary:
-      - username
-      - accessToken
-  - mappingName: illegal-pattern-1
-    description: fake mapping with illegal vocabulary
-    schema: "{}"
-    usedVocabulary:
-      - username
-      - error
-  - mappingName: illegal-pattern-2
-    description: fake mapping with illegal schema
-    schema: "{error: }"
-    usedVocabulary:
-      - username
-  - mappingName: Jenkins-info
-    description: basic jenkins info, include username, accessToken and endpoint
-    schema: "{name: $username, token: $accessToken, url: $endpoint}"
-    usedVocabulary:
-      - username
-      - accessToken
-      - endpoint
+  - mappingName: struct
+    description: mapping struct
+    schema: "{name: %{username}}"
+    usedConcept:
+      - conceptName: jenkins
+        usedVocabulary:
+          - username
+#  - mappingName: jsonObject
+#    description: custom json object mapping example
+#    schema: "{myDataUser: %{username}, myAccessToken: %{accessToken}}"
+#    usedVocabulary:
+#      - username
+#      - accessToken
+#  - mappingName: jsonArray
+#    description: custom json array mapping example
+#    schema: "[%{username}, %{accessToken}]"
+#    usedVocabulary:
+#      - username
+#      - accessToken
+#  - mappingName: illegal-pattern-1
+#    description: fake mapping with illegal vocabulary
+#    schema: "{}"
+#    usedVocabulary:
+#      - username
+#      - error
+#  - mappingName: illegal-pattern-2
+#    description: fake mapping with illegal schema
+#    schema: "{error: }"
+#    usedVocabulary:
+#      - username
+#  - mappingName: Jenkins-info
+#    description: basic jenkins info, include username, accessToken and endpoint
+#    schema: "{name: %{username}, token: %{accessToken}, url: %{endpoint}}"
+#    usedVocabulary:
+#      - username
+#      - accessToken
+#      - endpoint

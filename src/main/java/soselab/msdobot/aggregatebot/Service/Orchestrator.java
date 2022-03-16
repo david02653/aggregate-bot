@@ -136,7 +136,7 @@ public class Orchestrator {
     public String generateCustomMappingConfig(String mapName, HashMap<String, String> serviceConfigMap, CapabilityConfig sessionConfig){
         CustomMapping mapping = ConfigLoader.vocabularyList.customMappingHashMap.get(mapName);
         String mappingSchema = mapping.schema;
-        for(String usedVocabulary: mapping.usedVocabulary){
+        for(String usedVocabulary: mapping.usedConcept){
             if(serviceConfigMap.containsKey(usedVocabulary))
                 mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, "\"" + serviceConfigMap.get(usedVocabulary) + "\"");
             else
