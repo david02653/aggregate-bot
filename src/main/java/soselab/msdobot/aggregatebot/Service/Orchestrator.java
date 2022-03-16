@@ -12,6 +12,7 @@ import soselab.msdobot.aggregatebot.Entity.CapabilityConfig;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Entity.Service.SubService;
 import soselab.msdobot.aggregatebot.Entity.Capability.JsonInfo;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.Concept;
 import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import java.util.Map;
 import java.util.concurrent.*;
 
 /**
- * define which intent activate which agent/skill
+ * define which intent activate which agent/capability
  */
 @Service
 public class Orchestrator {
@@ -68,7 +69,7 @@ public class Orchestrator {
 
         // execute sequenced capability list
         for(Capability capability : capabilityList){
-            // todo: store previous capability info, add output data mapping
+            // todo: add output data mapping
             // fire skill request for every sub-service
             // todo: any world changing capability ?
             if(capability.method.equals("POST")) {
@@ -106,7 +107,7 @@ public class Orchestrator {
     }
 
     /**
-     * get complete correspond skill list
+     * get complete correspond capability list
      * @param intent
      * @return
      */
@@ -133,14 +134,22 @@ public class Orchestrator {
         sessionData.put(serviceName, tempSession);
     }
 
+    // todo: currently broken due to data type changing, fix it
+    /**
+     * fill up config slot in custom mapping schema and return result
+     * @param mapName
+     * @param serviceConfigMap
+     * @param sessionConfig
+     * @return
+     */
     public String generateCustomMappingConfig(String mapName, HashMap<String, String> serviceConfigMap, CapabilityConfig sessionConfig){
         CustomMapping mapping = ConfigLoader.vocabularyList.customMappingHashMap.get(mapName);
         String mappingSchema = mapping.schema;
-        for(String usedVocabulary: mapping.usedConcept){
-            if(serviceConfigMap.containsKey(usedVocabulary))
-                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, "\"" + serviceConfigMap.get(usedVocabulary) + "\"");
+        for(Concept concept: mapping.usedConcept){
+            if(serviceConfigMap.containsKey(concept))
+                mappingSchema = mappingSchema.replaceAll("\\$" + concept, "\"" + serviceConfigMap.get(concept) + "\"");
             else
-                mappingSchema = mappingSchema.replaceAll("\\$" + usedVocabulary, "\"" + sessionConfig.content.get(usedVocabulary) + "\"");
+                mappingSchema = mappingSchema.replaceAll("\\$" + concept, "\"" + sessionConfig.content.get(concept) + "\"");
         }
         return mappingSchema;
     }

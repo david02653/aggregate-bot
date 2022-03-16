@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class AgentContent {
 
-    public ArrayList<String> skillList;
+    public ArrayList<String> capabilityList;
 
     public AgentContent(){
     }

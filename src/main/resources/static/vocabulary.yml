@@ -9,12 +9,12 @@ output:
   - json
 conceptList:
   - conceptName: jenkins
-    availableVocabulary:
+    usedVocabulary:
       - username
 customMappingList:
   - mappingName: struct
     description: mapping struct
-    schema: "{name: %{username}}"
+    schema: "{name: %{jenkins/username}}"
     usedConcept:
       - conceptName: jenkins
         usedVocabulary:

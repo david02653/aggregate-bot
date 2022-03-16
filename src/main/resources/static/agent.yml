@@ -3,13 +3,13 @@ agentList:
     type: agent
     description: "jenkins function model"
     content:
-      skillList:
+      capabilityList:
         - Jenkins-health
         - Jenkins-test-report
   - name: fakeAgent
     type: fake
     description: "fake agent"
     content:
-      skillList:
+      capabilityList:
         - fakeSkill-a
         - fakeSkill-b

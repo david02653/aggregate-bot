@@ -8,6 +8,7 @@ import java.util.HashMap;
 public class Vocabulary {
     public ArrayList<String> general;
     public ArrayList<String> output;
+    public ArrayList<Concept> conceptList;
     public ArrayList<CustomMapping> customMappingList;
     public HashMap<String, CustomMapping> customMappingHashMap;
 

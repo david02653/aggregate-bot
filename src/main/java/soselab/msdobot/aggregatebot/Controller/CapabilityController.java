@@ -8,7 +8,7 @@ import soselab.msdobot.aggregatebot.Entity.Service.Config;
 import soselab.msdobot.aggregatebot.Service.JenkinsService;
 
 /**
- * declare all skills unit
+ * declare all capability endpoint
  */
 @RestController
 @RequestMapping(value = "/capability")

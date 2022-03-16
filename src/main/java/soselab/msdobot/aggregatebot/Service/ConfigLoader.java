@@ -187,6 +187,9 @@ public class ConfigLoader {
 //            skill.input.stream().anyMatch(input -> !keywordList.keyword.contains(input)));
     }
 
+    /**
+     * verify if loaded vocabulary config file has illegal format and remove illegal entities
+     */
     public void verifyCustomMappingVocabulary(){
         // check custom mapping binding vocabulary and schema
         Iterator<CustomMapping> mappingsIterator = vocabularyList.customMappingList.iterator();
@@ -194,13 +197,17 @@ public class ConfigLoader {
             CustomMapping mapping = mappingsIterator.next();
             ArrayList<Concept> bindingVocabularyList = mapping.usedConcept;
             String mappingSchema = mapping.schema;
-            Pattern vocabularyPattern = Pattern.compile("%\\{([a-zA-Z0-9-]+)\\}");
+            Pattern vocabularyPattern = Pattern.compile("%\\{([a-zA-Z0-9-/]+)\\}");
             Matcher vocabularyMatcher = vocabularyPattern.matcher(mappingSchema);
-            // check schema
+            // create verify list from schema data
+            ArrayList<String> verifyList = new ArrayList<>();
             while (vocabularyMatcher.find()){
-                System.out.println("[DEBUG] vocabulary '" + vocabularyMatcher.group(1) + "' detected in schema " + mapping.mappingName);
+                String fullVocabulary = vocabularyMatcher.group(1);
+                String conceptType = "general";
+                System.out.println("[DEBUG] vocabulary '" + fullVocabulary + "' detected in schema " + mapping.mappingName);
                 // retrieve vocabulary concept type
             }
+            // check verify list
             /*
             // check binding vocabulary
             if(!vocabularyList.input.containsAll(bindingVocabularyList)){
