@@ -15,7 +15,7 @@ public class CapabilityList {
     }
 
     /**
-     * get available skill by correspond intent
+     * get available capability by correspond intent
      * @param correspondIntent correspond atomic intent
      * @return correspond capability array list, otherwise empty array list
      */

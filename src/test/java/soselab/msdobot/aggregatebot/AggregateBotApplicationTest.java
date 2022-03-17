@@ -86,24 +86,6 @@ class AggregateBotApplicationTest {
     }
 
     @Test
-    void testVocabularyCustomMappingFormat(){
-        configLoader.loadVocabularyConfig();
-        ArrayList<CustomMapping> customMappings = ConfigLoader.vocabularyList.customMappingList;
-        for(CustomMapping mapping: customMappings){
-            ArrayList<Concept> bindingList = mapping.usedConcept;
-            String schema = mapping.schema;
-            for(Concept concept: bindingList){
-//                schema = schema.replaceAll("\\$" + input, input);
-                String conceptName = concept.conceptName;
-                ArrayList<String> active = concept.usedVocabulary;
-
-            }
-            System.out.println("[modified] " + schema);
-            System.out.println("[result] " + isValidJsonString(schema));
-        }
-    }
-
-    @Test
     void testVocabularyCustomMappingValidation(){
         configLoader.loadVocabularyConfig();
         configLoader.verifyCustomMappingVocabulary();

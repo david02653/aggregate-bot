@@ -8,11 +8,11 @@ public class CustomMapping {
     public String mappingName;
     public String description;
     public String schema;
-    public ArrayList<Concept> usedConcept;
+//    public ArrayList<Concept> usedConcept;
 
-    public CustomMapping(){
-        this.usedConcept = new ArrayList<>();
-    }
+//    public CustomMapping(){
+//        this.usedConcept = new ArrayList<>();
+//    }
 
     @Override
     public String toString(){

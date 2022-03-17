@@ -1,6 +1,7 @@
 package soselab.msdobot.aggregatebot.Entity.Vocabulary;
 
 import com.google.gson.Gson;
+import soselab.msdobot.aggregatebot.Exception.IllegalConceptException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +14,20 @@ public class Vocabulary {
     public HashMap<String, CustomMapping> customMappingHashMap;
 
     public Vocabulary(){
+    }
+
+    /**
+     * retrieve specific concept
+     * @param conceptName target concept name
+     * @return target concept
+     * @throws IllegalConceptException if no matched concept found
+     */
+    public Concept getConcept(String conceptName) throws IllegalConceptException {
+        for(Concept concept: conceptList){
+            if(concept.conceptName.equals(conceptName))
+                return concept;
+        }
+        throw new IllegalConceptException("no available concept found");
     }
 
     /**

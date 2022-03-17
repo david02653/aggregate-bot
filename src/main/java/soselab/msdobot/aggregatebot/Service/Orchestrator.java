@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * define which intent activate which agent/capability
@@ -134,7 +136,7 @@ public class Orchestrator {
         sessionData.put(serviceName, tempSession);
     }
 
-    // todo: currently broken due to data type changing, fix it
+    // todo: currently broken due to data structure changing, fix it
     /**
      * fill up config slot in custom mapping schema and return result
      * @param mapName
@@ -145,12 +147,21 @@ public class Orchestrator {
     public String generateCustomMappingConfig(String mapName, HashMap<String, String> serviceConfigMap, CapabilityConfig sessionConfig){
         CustomMapping mapping = ConfigLoader.vocabularyList.customMappingHashMap.get(mapName);
         String mappingSchema = mapping.schema;
-        for(Concept concept: mapping.usedConcept){
-            if(serviceConfigMap.containsKey(concept))
-                mappingSchema = mappingSchema.replaceAll("\\$" + concept, "\"" + serviceConfigMap.get(concept) + "\"");
+        Pattern vocabularyPattern = Pattern.compile("%\\{([a-zA-Z0-9-/]+)}");
+        Matcher vocabularyMatcher = vocabularyPattern.matcher(mappingSchema);
+        while(vocabularyMatcher.find()){
+            String vocabulary = vocabularyMatcher.group(1);
+            if(serviceConfigMap.containsKey(vocabulary))
+                mappingSchema = mappingSchema.replaceAll("%\\{" + vocabulary + "}", "\"" + serviceConfigMap.get(vocabulary) + "\"");
             else
-                mappingSchema = mappingSchema.replaceAll("\\$" + concept, "\"" + sessionConfig.content.get(concept) + "\"");
+                mappingSchema = mappingSchema.replaceAll("%\\{" + vocabulary + "}", "\"" + sessionConfig.content.get(vocabulary) + "\"");
         }
+//        for(Concept concept: mapping.usedConcept){
+//            if(serviceConfigMap.containsKey(concept))
+//                mappingSchema = mappingSchema.replaceAll("\\$" + concept, "\"" + serviceConfigMap.get(concept) + "\"");
+//            else
+//                mappingSchema = mappingSchema.replaceAll("\\$" + concept, "\"" + sessionConfig.content.get(concept) + "\"");
+//        }
         return mappingSchema;
     }
 
@@ -246,6 +257,7 @@ public class Orchestrator {
         return url.contains("{") && url.contains("}");
     }
 
+    // todo: broken session data storage due to data structure change, fix it
     /**
      * parse output result, if output type is json, try to extract info by given json path, if output type is text and has tag, return a hash map data pair with tag as key and data as value
      */

@@ -3,7 +3,6 @@ package soselab.msdobot.aggregatebot.Service;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.json.JSONObject;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -140,14 +139,18 @@ public class JenkinsService {
 
     public String getJenkinsViewList(String config){
         System.out.println("[DEBUG] received config " + config);
-        JSONObject rawObj = new JSONObject(config);
-        String rawString = rawObj.getString("Jenkins-info");
-        JSONObject configObj = new JSONObject(rawString);
-        System.out.println("[DEBUG] config " + configObj);
-        String requestUrl = configObj.getString("url") +  "/api/json?tree=views[name,jobs[name,url]]";
+        Gson gson = new Gson();
+        JsonObject rawObj = gson.fromJson(config, JsonObject.class);
+        String rawString = rawObj.get("Jenkins-info").getAsString();
+        JsonObject configObj = gson.fromJson(rawString, JsonObject.class);
+//        JSONObject rawObj = new JSONObject(config);
+//        String rawString = rawObj.getString("Jenkins-info");
+//        JSONObject configObj = new JSONObject(rawString);
+//        System.out.println("[DEBUG] config " + configObj);
+        String requestUrl = configObj.get("url").getAsString() +  "/api/json?tree=views[name,jobs[name,url]]";
         System.out.println("[DEBUG] request url " + requestUrl);
         try{
-            ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, configObj.getString("name"), configObj.getString("token"));
+            ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, configObj.get("name").getAsString(), configObj.get("token").getAsString());
             return resp.getBody();
         }catch (RequestException je){
             je.printStackTrace();
