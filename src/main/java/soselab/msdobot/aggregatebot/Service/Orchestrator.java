@@ -101,6 +101,7 @@ public class Orchestrator {
             }
             // collect futures and check if every thread works fine
             try{
+                System.out.println("[DEBUG][orchestrator result] future size: " + futures.size());
                 CapabilityReport result;
                 for(Future<CapabilityReport> executeResult: futures){
                     // check if response map is empty
@@ -488,25 +489,33 @@ public class Orchestrator {
         String capabilityContext = capability.context;
         StoredData storedData = capability.storedData;
         HashMap<String, HashMap<String, String>> serviceConfigMap = service.getConfigMap();
-        CapabilityReport report = new CapabilityReport();
+        CapabilityReport report = new CapabilityReport(capability.name, service.name);
+        /* check stored data */
+        if(storedData == null)
+            return report;
         // check input stored data
-        for(DataLabel inputData: storedData.input){
-            addServiceSessionConfig(service.name, capabilityContext, inputData.to, inputConfig.get(inputData.from));
-        }
-        // check output stored data
-        for(DataLabel outputData: storedData.output){
-            String outputType = capability.output.type;
-            if (outputType.equals("plainText")) {
-                if (outputData.from.equals(capability.output.dataLabel))
-                    addServiceSessionConfig(service.name, capabilityContext, outputData.to, output);
-            } else if (outputType.equals("json")) {
-                ArrayList<JsonInfo> jsonInfos = capability.output.jsonInfo;
-                JsonInfo targetInfo = jsonInfos.stream().filter(jsonInfo -> jsonInfo.dataLabel.equals(outputData.from)).findFirst().get();
-                String info = JsonPath.read(output, targetInfo.jsonPath).toString();
-                System.out.println(">>> [" + service.name + "]" + targetInfo.description + " : " + info);
-                addServiceSessionConfig(service.name, capabilityContext, outputData.to, info);
+        if(storedData.input != null) {
+            for (DataLabel inputData : storedData.input) {
+                addServiceSessionConfig(service.name, capabilityContext, inputData.to, inputConfig.get(inputData.from));
             }
         }
+        // check output stored data
+        if(storedData.output != null) {
+            for (DataLabel outputData : storedData.output) {
+                String outputType = capability.output.type;
+                if (outputType.equals("plainText")) {
+                    if (outputData.from.equals(capability.output.dataLabel))
+                        addServiceSessionConfig(service.name, capabilityContext, outputData.to, output);
+                } else if (outputType.equals("json")) {
+                    ArrayList<JsonInfo> jsonInfos = capability.output.jsonInfo;
+                    JsonInfo targetInfo = jsonInfos.stream().filter(jsonInfo -> jsonInfo.dataLabel.equals(outputData.from)).findFirst().get();
+                    String info = JsonPath.read(output, targetInfo.jsonPath).toString();
+                    System.out.println(">>> [" + service.name + "]" + targetInfo.description + " : " + info);
+                    addServiceSessionConfig(service.name, capabilityContext, outputData.to, info);
+                }
+            }
+        }
+        /* output message handle */
         System.out.println("[parse result] result map: " + gson.toJson(report));
         return report;
     }
