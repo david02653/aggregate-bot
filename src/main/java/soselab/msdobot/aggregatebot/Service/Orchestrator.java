@@ -7,7 +7,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
 import soselab.msdobot.aggregatebot.Entity.Capability.*;
-import soselab.msdobot.aggregatebot.Entity.ConfigReportMap;
+import soselab.msdobot.aggregatebot.Entity.CapabilityReport;
 import soselab.msdobot.aggregatebot.Entity.ContextConfigMap;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Entity.Service.Service;
@@ -53,8 +53,8 @@ public class Orchestrator {
         }
         Gson gson = new Gson();
         final ExecutorService executor = Executors.newFixedThreadPool(5);
-        final List<Future<ConfigReportMap>> futures = new ArrayList<>();
-        Future<ConfigReportMap> future;
+        final List<Future<CapabilityReport>> futures = new ArrayList<>();
+        Future<CapabilityReport> future;
 
         // get correspond capability by intent name
         ArrayList<Capability> capabilityList = getCorrespondCapabilityList(intentName);
@@ -101,10 +101,13 @@ public class Orchestrator {
             }
             // collect futures and check if every thread works fine
             try{
-                ConfigReportMap result;
-                for(Future<ConfigReportMap> executeResult: futures){
+                CapabilityReport result;
+                for(Future<CapabilityReport> executeResult: futures){
                     // check if response map is empty
                     result = executeResult.get();
+                    System.out.println(">>> [check result]:");
+                    System.out.println(gson.toJson(result));
+                    System.out.println("-----");
                 }
                 futures.clear();
             }catch (InterruptedException | ExecutionException e){
@@ -124,13 +127,16 @@ public class Orchestrator {
      * @throws NoSessionFoundException if no session config and general session config available
      */
     public String retrieveSessionConfig(String serviceName, String context, String propertyName) throws NoSessionFoundException {
+        System.out.println("[DEBUG] check session config '" + propertyName + "'");
         if(contextSessionData.containsKey(serviceName) && contextSessionData.get(serviceName).context.containsKey(context) && contextSessionData.get(serviceName).context.get(context).containsKey(propertyName)){
             return contextSessionData.get(serviceName).context.get(context).get(propertyName);
         }else{
             if(generalSessionData.containsKey(propertyName))
                 return generalSessionData.get(propertyName);
-            else
+            else{
+                System.out.println("[DEBUG] no session config found");
                 throw new NoSessionFoundException();
+            }
         }
     }
 
@@ -142,8 +148,10 @@ public class Orchestrator {
      */
     public String retrieveConfig(Service service, String context, String propertyName) throws NoSessionFoundException {
         // todo: retrieve config
+        System.out.println("[DEBUG] try to retrieve '" + propertyName + "' from context '" + context + "'");
         String serviceName = service.name;
         HashMap<String, HashMap<String, String>> serviceConfigMap = service.getConfigMap();
+        System.out.println("[DEBUG] config map: " + new Gson().toJson(serviceConfigMap));
         if(serviceConfigMap.containsKey(context) && serviceConfigMap.get(context).containsKey(propertyName))
             return serviceConfigMap.get(context).get(propertyName);
         else
@@ -165,16 +173,25 @@ public class Orchestrator {
         Matcher matcher = propertyPattern.matcher(tempSchema);
         while(matcher.find()){
             String property = matcher.group(1);
+            System.out.println("[DEBUG][mapping property detect] " + property);
             try{
                 String propertyValue = retrieveConfig(service, context, property);
+                System.out.println("[DEBUG][mapping process] property: " + property);
+                System.out.println("[DEBUG][mapping process] value: " + propertyValue);
                 resultMap.put(property, propertyValue);
                 tempSchema = tempSchema.replaceAll("%\\{" + property + "}", "\"" + propertyValue + "\"");
             }catch (NoSessionFoundException ne){
+                System.out.println("[DEBUG] retrieve custom failed");
                 resultMap.put(property, null);
+                System.out.println(resultMap.size());
             }
         }
         if(!resultMap.containsValue(null))
             resultMap.put(mapping.mappingName, tempSchema);
+        System.out.println("[DEBUG][custom mapping] " + new Gson().toJson(resultMap));
+        System.out.println(resultMap.size());
+        System.out.println(resultMap.get("User.username"));
+        System.out.println("---");
         return resultMap;
     }
 
@@ -201,7 +218,10 @@ public class Orchestrator {
                 // custom mapping, need to check every property used in mapping schema
                 CustomMapping targetMapping = capability.usedMappingList.stream().filter(mapping -> mapping.mappingName.equals(property)).findFirst().get();
                 HashMap<String, String> customMapResult = retrieveCustomMapConfig(service, context, targetMapping);
+                System.out.println("[DEBUG][retrieve require] size: " + customMapResult.size());
+                System.out.println("[DEBUG] origin size: " + resultMap.size());
                 resultMap.putAll(customMapResult);
+                System.out.println("[DEBUG] after size: " + resultMap.size());
             }
         }
         return resultMap;
@@ -258,7 +278,7 @@ public class Orchestrator {
      * @param service target service
      * @return parsed request response
      */
-    public ConfigReportMap postRequestCapability(Capability capability, Service service){
+    public CapabilityReport postRequestCapability(Capability capability, Service service){
         // get config from service
         // HashMap< contextName, HashMap< propertyName, propertyValue >>
         HashMap<String, HashMap<String, String>> serviceConfigMap = service.getConfigMap();
@@ -271,16 +291,26 @@ public class Orchestrator {
         HashMap<String, String> requiredConfig = retrieveRequiredConfig(service, capability);
         System.out.println("### check retrieved config ###");
         System.out.println(new Gson().toJson(requiredConfig));
+        System.out.println("[size] " + requiredConfig.size());
         System.out.println("### end retrieved data check ###");
         if(requiredConfig.containsValue(null)){
             // missing input property, return error
-            ConfigReportMap reportMap = new ConfigReportMap();
-            requiredConfig.forEach((property, propertyValue) -> {
-                if(propertyValue == null){
-                    reportMap.addContextProperty(service.name, capabilityContext, property);
+            CapabilityReport report = new CapabilityReport(capability.name, service.name);
+            for(java.util.Map.Entry<String, String> config: requiredConfig.entrySet()){
+                String key = config.getKey();
+                String value = config.getValue();
+                if(value == null){
+                    System.out.println("[DEBUG][check result null] " + key);
+                    report.addProperty(capabilityContext, key);
                 }
-            });
-            return reportMap;
+            }
+//            requiredConfig.forEach((property, propertyValue) -> {
+//                if(propertyValue == null){
+//                    reportMap.addContextProperty(service.name, capabilityContext, property);
+//                }
+//            });
+            System.out.println("[report] " + new Gson().toJson(report));
+            return report;
         }
         // build request body
         for(String input: capability.input){
@@ -371,15 +401,15 @@ public class Orchestrator {
         return raw.replace(".", "-");
     }
 
-    public ConfigReportMap getRequestCapability(Capability capability, Service service){
+    public CapabilityReport getRequestCapability(Capability capability, Service service){
         String capabilityContext = capability.context;
         StringBuilder requestUrl = new StringBuilder(capability.apiEndpoint);
         HashMap<String, String> requiredConfig = retrieveRequiredConfig(service, capability);
         if(requiredConfig.containsValue(null)){
             /* missing config */
-            ConfigReportMap report = new ConfigReportMap();
+            CapabilityReport report = new CapabilityReport(capability.name, service.name);
             requiredConfig.forEach((property, propertyValue) -> {
-                report.addContextProperty(service.name, capabilityContext, property);
+                report.addProperty(capabilityContext, property);
             });
             return report;
         }
@@ -406,15 +436,15 @@ public class Orchestrator {
      * @param capability
      * @param service
      */
-    public ConfigReportMap getRequestCapabilityViaPathVariable(Capability capability, Service service){
+    public CapabilityReport getRequestCapabilityViaPathVariable(Capability capability, Service service){
         String variablePattern;
         String requestUrl = capability.apiEndpoint;
         HashMap<String, String> requiredConfig = retrieveRequiredConfig(service, capability);
         if(requiredConfig.containsValue(null)){
             /* missing config */
-            ConfigReportMap report = new ConfigReportMap();
+            CapabilityReport report = new CapabilityReport(capability.name, service.name);
             requiredConfig.forEach((property, propertyValue) -> {
-                report.addContextProperty(service.name, capability.context, property);
+                report.addProperty(capability.context, property);
             });
         }
         if(!capability.input.isEmpty()){
@@ -450,7 +480,7 @@ public class Orchestrator {
      * parse output result, if output type is json, try to extract info by given json path, if output type is text and has tag, return a hash map data pair with tag as key and data as value
      * @return
      */
-    public ConfigReportMap parseRequestResult(Capability capability, Service service, HashMap<String, String> inputConfig, String output){
+    public CapabilityReport parseRequestResult(Capability capability, Service service, HashMap<String, String> inputConfig, String output){
         Gson gson = new Gson();
         System.out.println("[parse result] capability > " + gson.toJson(capability));
         System.out.println("[parse result] service > " + gson.toJson(service));
@@ -458,7 +488,7 @@ public class Orchestrator {
         String capabilityContext = capability.context;
         StoredData storedData = capability.storedData;
         HashMap<String, HashMap<String, String>> serviceConfigMap = service.getConfigMap();
-        ConfigReportMap report = new ConfigReportMap();
+        CapabilityReport report = new CapabilityReport();
         // check input stored data
         for(DataLabel inputData: storedData.input){
             addServiceSessionConfig(service.name, capabilityContext, inputData.to, inputConfig.get(inputData.from));
