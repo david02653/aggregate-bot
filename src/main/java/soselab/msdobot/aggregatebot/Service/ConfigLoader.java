@@ -1,39 +1,34 @@
 package soselab.msdobot.aggregatebot.Service;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLParser;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Service;
 import soselab.msdobot.aggregatebot.Entity.Agent.AgentList;
+import soselab.msdobot.aggregatebot.Entity.Capability.*;
+import soselab.msdobot.aggregatebot.Entity.Service.*;
 import soselab.msdobot.aggregatebot.Entity.UpperIntent.UpperIntent;
 import soselab.msdobot.aggregatebot.Entity.UpperIntent.UpperIntentList;
-import soselab.msdobot.aggregatebot.Entity.Vocabulary.Concept;
-import soselab.msdobot.aggregatebot.Entity.Vocabulary.CustomMapping;
+import soselab.msdobot.aggregatebot.Entity.Vocabulary.Context;
 import soselab.msdobot.aggregatebot.Entity.Vocabulary.Vocabulary;
-import soselab.msdobot.aggregatebot.Entity.Service.ServiceList;
-import soselab.msdobot.aggregatebot.Entity.Service.ServiceSystem;
-import soselab.msdobot.aggregatebot.Entity.Service.SubService;
-import soselab.msdobot.aggregatebot.Entity.Capability.Capability;
-import soselab.msdobot.aggregatebot.Entity.Capability.CapabilityList;
 import soselab.msdobot.aggregatebot.Exception.IllegalConceptException;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * load config files
+ * load config files and handle simple config data control
  */
-@Service
+@org.springframework.stereotype.Service
 public class ConfigLoader {
 
     private final YAMLFactory yamlFactory;
@@ -48,8 +43,9 @@ public class ConfigLoader {
 
     public static AgentList agentList;
     public static ServiceList serviceList;
-    public static CapabilityList capabilityList;
+    public static ArrayList<Capability> capabilityList;
     public static UpperIntentList upperIntentList;
+    //    public static ArrayList<UpperIntent> upperIntentList;
     public static Vocabulary vocabularyList;
 
     /**
@@ -60,7 +56,8 @@ public class ConfigLoader {
     public ConfigLoader(Environment env){
         yamlFactory = new YAMLFactory();
         mapper = new ObjectMapper();
-        gson = new Gson();
+//        gson = new Gson();
+        gson = new GsonBuilder().setPrettyPrinting().create();
         agentConfigPath = env.getProperty("bot.config.agent");
         serviceConfigPath = env.getProperty("bot.config.service");
         capabilityConfigPath = env.getProperty("bot.config.capability");
@@ -68,14 +65,14 @@ public class ConfigLoader {
         vocabularyConfigPath = env.getProperty("bot.config.vocabulary");
 
         loadVocabularyConfig();
-        verifyConceptVocabulary();
-        verifyCustomMappingVocabulary();
+        verifyContextProperties();
         loadAgentConfig();
         loadCapabilityConfig();
-        verifyCapabilityInputVocabulary();
+        verifyCapabilityConfig();
         loadUpperIntentConfig();
         verifyUpperIntent();
         loadServiceConfig();
+        verifyServiceConfig();
     }
 
     /**
@@ -101,7 +98,8 @@ public class ConfigLoader {
         try{
             System.out.println("> try to load skill config from " + capabilityConfigPath);
             parser = yamlFactory.createParser(new File(capabilityConfigPath));
-            capabilityList = mapper.readValue(parser, CapabilityList.class);
+//            capabilityList = mapper.readValue(parser, CapabilityList.class);
+            capabilityList = mapper.readValue(parser, new TypeReference<ArrayList<Capability>>(){});
             System.out.println(">>> " + capabilityList);
             System.out.println("---");
         }catch (IOException ioe){
@@ -118,6 +116,7 @@ public class ConfigLoader {
             System.out.println("> try to load upper intent config from " + upperIntentConfigPath);
             parser = yamlFactory.createParser(new File(upperIntentConfigPath));
             upperIntentList = mapper.readValue(parser, UpperIntentList.class);
+//            upperIntentList = mapper.readValue(parser, new TypeReference<ArrayList<UpperIntent>>(){});
             System.out.println(">>> " + upperIntentList);
         }catch (IOException ioe){
             ioe.printStackTrace();
@@ -136,7 +135,8 @@ public class ConfigLoader {
             UpperIntent currentIntent = intentIterator.next();
             System.out.println("[DEBUG] checking upper intent '" + currentIntent.name + "'");
             for(Capability step: currentIntent.sequencedCapabilityList){
-                if(capabilityList.availableCapabilityList.stream().noneMatch(capability -> capability.name.equals(step.name))){
+                if(capabilityList.stream().noneMatch(capability -> capability.name.equals(step.name))){
+                    System.out.println("[Error] Error code: U01");
                     System.out.println("[WARNING] capability '" + step.name + "' at order " + step.order + " from upper intent '" + currentIntent.name + "' is not available !");
                     System.out.println("[WARNING] system will ignore upperIntent '" + currentIntent.name + "' from now on.");
                     intentIterator.remove();
@@ -173,6 +173,7 @@ public class ConfigLoader {
             System.out.println("> try to load vocabulary config from " + vocabularyConfigPath);
             parser = yamlFactory.createParser(new File(vocabularyConfigPath));
             vocabularyList = mapper.readValue(parser,  Vocabulary.class);
+            vocabularyList.createConceptHashMap();
             printVocabularyConfig();
             System.out.println("---");
         }catch (IOException ioe){
@@ -185,30 +186,22 @@ public class ConfigLoader {
      * print summary of loaded vocabulary config
      */
     public void printVocabularyConfig(){
-        System.out.println("[Vocabulary] " + vocabularyList.general.size() + " vocabulary found in general concept.");
-        System.out.println("[Vocabulary] " + vocabularyList.customMappingList.size() + " custom mapping found.");
-        System.out.println("[Vocabulary] " + gson.toJson(vocabularyList));
+        System.out.println(gson.toJson(vocabularyList));
     }
 
     /**
-     * generate a service list in hashmap form
+     * generate a service list in hashmap form<br>
      * this map could be used as a quick lookup table when checking service level
      */
     public void generateServiceMap(){
         System.out.println("[DEBUG] start to generate service map");
-        HashMap<String, SubService> tempServiceMap = new HashMap<>();
-        SubService tempService;
+        HashMap<String, Service> tempServiceMap = new HashMap<>();
         for(ServiceSystem system: serviceList.serviceList){
-            tempService = new SubService(system.name, system.type, system.description, system.config);
-            tempServiceMap.put(system.name, tempService.overrideJenkinsConfig(null));
-            for(SubService service: system.getSubService()){
-                tempService.setName(service.name);
-                tempService.setType(service.type);
-                tempService.setDescription(service.description);
-                // override system jenkins config if service has individual config
-//                if(service.jenkinsConfig != null)
-//                    tempService.setJenkinsConfig(service.jenkinsConfig);
-                tempServiceMap.put(service.name, tempService.overrideJenkinsConfig(service.config));
+            // system
+            tempServiceMap.put(system.name, new Service(system.name, system.type, system.description, system.config));
+            // sub service
+            for(Service service: system.service){
+                tempServiceMap.put(service.name, new Service(service.name, service.type, service.description, mergeConfig(system.config, service.config)));
             }
         }
         serviceList.setServiceMap(tempServiceMap);
@@ -216,126 +209,333 @@ public class ConfigLoader {
     }
 
     /**
+     * merge system config and service config and return new instance of config array list
+     * @param generalConfig system config
+     * @param config service config
+     * @return merged config
+     */
+    private ArrayList<ServiceConfig> mergeConfig(ArrayList<ServiceConfig> generalConfig, ArrayList<ServiceConfig> config){
+        ArrayList<ServiceConfig> result;
+        // todo: merge service config
+        if(generalConfig == null){
+            return Objects.requireNonNullElseGet(config, ArrayList::new);
+        }else{
+            if(config == null)
+                return generalConfig;
+            else{
+                // merge config
+                result = new ArrayList<>(generalConfig);
+                // foreach new subService config
+                for(ServiceConfig currentConfig: config){
+                    // get previous context config if exist
+                    if(result.stream().anyMatch(previous -> previous.context.equals(currentConfig.context))){
+                        ServiceConfig temp = result.stream().filter(current -> current.context.equals(currentConfig.context)).findFirst().get();
+                        for(ContextConfig property: currentConfig.properties){
+                            if(temp.properties.stream().anyMatch(previous -> previous.name.equals(property.name))){
+                                temp.properties.stream().filter(previous -> previous.name.equals(property.name)).findFirst().get().setValue(property.value);
+                            }else{
+                                temp.properties.add(property);
+                            }
+                        }
+                        // update config
+                        result.removeIf(previous -> previous.context.equals(currentConfig.context));
+                        result.add(temp);
+                    }else{
+                        result.add(currentConfig);
+                    }
+                }
+                return result;
+            }
+        }
+    }
+
+    /**
      * verify all listed vocabulary in capability specification file is legal
      */
-    public void verifyCapabilityInputVocabulary(){
+    public void verifyCapabilityConfig(){
         System.out.println("> start to verify capability config");
-        Iterator<Capability> capabilityIterator = capabilityList.availableCapabilityList.iterator();
+        Iterator<Capability> capabilityIterator = capabilityList.iterator();
         while(capabilityIterator.hasNext()){
             Capability currentCapability = capabilityIterator.next();
             System.out.println("[DEBUG] checking capability '" + currentCapability.name + "'");
-            // check input type
-            if(currentCapability.input.stream().anyMatch(this::isVocabularyIllegal)){
-                System.out.println("[WARNING] illegal input vocabulary found in Capability '" + currentCapability.name + "'.");
-                System.out.println("[WARNING] system will ignore Capability '" + currentCapability.name + "' from now on.");
+            /* check context */
+            String context = currentCapability.context;
+            if(!vocabularyList.isAvailableContext(context)){
+                System.out.println("[Error] Error code: C01");
+                System.out.println("[WARNING] context '" + context + "' found in capability '" + currentCapability.name + "' is illegal");
+                System.out.println("[WARNING] this capability will be ignored by system from now on.");
                 capabilityIterator.remove();
-                continue; // move on to next capability if current one get removed
+                continue;
             }
-            // check output type
-            if(!vocabularyList.output.contains(currentCapability.output.type)){
-                System.out.println("[WARNING] illegal output found in Capability '" + currentCapability.name + "'.");
-                System.out.println("[WARNING] system will ignore Capability '" + currentCapability.name + "' from now on.");
+            /* check used mapping */
+            final ArrayList<String> legalMappingList;
+            try {
+                if(currentCapability.usedMappingList != null)
+                    legalMappingList = getLegalCustomMapping(currentCapability.usedMappingList);
+                else
+                    legalMappingList = new ArrayList<>();
+            }catch (IllegalConceptException ic){
+                System.out.println("[WARNING] verification failed when processing custom mapping, this capability will be ignored from now on.");
                 capabilityIterator.remove();
+                continue;
+            }
+            /* check input */
+            if(currentCapability.input.stream().anyMatch(input -> isPropertyIllegal(input, legalMappingList))){
+                System.out.println("[WARNING] verification failed when processing input properties, this capability will be ignored from now on.");
+                capabilityIterator.remove();
+                continue;
+            }
+            /* check output */
+            final ArrayList<String> outputStoredDataLabelList;
+            try{
+                outputStoredDataLabelList = getOutputStoredDataList(currentCapability.output);
+            }catch (IllegalConceptException ic){
+                System.out.println("[Error] Error code: C05");
+                System.out.println("[WARNING] verification failed when processing output config, this capability will be ignored from now on.");
+                capabilityIterator.remove();
+                continue;
+            }
+            /* check stored data */
+            if(currentCapability.storedData != null) {
+                // input
+                if (!isStoredDataInputLegal(currentCapability.storedData.input, currentCapability.input)) {
+                    System.out.println("[WARNING] verification failed when processing storedData input config, this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                    continue;
+                }
+                // output
+                if (!isStoredDataOutputLegal(currentCapability.storedData.output, outputStoredDataLabelList)) {
+                    System.out.println("[WARNING] illegal output label found in storedData, this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                }
             }
         }
         System.out.println(">>> " + gson.toJson(capabilityList));
         System.out.println("---");
     }
 
+    private boolean isStoredDataInputLegal(ArrayList<DataLabel> dataLabelList, ArrayList<String> inputList){
+        for(DataLabel dataSet: dataLabelList){
+            if(isPropertyIllegal(dataSet.to)) {
+                System.out.println("[Error] Error code: C06");
+                System.out.println("[WARNING] data destination '" + dataSet.to + "' found in storedData input is illegal.");
+                return false;
+            }
+            if(!inputList.contains(dataSet.from)){
+                System.out.println("[Error] Error code: C07");
+                System.out.println("[WARNING] data source '" + dataSet.from + "' found in storedData input is illegal.");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isStoredDataOutputLegal(ArrayList<DataLabel> dataLabels, ArrayList<String> outputDataLabelList){
+        if(dataLabels == null)
+            return true;
+        for(DataLabel dataSet: dataLabels){
+            if(isPropertyIllegal(dataSet.to)){
+                System.out.println("[Error] Error code: C08");
+                System.out.println("[WARNING] data destination '" + dataSet.to + "' found in storedData output is illegal.");
+                return false;
+            }
+            if(!outputDataLabelList.contains(dataSet.from)){
+                System.out.println("[Error] Error code: C09");
+                System.out.println("[WARNING] data source '" + dataSet.from + "' found in storedData output is illegal.");
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
-     * verify all used vocabulary in each concept, all vocabulary are expected existing in general concept<br>
-     * illegal vocabulary usage will be ignored
+     * verify loaded service config
      */
-    public void verifyConceptVocabulary(){
-        System.out.println("> start to verify vocabulary used in concept");
-        for(Concept concept: vocabularyList.conceptList){
-            System.out.println("[DEBUG] checking concept '" + concept.conceptName + "'");
-            Iterator<String> iterator = concept.usedVocabulary.iterator();
+    private void verifyServiceConfig(){
+        System.out.println("> start to verify service config.");
+        for(ServiceSystem system: serviceList.serviceList){
+            System.out.println("[DEBUG] start checking system '" + system.name + "'");
+            /* check system-wide config */
+            // context
+            if(system.config != null){
+                if(system.config.removeIf(config -> !vocabularyList.isAvailableContext(config.context))) {
+                    System.out.println("[Error] Error code: S01");
+                    System.out.println("[WARNING] illegal context found in system '" + system.name + "'.");
+                    System.out.println("[WARNING] this context config setting will be ignored by system from now on.");
+                }
+                // context property
+                for(ServiceConfig serviceConfig: system.config){
+                    System.out.println("[DEBUG] checking system config setting of context '" + serviceConfig.context + "'");
+                    if(serviceConfig.properties.removeIf(config -> isPropertyIllegal(config.name))){
+                        System.out.println("[Error] Error code: S02");
+                        System.out.println("[WARNING] illegal property found in context '" + serviceConfig.context + "' config.");
+                        System.out.println("[WARNING] illegal property config will be ignored by system from now on.");
+                    }
+                }
+            }
+            /* check service config */
+            System.out.println("[DEBUG] start checking subService settings of system '" + system.name + "'");
+            for(Service service: system.service){
+                System.out.println("[DEBUG] start checking service '" + service.name + "'");
+                // context
+                if(service.config != null){
+                    if(service.config.removeIf(config -> !vocabularyList.isAvailableContext(config.context))){
+                        System.out.println("[Error] Error code: S03");
+                        System.out.println("[WARNING] illegal context found in service '" + service.name + "'.");
+                        System.out.println("[WARNING] this context config setting will be ignored by system from now on.");
+                    }
+                    // context property
+                    for(ServiceConfig serviceConfig: service.config){
+                        if(serviceConfig.properties.removeIf(config -> isPropertyIllegal(config.name))){
+                            System.out.println("[Error] Error code: S04");
+                            System.out.println("[WARNING] illegal property found in context '" + serviceConfig.context + "' config.");
+                            System.out.println("[WARNING] illegal property config will be ignored by system from now on.");
+                        }
+                    }
+                }
+            }
+        }
+        System.out.println(">>> " + gson.toJson(serviceList));
+    }
+
+    /**
+     * check if given custom mapping list contains any illegal property
+     * @param mappingList given custom mapping list
+     * @return legal mapping name list, otherwise empty list
+     * @throws IllegalConceptException if any schema or property is illegal
+     */
+    public ArrayList<String> getLegalCustomMapping(ArrayList<CustomMapping> mappingList) throws IllegalConceptException {
+        ArrayList<String> legalMappingList = new ArrayList<>();
+        Pattern propertyPattern = Pattern.compile("%\\{([a-zA-Z0-9-/.]+)}");
+        Matcher propertyMatcher;
+        for(CustomMapping mapping: mappingList){
+            // check schema
+            if(!isValidJsonString(mapping.schema.replaceAll("%\\{[a-zA-Z0-9-/.]+}", "\"test\""))) {
+                System.out.println("[Error] Error code: C02");
+                System.out.println("[WARNING] given schema is not a legal json string.");
+                throw new IllegalConceptException("illegal schema format");
+            }
+            propertyMatcher = propertyPattern.matcher(mapping.schema);
+            while(propertyMatcher.find()){
+                String property = propertyMatcher.group(1);
+                // check extracted property
+                if(isPropertyIllegal(property)) {
+                    System.out.println("[Error] Error code: C03");
+                    System.out.println("[WARNING] property '" + property + "' found in mapping '" + mapping.mappingName + "' is not a legal property.");
+                    throw new IllegalConceptException(property + " is illegal.");
+                }
+            }
+            legalMappingList.add(mapping.mappingName);
+        }
+        return legalMappingList;
+    }
+
+    /**
+     * get all dataLabel in output config
+     * @param output output config
+     * @return output stored data label list
+     * @throws IllegalConceptException if illegal output type found
+     */
+    public ArrayList<String> getOutputStoredDataList(CapabilityOutput output) throws IllegalConceptException {
+        // check output type
+        if(!vocabularyList.getOutputConcept().contains(output.type))
+            throw new IllegalConceptException("[WARNING] illegal output type detected.");
+        ArrayList<String> storedDataLabelList = new ArrayList<>();
+        if(output.dataLabel != null && !output.dataLabel.isEmpty())
+            storedDataLabelList.add(output.dataLabel);
+        // check json info
+        if(output.jsonInfo != null)
+            for(JsonInfo jsonInfo: output.jsonInfo)
+                if(jsonInfo.dataLabel != null && !jsonInfo.dataLabel.isEmpty())
+                    storedDataLabelList.add(jsonInfo.dataLabel);
+        return storedDataLabelList;
+    }
+
+    /**
+     * get correspond capabilities by target intent
+     * @param intent target intent
+     * @return correspond capability
+     */
+    public ArrayList<Capability> getCorrespondCapabilityByIntent(String intent){
+        // check normal capability
+        if(capabilityList.stream().anyMatch(capability -> capability.atomicIntent.equals(intent)))
+            return new ArrayList<>(List.of(capabilityList.stream().filter(capability -> capability.atomicIntent.equals(intent)).findFirst().get()));
+        else
+            return new ArrayList<>();
+    }
+
+    /**
+     * get complete capabilities list by target upper intent
+     * @param upperIntent target upper intent
+     * @return capability list
+     */
+    public ArrayList<Capability> getUpperIntentCapabilityListByIntent(String upperIntent){
+        ArrayList<Capability> semiCapabilityList = upperIntentList.getSemiCapabilityList(upperIntent);
+        ArrayList<Capability> resultList = new ArrayList<>();
+        for(Capability semiCapability: semiCapabilityList){
+            resultList.add(capabilityList.stream().filter(capability -> capability.name.equals(semiCapability.name)).findFirst().get());
+        }
+        return resultList;
+    }
+
+    /**
+     * verify all used properties in each context, each property is expected existing in assigned concept<br>
+     * illegal property usage will be ignored
+     */
+    public void verifyContextProperties(){
+        System.out.println("> start to verify properties used in context");
+        for(Context context: vocabularyList.ContextList){
+            System.out.println("[DEBUG] checking context '" + context.contextName + "'");
+            Iterator<String> iterator = context.properties.iterator();
             while(iterator.hasNext()){
-                String vocabulary = iterator.next();
-                if(isVocabularyIllegal(vocabulary)){
-                    System.out.println("[WARNING] vocabulary '" + vocabulary + "' used in concept '" + concept.conceptName + "' does not exist in general concept or any other concept !");
-                    System.out.println("[WARNING] system will ignore this vocabulary from now on.");
+                String property = iterator.next();
+                System.out.println("[DEBUG] checking property '" + property + "'");
+                if(isPropertyIllegal(property)){
+                    System.out.println("[Error] Error code: V01");
+                    System.out.println("[WARNING] system will ignore this property from now on.");
                     iterator.remove();
                 }
             }
         }
-        System.out.println(">>> " + gson.toJson(vocabularyList.conceptList));
+        System.out.println(">>> " + gson.toJson(vocabularyList.ContextList));
+        vocabularyList.createContextHashMap();
         System.out.println("---");
     }
 
     /**
-     * verify if loaded vocabulary config file has illegal format and remove illegal entities
-     */
-    public void verifyCustomMappingVocabulary(){
-        // check custom mapping binding vocabulary and schema
-        System.out.println("> start to verify vocabulary custom mapping.");
-        Iterator<CustomMapping> mappingsIterator = vocabularyList.customMappingList.iterator();
-        while(mappingsIterator.hasNext()){
-            CustomMapping mapping = mappingsIterator.next();
-            String mappingSchema = mapping.schema;
-            String resultSchema = mappingSchema;
-            Pattern vocabularyPattern = Pattern.compile("%\\{([a-zA-Z0-9-/]+)}");
-            Matcher vocabularyMatcher = vocabularyPattern.matcher(mappingSchema);
-            // create vocabulary verify list from schema data, format schema
-            ArrayList<String> verifyList = new ArrayList<>();
-            while (vocabularyMatcher.find()){
-                String fullVocabulary = vocabularyMatcher.group(1);
-                resultSchema = resultSchema.replaceAll("%\\{" + fullVocabulary + "\\}", "\"" + fullVocabulary + "\"");
-                System.out.println("[DEBUG] vocabulary '" + fullVocabulary + "' detected in custom mapping schema '" + mapping.mappingName + "'");
-                verifyList.add(fullVocabulary);
-            }
-            // check schema
-            if(!isValidJsonString(resultSchema)){
-                System.out.println("[WARNING] schema of mapping '" + mapping.mappingName + "' is not a json string.");
-                System.out.println("[WARNING] system will ignore mapping '" + mapping.mappingName + "' from now on.");
-                mappingsIterator.remove();
-                continue;
-            }
-            // check vocabulary verify list
-            for(String currentRawVocabulary: verifyList){
-                if(isVocabularyIllegal(currentRawVocabulary)){
-                    System.out.println("[WARNING] system will ignore mapping '" + mapping.mappingName + "' from now on.");
-                    mappingsIterator.remove();
-                    break;
-                }
-            }
-        }
-        vocabularyList.createCustomMappingHashMap();
-        System.out.println(">>> " + gson.toJson(vocabularyList));
-        System.out.println("---");
-    }
-
-    /**
-     * check if vocabulary available in assigned concept, concept name and vocabulary value are expected to be separated by slash character<br>
-     * use default concept 'general' if there is no slash character found in input vocabulary
-     * @param input vocabulary
+     * check if given property is available in assigned concept, concept name and property are expected to be separated by hyphen character<br>example: conceptA-propertyA
+     * @param property input property
      * @return true if illegal, otherwise false
      */
-    private boolean isVocabularyIllegal(String input){
-        if(input.contains("/")){
-            String conceptType = input.split("/")[0];
-            String vocabulary = input.split("/", 2)[1];
-            try{
-                Concept concept = vocabularyList.getConcept(conceptType);
-                /* no matched vocabulary found in target concept */
-                if(!concept.usedVocabulary.contains(vocabulary)){
-                    System.out.println("[WARNING] vocabulary '" + vocabulary + "' is not available in concept '" + conceptType + "' !");
-                    return true;
-                }
-            }catch (IllegalConceptException e){
-                /* no concept found */
-                System.out.println("[WARNING] concept '" + conceptType + "' does not exist.");
+    private boolean isPropertyIllegal(String property){
+        if(!property.contains("."))
+            return true;
+        String[] token = property.split("\\.", 2);
+        String conceptName = token[0];
+        String value = token[1];
+        return vocabularyList.isIllegalConceptProperty(conceptName, value);
+    }
+
+    /**
+     * check if given property is available in assigned concept, concept name and property are expected to be separated by hyphen character<br>example: conceptA-propertyA<br>if given property does not match general property format (contains hyphen), check if available in given exception list
+     * @param property input property
+     * @param exceptionList exception property list
+     * @return true if illegal, otherwise false
+     */
+    private boolean isPropertyIllegal(String property, ArrayList<String> exceptionList){
+        if(property.contains(".")){
+            String[] token = property.split("\\.", 2);
+            String conceptName = token[0];
+            String value = token[1];
+            return vocabularyList.isIllegalConceptProperty(conceptName, value);
+        }else {
+            if (!exceptionList.contains(property)) {
+                System.out.println("[Error] Error code: C04");
+                System.out.println("[WARNING] property '" + property + "' does not exist in exception list.");
                 return true;
             }
-        }else{
-            /* no matched vocabulary found in general concept */
-            if(!vocabularyList.general.contains(input)){
-                System.out.println("[WARNING] vocabulary '" + input + "' is not available in general concept !");
-                return true;
-            }
+            return false;
         }
-        return false;
     }
 
     /**
@@ -343,7 +543,8 @@ public class ConfigLoader {
      * @param raw json string
      * @return true if legal, otherwise false
      */
-    private boolean isValidJsonString(String raw){
+    private static boolean isValidJsonString(String raw){
+        Gson gson = new Gson();
         try{
             gson.fromJson(raw, JsonObject.class);
         }catch (Exception e){

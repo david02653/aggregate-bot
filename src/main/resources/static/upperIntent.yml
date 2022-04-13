@@ -2,7 +2,7 @@ crossCapabilityList:
   - name: test-jenkins-health
     upperIntent: test-jenkins-health
     sequencedCapabilityList:
-      # please use skills that are already exist !
+      # use capabilities that are already existed !
       - name: Jenkins-latest-build-number
         order: 0
         description: get latest job build number

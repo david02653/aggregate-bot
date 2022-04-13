@@ -1,10 +1,12 @@
 package soselab.msdobot.aggregatebot.Controller;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import soselab.msdobot.aggregatebot.Entity.Service.Config;
+
 import soselab.msdobot.aggregatebot.Service.JenkinsService;
 
 /**
@@ -15,10 +17,12 @@ import soselab.msdobot.aggregatebot.Service.JenkinsService;
 public class CapabilityController {
 
     private final JenkinsService jenkinsService;
+    private final Gson gson;
 
     @Autowired
     public CapabilityController(JenkinsService jenkinsService){
         this.jenkinsService = jenkinsService;
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     /**
@@ -27,10 +31,11 @@ public class CapabilityController {
      * @param requestBody
      */
     @PostMapping(value = "/jenkins-health")
-    public ResponseEntity<String> requestJenkinsHealthData(@RequestBody Config requestBody){
-        System.out.println(new Gson().toJson(requestBody));
+    public ResponseEntity<String> requestJenkinsHealthData(@RequestBody String requestBody){
+        JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
+        System.out.println(gson.toJson(requestBody));
 //        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(requestBody, requestBody.targetService));
+        return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(requestObj, requestObj.get("Api.serviceName").getAsString()));
     }
 
     /**
@@ -39,10 +44,11 @@ public class CapabilityController {
      * @return response from jenkins endpoint
      */
     @PostMapping(value = "/jenkins-testReport")
-    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody Config requestBody){
-        System.out.println(new Gson().toJson(requestBody));
+    public ResponseEntity<String> requestJenkinsTestReportData(@RequestBody String requestBody){
+        JsonObject requestObject = gson.fromJson(requestBody, JsonObject.class);
+        System.out.println(gson.toJson(requestBody));
 //        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(requestBody, requestBody.targetService));
+        return ResponseEntity.ok(jenkinsService.getDirectJenkinsTestReport(requestObject, requestObject.get("Api.serviceName").getAsString()));
     }
 
     /**
@@ -51,10 +57,11 @@ public class CapabilityController {
      * @return response from jenkins endpoint
      */
     @PostMapping(value = "/jenkins-buildNumber")
-    public ResponseEntity<String> requestJenkinsBuildNumber(@RequestBody Config requestBody){
-        System.out.println(new Gson().toJson(requestBody));
+    public ResponseEntity<String> requestJenkinsBuildNumber(@RequestBody String requestBody){
+        JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
+        System.out.println(gson.toJson(requestBody));
 //        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
-        return ResponseEntity.ok(jenkinsService.getJenkinsLatestBuildNumber(requestBody, requestBody.targetService));
+        return ResponseEntity.ok(jenkinsService.getJenkinsLatestBuildNumber(requestObj, requestObj.get("Api.serviceName").getAsString()));
     }
 
     /**
@@ -63,9 +70,10 @@ public class CapabilityController {
      * @return response from jenkins endpoint
      */
     @PostMapping(value = "/jenkins-testReport-semi")
-    public ResponseEntity<String> requestJenkinsSemiTestReport(@RequestBody Config requestBody){
-        System.out.println(new Gson().toJson(requestBody));
-        return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(requestBody, requestBody.targetService));
+    public ResponseEntity<String> requestJenkinsSemiTestReport(@RequestBody String requestBody){
+        JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
+        System.out.println(gson.toJson(requestBody));
+        return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(requestObj, requestObj.get("Api.serviceName").getAsString()));
     }
 
     /**
@@ -96,6 +104,7 @@ public class CapabilityController {
      */
     @PostMapping(value = "/jenkins-view-list")
     public ResponseEntity<String> requestJenkinsViewList(@RequestBody String requestBody){
+        System.out.println(requestBody);
         return ResponseEntity.ok(jenkinsService.getJenkinsViewList(requestBody));
     }
 }

@@ -1,103 +1,350 @@
-availableCapabilityList:
-  - name: Jenkins-health
-    accessLevel: service
-    description: check job health status on jenkins server
-    method: POST
-    atomicIntent: ask_job_health_report
-    apiEndpoint: http://localhost:8888/capability/jenkins-health
+- name: record-analyze
+  context: general
+  accessLevel: service
+  description: analyze access record in specific time zone
+  method: POST
+  atomicIntent: check-record-time
+  apiEndpoint: http://check-record-time
+  input:
+    # AnalysisData.accessTRecord
+    - AnalysisData.accessRecord
+    - timeZone
+  output:
+    type: json
+    # type: aggregate
+    jsonInfo:
+      - jsonPath: $.status
+        description: access record
+  usedMappingList:
+    - mappingName: timeZone
+      description: target time zone
+      schema: "{start: %{Time.startTime}, end: %{Time.endTime}}"
+- name: access-record
+  context: general
+  accessLevel: service
+  description: search user access recor
+  method: POST
+  atomicIntent: check-user-access
+  apiEndpoint: http://check-user-access
+  input:
+    - User.username
+    - Api.serviceName
+  output:
+    type: json
+    jsonInfo:
+      - jsonPath: $.record
+        dataLabel: accessRecord
+        description: access record
+  storedData:
     input:
-      - username
-      - accessToken
-      - endpoint
-      - targetService
+      - from: Api.serviceName
+        to: Api.serviceName
     output:
-      type: json
-      jsonInfo:
-        - jsonPath: $[0].description
-          description: health summary
-        - jsonPath: $[1].description
-          description: build summary
-      # rendering: rendering-type
-  - name: Jenkins-test-report
-    accessLevel: service
-    description: check test report of specific job on jenkins server
-    method: POST
-    atomicIntent: ask_job_test_report
-    apiEndpoint: http://localhost:8888/capability/jenkins-testReport
+      - from: accessRecord
+        to: AnalysisData.accessRecord
+- name: Jenkins-health
+  context: jenkins
+  accessLevel: service
+  description: check job health status on jenkins server
+  method: POST
+  atomicIntent: ask_job_health_report
+  apiEndpoint: http://localhost:8888/capability/jenkins-health
+  input:
+    - User.username
+    - Api.accessToken
+    - Api.endpoint
+    - Api.targetService
+  output:
+    type: json
+    jsonInfo:
+      - jsonPath: $[0].description
+        description: health summary
+      - jsonPath: $[1].description
+        description: build summary
+- name: Jenkins-test-report
+  context: jenkins
+  accessLevel: service
+  description: check test report of specific job on jenkins server
+  method: POST
+  atomicIntent: ask_job_test_report
+  apiEndpoint: http://localhost:8888/capability/jenkins-testReport
+  input:
+    - User.username
+    - Api.accessToken
+    - Api.endpoint
+    - Api.serviceName
+  output:
+    type: json
+  storedData:
     input:
-      - username
-      - accessToken
-      - endpoint
-      - targetService
-    output:
-      type: json
-  - name: Jenkins-latest-build-number
-    accessLevel: service
-    description: get latest jenkins job build number
-    method: POST
-    atomicIntent: ask_jenkins_job_build_number
-    apiEndpoint: http://localhost:8888/capability/jenkins-buildNumber
+      - from: User.username
+        to: User.username
+      - from: Api.accessToken
+        to: Api.username
+      - from: Api.serviceName
+        to: Api.serviceName
+- name: Jenkins-latest-build-number
+  context: jenkins
+  accessLevel: service
+  description: get latest jenkins job build number
+  method: POST
+  atomicIntent: ask_jenkins_job_build_number
+  apiEndpoint: http://localhost:8888/capability/jenkins-buildNumber
+  input:
+    - User.username
+    - Api.accessToken
+    - Api.endpoint
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: buildNumber
+  storedData:
     input:
-      - username
-      - accessToken
-      - endpoint
-      - targetService
+      - from: User.username
+        to: User.username
+      - from: Api.accessToken
+        to: Api.accessToken
+      - from: Api.serviceName
+        to: Api.serviceName
     output:
-      type: plainText
-      storedData: buildNumber
-  - name: Jenkins-semi-test-report
-    accessLevel: service
-    description: get jenkins test report
-    method: POST
-    atomicIntent: ask_jenkins_semi_test_report
-    apiEndpoint: http://localhost:8888/capability/jenkins-testReport-semi
+      - from: buildNumber
+        to: Api.buildNumber
+- name: Jenkins-semi-test-report
+  context: jenkins
+  accessLevel: service
+  description: get jenkins test report
+  method: POST
+  atomicIntent: ask_jenkins_semi_test_report
+  apiEndpoint: http://localhost:8888/capability/jenkins-testReport-semi
+  input:
+    - User.username
+    - Api.accessToken
+    - Api.endpoint
+    - Api.serviceName
+    - Api.buildNumber
+  output:
+    type: plainText
+  storedData:
     input:
-      - username
-      - accessToken
-      - endpoint
-      - targetService
-      - buildNumber
-    output:
-      type: plainText
-  - name: Jenkins-view-list
-    accessLevel: system
-    description: get jenkins view list
-    method: POST
-    atomicIntent: ask_job_view_list
-    apiEndpoint: http://localhost:8888/capability/jenkins-view-list
-    input:
-      - Jenkins-info
-    output:
-      type: plainText
-  - name: Fake-test-skill
-    accessLevel: service
-    description: try to use get method with request param
-    method: GET
-    atomicIntent: get_this
-    apiEndpoint: http://localhost:8888/capability/fake
-    input:
-      - username
-      - accessToken
-    output:
-      type: plaintext
-  - name: Fake-skill-pathvariable
-    accessLevel: service
-    description: try to use get method with path variable
-    method: GET
-    atomicIntent: get_path
-    apiEndpoint: http://localhost:8888/capability/fake-variable/{username}
-    input:
-      - username
-    output:
-      type: plainText
-  - name: illegal-skill
-    accessLevel: service
-    description: dummy illegal capability
-    method: POST
-    atomicIntent: none
-    apiEndpoint: url
-    input:
-      - fake-input
-      - username
-    output:
-      type: plainText
+      - from: User.username
+        to: User.username
+      - from: Api.accessToken
+        to: Api.accessToken
+      - from: Api.serviceName
+        to: Api.serviceName
+- name: Jenkins-view-list
+  context: jenkins
+  accessLevel: system
+  description: get jenkins view list
+  method: POST
+  atomicIntent: ask_job_view_list
+  apiEndpoint: http://localhost:8888/capability/jenkins-view-list
+  input:
+    - jenkinsInfo
+  output:
+    type: plainText
+  usedMappingList:
+    - mappingName: jenkinsInfo
+      description: basic jenkins information
+      schema: "{name: %{User.username}, token: %{Api.accessToken}, url: %{Api.endpoint}}"
+- name: Fake-test-capability
+  context: general
+  accessLevel: service
+  description: try to use get method with request param
+  method: GET
+  atomicIntent: get_this
+  apiEndpoint: http://localhost:8888/capability/fake
+  input:
+    - User.username
+    - Api.accessToken
+  output:
+    type: plainText
+- name: Fake-capability-pathvariable
+  context: general
+  accessLevel: service
+  description: try to use get method with path variable
+  method: GET
+  atomicIntent: get_path
+  apiEndpoint: http://localhost:8888/capability/fake-variable/{User-username}
+  input:
+    - User-username
+  output:
+    type: plainText
+- name: illegal-capability
+  context: general
+  accessLevel: service
+  description: dummy illegal capability
+  method: POST
+  atomicIntent: none
+  apiEndpoint: url
+  input:
+    - fake.input
+    - User.name
+  output:
+    type: plainText
+  #availableCapabilityList:
+  #  - name: record-analyze
+  #    accessLevel: service
+  #    description: analyze access record in specific time zone
+  #    method: POST
+  #    atomicIntent: check-record-time
+  #    apiEndpoint: http://check-record-time
+  #    input:
+  #      - accessRecord
+  #      - timeZone
+  #    output:
+  #      type: json
+  #      jsonInfo:
+  #        - jsonPath: $.status
+  #          description: access record
+  #    usedMappingList:
+  #      - mappingName: timeZone
+  #        description: target time zone
+  #        schema: "{start: %{startTime}, end: %{endTime}}"
+  #  - name: access-record
+  #    accessLevel: service
+  #    description: search user access record
+  #    method: POST
+  #    atomicIntent: check-user-access
+  #    apiEndpoint: http://check-user-access
+  #    input:
+  #      - username
+  #      - serviceName
+  #    output:
+  #      type: json
+  #      jsonInfo:
+  #        - jsonPath: $.record
+  #          dataLabel: buildNumber
+  #          description: access record
+  #    storedData:
+  #      input:
+  #        - label: serviceName
+  #          concept: Api-serviceName
+  #      output:
+  #        - Api-buildNumber
+  #  - name: Jenkins-health
+  #    context: jenkins
+  #    accessLevel: service
+  #    description: check job health status on jenkins server
+  #    method: POST
+  #    atomicIntent: ask_job_health_report
+  #    apiEndpoint: http://localhost:8888/capability/jenkins-health
+  #    input:
+  #      - username
+  #      - accessToken
+  #      - endpoint
+  #      - targetService
+  #    output:
+  #      type: json
+  #      jsonInfo:
+  #        - jsonPath: $[0].description
+  #          description: health summary
+  #        - jsonPath: $[1].description
+  #          description: build summary
+  #      # rendering: rendering-type
+  #  - name: Jenkins-test-report
+  #    accessLevel: service
+  #    description: check test report of specific job on jenkins server
+  #    method: POST
+  #    atomicIntent: ask_job_test_report
+  #    apiEndpoint: http://localhost:8888/capability/jenkins-testReport
+  #    input:
+  #      - username
+  #      - accessToken
+  #      - endpoint
+  #      - targetService
+  #    output:
+  #      type: json
+  #  - name: Jenkins-latest-build-number
+  #    accessLevel: service
+  #    description: get latest jenkins job build number
+  #    method: POST
+  #    atomicIntent: ask_jenkins_job_build_number
+  #    apiEndpoint: http://localhost:8888/capability/jenkins-buildNumber
+  #    input:
+  #      - username
+  #      - accessToken
+  #      - endpoint
+  #      - targetService
+  #    output:
+  #      type: plainText
+  #      storedData: buildNumber
+  #  - name: Jenkins-semi-test-report
+  #    accessLevel: service
+  #    description: get jenkins test report
+  #    method: POST
+  #    atomicIntent: ask_jenkins_semi_test_report
+  #    apiEndpoint: http://localhost:8888/capability/jenkins-testReport-semi
+  #    input:
+  #      - username
+  #      - accessToken
+  #      - endpoint
+  #      - targetService
+  #      - buildNumber
+  #    output:
+  #      type: plainText
+  #  - name: Jenkins-view-list
+  #    accessLevel: system
+  #    description: get jenkins view list
+  #    method: POST
+  #    atomicIntent: ask_job_view_list
+  #    apiEndpoint: http://localhost:8888/capability/jenkins-view-list
+  #    input:
+  #      - Jenkins-info
+  #    output:
+  #      type: plainText
+  #  - name: Fake-test-skill
+  #    accessLevel: service
+  #    description: try to use get method with request param
+  #    method: GET
+  #    atomicIntent: get_this
+  #    apiEndpoint: http://localhost:8888/capability/fake
+  #    input:
+  #      - username
+  #      - accessToken
+  #    output:
+  #      type: plaintext
+  #  - name: Fake-skill-pathvariable
+  #    accessLevel: service
+  #    description: try to use get method with path variable
+  #    method: GET
+  #    atomicIntent: get_path
+  #    apiEndpoint: http://localhost:8888/capability/fake-variable/{username}
+  #    input:
+  #      - username
+  #    output:
+  #      type: plainText
+  #  - name: illegal-skill
+  #    accessLevel: service
+  #    description: dummy illegal capability
+  #    method: POST
+  #    atomicIntent: none
+  #    apiEndpoint: url
+  #    input:
+  #      - fake-input
+  #      - username
+  #    output:
+  #      type: plainText
+#customMappingList:
+#  - mappingName: struct
+#    description: mapping struct
+#    schema: "{name: %{jenkins/username}, test: %{jenkins/not}}"
+##    usedConcept:
+##      - conceptName: jenkins
+##        usedVocabulary:
+##          - username
+#  - mappingName: jsonObject
+#    description: custom json object mapping example
+#    schema: "{myDataUser: %{username}, myAccessToken: %{accessToken}}"
+#  - mappingName: jsonArray
+#    description: custom json array mapping example
+#    schema: "[%{username}, %{accessToken}]"
+#  - mappingName: illegal-pattern-1
+#    description: fake mapping with illegal vocabulary
+#    schema: "{}"
+#  - mappingName: illegal-pattern-2
+#    description: fake mapping with illegal schema
+#    schema: "{error: }"
+#  - mappingName: Jenkins-info
+#    description: basic jenkins info, include username, accessToken and endpoint
+#    schema: "{name: %{username}, token: %{accessToken}, url: %{endpoint}}"

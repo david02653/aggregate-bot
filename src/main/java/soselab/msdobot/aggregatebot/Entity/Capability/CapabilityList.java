@@ -1,6 +1,7 @@
 package soselab.msdobot.aggregatebot.Entity.Capability;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,17 @@ public class CapabilityList {
     public int size(){
         return availableCapabilityList.size();
     }
+
+//    /**
+//     * create hashmap of currently available capability list
+//     */
+//    public void createCapabilityMap(){
+//        HashMap<String, Capability> map = new HashMap<>();
+//        for(Capability capability: availableCapabilityList){
+//            map.put(capability.name, capability);
+//        }
+//        this.capabilityHashMap = map;
+//    }
 
     /**
      * get available capability by correspond intent
@@ -42,7 +54,7 @@ public class CapabilityList {
 
     @Override
     public String toString(){
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
         return gson.toJson(availableCapabilityList);
     }
 }

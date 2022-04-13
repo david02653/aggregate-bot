@@ -1,6 +1,7 @@
-package soselab.msdobot.aggregatebot.Entity.Vocabulary;
+package soselab.msdobot.aggregatebot.Entity.Capability;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
@@ -16,6 +17,6 @@ public class CustomMapping {
 
     @Override
     public String toString(){
-        return new Gson().toJson(this);
+        return new GsonBuilder().setPrettyPrinting().create().toJson(this);
     }
 }

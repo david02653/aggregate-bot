@@ -6,16 +6,16 @@ public class ServiceSystem {
     public String name;
     public String type;
     public String description;
-    public Config config;
-    public ArrayList<SubService> subService;
+    public ArrayList<ServiceConfig> config;
+    public ArrayList<Service> service;
 
     public ServiceSystem(){}
 
     public int subSystemCount(){
-        return subService.size();
+        return service.size();
     }
 
-    public ArrayList<SubService> getSubService(){
-        return this.subService;
+    public ArrayList<Service> getSubService(){
+        return this.service;
     }
 }

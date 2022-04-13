@@ -7,7 +7,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import soselab.msdobot.aggregatebot.Entity.Service.Config;
 import soselab.msdobot.aggregatebot.Exception.RequestException;
 
 /**
@@ -52,11 +51,11 @@ public class JenkinsService {
      * @param config required info to access jenkins endpoint
      * @param targetService target job
      */
-    public String getJenkinsHealthReport(Config config, String targetService){
-        String queryUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=healthReport[*]";
+    public String getJenkinsHealthReport(JsonObject config, String targetService){
+        String queryUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/api/json?depth=2&tree=healthReport[*]";
         System.out.println("> [url] " + queryUrl);
         try {
-            ResponseEntity<String> resp = basicJenkinsRequest(queryUrl, config.username, config.accessToken);
+            ResponseEntity<String> resp = basicJenkinsRequest(queryUrl, config.get("User.username").getAsString(), config.get("Api-accessToken").getAsString());
 //            System.out.println(resp.getBody());
             Gson gson = new Gson();
             JsonObject body = gson.fromJson(resp.getBody(), JsonObject.class);
@@ -76,12 +75,12 @@ public class JenkinsService {
      * @param targetService service name
      * @return latest job build number
      */
-    public String getJenkinsLatestBuildNumber(Config config, String targetService){
-        String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
+    public String getJenkinsLatestBuildNumber(JsonObject config, String targetService){
+        String buildStatusRequestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
         System.out.println("[DEBUG][build number] received config : " + config);
         System.out.println("[DEBUG][build number] try to request latest build data from " + buildStatusRequestUrl);
         try{
-            ResponseEntity<String> resp = basicJenkinsRequest(buildStatusRequestUrl, config.username, config.accessToken);
+            ResponseEntity<String> resp = basicJenkinsRequest(buildStatusRequestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
             Gson gson  = new Gson();
             JsonObject json = gson.fromJson(resp.getBody(), JsonObject.class);
             return json.getAsJsonObject("lastBuild").get("number").getAsString();
@@ -98,12 +97,12 @@ public class JenkinsService {
      * @param targetService service name
      * @return latest jenkins job test report
      */
-    public String getJenkinsTestReport(Config config, String targetService){
-        String requestUrl = config.endpoint + "/job/" + targetService + "/" + config.buildNumber + "/testReport/api/json";
+    public String getJenkinsTestReport(JsonObject config, String targetService){
+        String requestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/" + config.get("Api.buildNumber").getAsString() + "/testReport/api/json";
         System.out.println("[DEBUG][test report] received config : " + config);
         System.out.println("[DEBUG][test report] try to request test report data from " + requestUrl);
         try{
-            ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, config.username, config.accessToken);
+            ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
             return new Gson().toJson(resp.getBody());
         }catch (RequestException je){
             je.printStackTrace();
@@ -112,21 +111,21 @@ public class JenkinsService {
         }
     }
 
-    public String getDirectJenkinsTestReport(Config config, String targetService){
+    public String getDirectJenkinsTestReport(JsonObject config, String targetService){
         // retrieve the latest build number
-        String buildStatusRequestUrl = config.endpoint + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
+        String buildStatusRequestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
         System.out.println("[DEBUG] received config : " + config);
         System.out.println("[DEBUG] try to request latest build data from " + buildStatusRequestUrl);
         try {
-            ResponseEntity<String> buildResp = basicJenkinsRequest(buildStatusRequestUrl, config.username, config.accessToken);
+            ResponseEntity<String> buildResp = basicJenkinsRequest(buildStatusRequestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
             // extract build data
             Gson gson = new Gson();
             JsonObject statusObj = gson.fromJson(buildResp.getBody(), JsonObject.class);
             String buildNumber = statusObj.getAsJsonObject("lastBuild").get("number").getAsString();
             // declare test report request url
-            String testReportRequestUrl = config.endpoint + "/job/" + targetService + "/" + buildNumber + "/testReport/api/json";
+            String testReportRequestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/" + buildNumber + "/testReport/api/json";
             System.out.println("[DEBUG] try to request test report data from " + testReportRequestUrl);
-            ResponseEntity<String> testResp = basicJenkinsRequest(testReportRequestUrl, config.username, config.accessToken);
+            ResponseEntity<String> testResp = basicJenkinsRequest(testReportRequestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
             System.out.println(">>> raw test report of " + targetService + ": " + gson.toJson(testResp.getBody()));
             System.out.println("-----");
             return gson.toJson(testResp.getBody());
@@ -141,7 +140,7 @@ public class JenkinsService {
         System.out.println("[DEBUG] received config " + config);
         Gson gson = new Gson();
         JsonObject rawObj = gson.fromJson(config, JsonObject.class);
-        String rawString = rawObj.get("Jenkins-info").getAsString();
+        String rawString = rawObj.get("jenkinsInfo").getAsString();
         JsonObject configObj = gson.fromJson(rawString, JsonObject.class);
 //        JSONObject rawObj = new JSONObject(config);
 //        String rawString = rawObj.getString("Jenkins-info");

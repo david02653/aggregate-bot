@@ -1,15 +1,15 @@
-package soselab.msdobot.aggregatebot.Entity.Vocabulary;
+package soselab.msdobot.aggregatebot.Entity.Capability;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
-public class Concept {
-    public String conceptName;
-    public ArrayList<String> properties;
+public class StoredData {
 
-    public Concept(){
+    public ArrayList<DataLabel> input;
+    public ArrayList<DataLabel> output;
+
+    public StoredData(){
     }
 
     @Override

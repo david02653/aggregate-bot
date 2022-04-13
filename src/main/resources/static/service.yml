@@ -2,19 +2,45 @@ serviceList:
   - name: Cinema
     type: system
     description: simple cinema system
+    #    context:
+    #      - contextName: jenkins
+    #        usedProperties:
+    #          Api-accessToken: 11eb26ac2812dda2527594fc7a423a98fd
+    #          User-username: linux
+    #          Api-endpoint: http://soselab.asuscomm.com:10000
     config:
       # this endpoint is one of the parameter, used by SKILL, not requesting skill
-      endpoint: http://soselab.asuscomm.com:10000
-      username: linux
-      accessToken: 11eb26ac2812dda2527594fc7a423a98fd
-    subService:
+      - context: jenkins
+        properties:
+          - name: Api.endpoint
+            value: http://soselab.asuscomm.com:10000
+          - name: User.username
+            value: linux
+          - name: Api.accessToken
+            value: 11eb26ac2812dda2527594fc7a423a98fd
+      - context: eureka
+        properties:
+          - name: User.username
+            value: name
+    #      jenkins-endpoint: http://soselab.asuscomm.com:10000
+    #      jenkins-username: linux
+    #      accessToken: 11eb26ac2812dda2527594fc7a423a98fd
+    service:
       - name: Ordering
         type: service
         description: ordering service
         config:
-          endpoint: http://soselab.asuscomm.com:10000
-          username: linux
-          accessToken: 11eb26ac2812dda2527594fc7a423a98fd
+          - context: jenkins
+            properties:
+              - name: Api.endpoint
+                value: http://soselab.asuscomm.com:10000
+              - name: User.username
+                value: linux
+              - name: Api.accessToken
+                value: 11eb26ac2812dda2527594fc7a423a98fd
+      #          endpoint: http://soselab.asuscomm.com:10000
+      #          username: linux
+      #          accessToken: 11eb26ac2812dda2527594fc7a423a98fd
       - name: Payment
         type: service
         description: payment service
@@ -25,17 +51,33 @@ serviceList:
     type: system
     description: fake system
     config:
-      endpoint: url
-      username: me
-      accessToken: toKen
-    subService:
+      - context: general
+        properties:
+          - name: Api.endpoint
+            value: url
+          - name: User.username
+            value: me
+          - name: Api.accessToken
+            value: toKen
+    #      endpoint: url
+    #      username: me
+    #      accessToken: toKen
+    service:
       - name: FakeOne
         type: service
         description: try to use get method
         config:
-          username: fake one
+          - context: general
+            properties:
+              - name: User.username
+                value: fake one
+      #          username: fake one
       - name: FakeTwo
         type: service
         description: fake service
         config:
-          username: fake two
+          - context: general
+            properties:
+              - name: User.username
+                value: fake two
+#          username: fake two
