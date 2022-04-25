@@ -8,6 +8,8 @@ public class DataLabel {
     public String from;
     // data destination
     public String to;
+    // add config to global config or not
+    public boolean addToGlobal;
 
     public DataLabel(){
     }

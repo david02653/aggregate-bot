@@ -1,6 +1,7 @@
 package soselab.msdobot.aggregatebot.Service;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.jayway.jsonpath.JsonPath;
 import org.springframework.core.env.Environment;
@@ -16,6 +17,7 @@ import soselab.msdobot.aggregatebot.Exception.NoSessionFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,23 +35,28 @@ public class Orchestrator {
     public static ConcurrentHashMap<String, ContextConfigMap> contextSessionData;
     // general session config
     public static ConcurrentHashMap<String, String> generalSessionData;
+    // missing config found: service - context - propertyKey
+    public static ConcurrentHashMap<String, HashMap<String, ArrayList<String>>> missingConfigMap;
     private final String expireTrigger;
     private final ConfigLoader configLoader;
 
     public Orchestrator(Environment env, ConfigLoader configLoader){
         contextSessionData = new ConcurrentHashMap<>();
         generalSessionData = new ConcurrentHashMap<>();
+        missingConfigMap = new ConcurrentHashMap<>();
         expireTrigger = env.getProperty("bot.session.expire.trigger");
         this.configLoader = configLoader;
     }
 
-    public void capabilitySelector(RasaIntent intent){
+    public HashMap<String, ArrayList<CapabilityReport>> capabilitySelector(RasaIntent intent){
+//        HashMap<String, CapabilityReport> finalReport = new HashMap<>();
+        HashMap<String, ArrayList<CapabilityReport>> finalReport = new HashMap<>();
         String intentName = intent.getIntent();
         String jobName = intent.getJobName();
         // check if try to expire session
         if(intentName.equals(expireTrigger)){
             expireAllSessionData();
-            return;
+            return finalReport;
         }
         Gson gson = new Gson();
         final ExecutorService executor = Executors.newFixedThreadPool(5);
@@ -60,24 +67,26 @@ public class Orchestrator {
         ArrayList<Capability> capabilityList = getCorrespondCapabilityList(intentName);
         if(capabilityList == null || capabilityList.isEmpty()) {
             System.out.println(">> [DEBUG] No available skill found.");
-            return;
+            return finalReport;
         }
         System.out.println("[DEBUG] available skill detected : " + gson.toJson(capabilityList));
 
         // get service list
-        // todo : maybe consider job name is also a session config
+        // try to extract service name from general config if service name is not available
+        if(jobName == null || jobName.isEmpty())
+            jobName = generalSessionData.getOrDefault("Api.serviceName", "");
         ArrayList<Service> serviceList = ConfigLoader.serviceList.getSubServiceList(jobName);
         System.out.println("[DEBUG] todo subService list: " + gson.toJson(serviceList));
         if(serviceList.isEmpty()) {
             System.out.println("[DEBUG] target service not exist.");
-            return;
+            return finalReport;
         }
 
         // execute sequenced capability list
         for(Capability capability : capabilityList){
-            // todo: add output data mapping
             // fire skill request for every sub-service
             // todo: any world changing capability ?
+            /* POST method */
             if(capability.method.equals("POST")) {
                 for (Service service : serviceList) {
                     if(capability.accessLevel.equals(service.type)) {
@@ -87,7 +96,7 @@ public class Orchestrator {
                     }
                 }
             }else{
-                // get method
+                /* GET method */
                 for (Service service : serviceList) {
                     System.out.println("[DEBUG] current subService " + gson.toJson(service));
                     if(capability.accessLevel.equals(service.type)) {
@@ -102,17 +111,104 @@ public class Orchestrator {
             // collect futures and check if every thread works fine
             try{
                 System.out.println("[DEBUG][orchestrator result] future size: " + futures.size());
-                CapabilityReport result;
+                CapabilityReport tempReport = new CapabilityReport();
+                boolean reportFlag = false;
                 for(Future<CapabilityReport> executeResult: futures){
                     // check if response map is empty
-                    result = executeResult.get();
+                    tempReport = executeResult.get();
                     System.out.println(">>> [check result]:");
-                    System.out.println(gson.toJson(result));
+                    System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(tempReport));
                     System.out.println("-----");
+                    if(tempReport.contextProperty.size() > 0) {
+                        mergeReport(finalReport, tempReport);
+                        addMissingConfig(tempReport);
+                        reportFlag = true;
+                    }
                 }
+                // todo: if any error report found, return current report
                 futures.clear();
+                if(reportFlag)
+                    return finalReport;
             }catch (InterruptedException | ExecutionException e){
                 e.printStackTrace();
+            }
+        }
+        return finalReport;
+    }
+
+    /**
+     * add new missing config in previous report map<br>
+     * @param reportMap previous report map, use capability name as key, service report list as value
+     * @param report new report
+     */
+    private void mergeReport(HashMap<String, ArrayList<CapabilityReport>> reportMap, CapabilityReport report){
+        // todo: merge report
+        if(reportMap.containsKey(report.capability)){
+            // has previous service config
+            ArrayList<CapabilityReport> reportList = reportMap.get(report.capability);
+            if(reportList.stream().anyMatch(previous -> previous.service.equals(report.service))){
+                // has previous missing info while executing same capability
+                reportList.stream().filter(previous -> previous.service.equals(report.service)).findFirst().get().mergeProperty(report.contextProperty);
+            }else{
+                reportList.add(report);
+            }
+            reportMap.put(report.capability, reportList);
+        }else{
+            ArrayList<CapabilityReport> tempList = new ArrayList<>();
+            tempList.add(report);
+            reportMap.put(report.capability, tempList);
+        }
+    }
+
+    /**
+     * add new missing config from report
+     * @param report
+     */
+    public void addMissingConfig(CapabilityReport report){
+        if(report.contextProperty.size() <= 0) return;
+        if(missingConfigMap.containsKey(report.service)){
+            HashMap<String, ArrayList<String>> missingContextMap = missingConfigMap.get(report.service);
+            for(Map.Entry<String, ArrayList<String>> reportContent: report.contextProperty.entrySet()){
+                String contextName = reportContent.getKey();
+                ArrayList<String> properties = reportContent.getValue();
+                if(missingContextMap.containsKey(contextName)){
+                    // missing config has same service-context config set
+                    ArrayList<String> previousConfig = missingContextMap.get(contextName);
+                    for(String property: properties){
+                        if(!previousConfig.contains(property))
+                            previousConfig.add(property);
+                    }
+                    missingContextMap.put(contextName, previousConfig);
+                }else{
+                    missingContextMap.put(contextName, properties);
+                }
+            }
+            missingConfigMap.put(report.service, missingContextMap);
+        }else{
+            // service missing config not exist
+            missingConfigMap.put(report.service, report.contextProperty);
+        }
+    }
+
+    /**
+     * remove missing config
+     * @param service service name
+     * @param context context name
+     * @param propertyName config property name
+     */
+    public void removeMissingConfig(String service, String context, String propertyName){
+        if(missingConfigMap.containsKey(service)){
+            HashMap<String, ArrayList<String>> missingContextProperties = missingConfigMap.get(service);
+            if(missingContextProperties.containsKey(context)){
+                ArrayList<String> missingProperties = missingContextProperties.get(context);
+                // remove property
+                missingProperties.remove(propertyName);
+                // remove current context if missing properties is empty
+                if(missingProperties.isEmpty())
+                    missingContextProperties.remove(context);
+                // remove current service if context map is empty
+                if(missingContextProperties.isEmpty())
+                    missingConfigMap.remove(service);
             }
         }
     }
@@ -260,17 +356,6 @@ public class Orchestrator {
             tempSession.addContextProperty(context, propertyName, propertyValue);
             contextSessionData.put(serviceName, tempSession);
         }
-//        ContextConfigMap tempSession = null;
-//        if(contextSessionData.containsKey(serviceName)){
-//            // if target service already has previous record, retrieve previous data
-//            tempSession = contextSessionData.get(serviceName);
-//        }else{
-//            // create new capability config
-//            tempSession = new ContextConfigMap();
-//        }
-//        // store new config in capability config
-//        tempSession.addContextProperty(propertyName, propertyValue);
-//        contextSessionData.put(serviceName, tempSession);
     }
 
     /**
@@ -368,29 +453,6 @@ public class Orchestrator {
         }
     }
 
-//     // todo: currently broken due to data structure changing, fix it
-//     /**
-//     * fill up config slot in custom mapping schema and return result
-//     * @param mapName
-//     * @param serviceConfigMap
-//     * @param sessionConfig
-//     * @return
-//     */
-//    public String generateCustomMappingConfig(String mapName, HashMap<String, String> serviceConfigMap, ContextConfigMap sessionConfig){
-//        CustomMapping mapping = ConfigLoader.vocabularyList.customMappingHashMap.get(mapName);
-//        String mappingSchema = mapping.schema;
-//        Pattern vocabularyPattern = Pattern.compile("%\\{([a-zA-Z0-9-/.]+)}");
-//        Matcher vocabularyMatcher = vocabularyPattern.matcher(mappingSchema);
-//        while(vocabularyMatcher.find()){
-//            String vocabulary = vocabularyMatcher.group(1);
-//            if(serviceConfigMap.containsKey(vocabulary))
-//                mappingSchema = mappingSchema.replaceAll("%\\{" + vocabulary + "}", "\"" + serviceConfigMap.get(vocabulary) + "\"");
-//            else
-//                mappingSchema = mappingSchema.replaceAll("%\\{" + vocabulary + "}", "\"" + sessionConfig.context.get(vocabulary) + "\"");
-//        }
-//        return mappingSchema;
-//    }
-
     /**
      * fix format of input parameter by removing concept prefix<br>
      * example:<br>
@@ -447,6 +509,7 @@ public class Orchestrator {
             requiredConfig.forEach((property, propertyValue) -> {
                 report.addProperty(capability.context, property);
             });
+            return report;
         }
         if(!capability.input.isEmpty()){
             for(String input: capability.input){
@@ -497,6 +560,8 @@ public class Orchestrator {
         if(storedData.input != null) {
             for (DataLabel inputData : storedData.input) {
                 addServiceSessionConfig(service.name, capabilityContext, inputData.to, inputConfig.get(inputData.from));
+                if(inputData.addToGlobal)
+                    addServiceSessionConfig(service.name, "general", inputData.to, inputConfig.get(inputData.from));
             }
         }
         // check output stored data
@@ -506,12 +571,16 @@ public class Orchestrator {
                 if (outputType.equals("plainText")) {
                     if (outputData.from.equals(capability.output.dataLabel))
                         addServiceSessionConfig(service.name, capabilityContext, outputData.to, output);
+                    if(outputData.addToGlobal)
+                        addServiceSessionConfig(service.name, "general", outputData.to, output);
                 } else if (outputType.equals("json")) {
                     ArrayList<JsonInfo> jsonInfos = capability.output.jsonInfo;
                     JsonInfo targetInfo = jsonInfos.stream().filter(jsonInfo -> jsonInfo.dataLabel.equals(outputData.from)).findFirst().get();
                     String info = JsonPath.read(output, targetInfo.jsonPath).toString();
                     System.out.println(">>> [" + service.name + "]" + targetInfo.description + " : " + info);
                     addServiceSessionConfig(service.name, capabilityContext, outputData.to, info);
+                    if(outputData.addToGlobal)
+                        addServiceSessionConfig(service.name, "general", outputData.to, info);
                 }
             }
         }

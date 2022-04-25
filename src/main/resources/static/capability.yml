@@ -6,12 +6,19 @@
   atomicIntent: check-record-time
   apiEndpoint: http://check-record-time
   input:
-    # AnalysisData.accessTRecord
     - AnalysisData.accessRecord
     - timeZone
   output:
     type: json
     # type: aggregate
+    # aggregateDetail:
+    #   # how to aggregate?
+        # QoS data, insight, risk
+    #   method: <chart? table? analyze function? webPage link? json>
+    #   dataSource:
+    #     - context: general
+    #       from: User.username
+    #       outputName: username
     jsonInfo:
       - jsonPath: $.status
         description: access record
@@ -39,6 +46,7 @@
     input:
       - from: Api.serviceName
         to: Api.serviceName
+        addToGlobal: true
     output:
       - from: accessRecord
         to: AnalysisData.accessRecord
@@ -182,6 +190,27 @@
     - User.name
   output:
     type: plainText
+#- name: illegal-capability
+#  context: general
+#  accessLevel: service
+#  description: dummy illegal capability
+#  type: AGGREGATE
+#  method: GET/POST
+#  atomicIntent: none
+#  apiEndpoint: url
+#  input:
+#    - fake.input
+#    - User.name
+#  output:
+#    type: plainText
+#    renderingDetail:
+#    aggregateDetail:
+#      method:
+#      dataSource:
+#        - to:
+#          from:
+#          context:
+
   #availableCapabilityList:
   #  - name: record-analyze
   #    accessLevel: service

@@ -28,17 +28,22 @@ public class ServiceList {
         return 0;
     }
 
-    public ArrayList<Service> getSubServiceList(String serviceName){
+    /**
+     * get service list of specific system name
+     * @param systemName target system name
+     * @return service list of system, return empty arraylist if nothing found
+     */
+    public ArrayList<Service> getSubServiceList(String systemName){
         ArrayList<Service> serviceList = new ArrayList<>();
         // normal service level
-        if(serviceMap.get(serviceName).type.equals("service"))
-            serviceList.add(serviceMap.get(serviceName));
+        if(serviceMap.get(systemName).type.equals("service"))
+            serviceList.add(serviceMap.get(systemName));
         else{
             // system level
             for(ServiceSystem serviceSystem: this.serviceList){
-                if(serviceSystem.name.equals(serviceName)) {
+                if(serviceSystem.name.equals(systemName)) {
                     // add system level data as sub service
-                    serviceList.add(serviceMap.get(serviceName));
+                    serviceList.add(serviceMap.get(systemName));
                     // add sub service of target system
                     for(Service service : serviceSystem.service){
                         serviceList.add(serviceMap.get(service.name));

@@ -8,31 +8,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Vocabulary {
-    //    public ArrayList<String> general;
-//    public ArrayList<String> output;
     public ArrayList<Concept> ConceptList;
     public ArrayList<Context> ContextList;
-    //    public ArrayList<CustomMapping> customMappingList;
-//    public HashMap<String, CustomMapping> customMappingHashMap;
     public HashMap<String, ArrayList<String>> conceptMap;
     public HashMap<String, ArrayList<String>> contextMap;
 
     public Vocabulary(){
     }
-
-//    /**
-//     * retrieve specific concept
-//     * @param conceptName target concept name
-//     * @return target concept
-//     * @throws IllegalConceptException if no matched concept found
-//     */
-//    public Concept getConcept(String conceptName) throws IllegalConceptException {
-//        for(Concept concept: ConceptList){
-//            if(concept.conceptName.equals(conceptName))
-//                return concept;
-//        }
-//        throw new IllegalConceptException("no available concept found");
-//    }
 
     /**
      * check if specific concept-property set exist
@@ -56,7 +38,24 @@ public class Vocabulary {
     }
 
     /**
-     * check if given context is available<br>note that context 'general' is treated as default
+     * check if given property is enabled in specific context domain
+     * @param context target context domain
+     * @param property target property
+     * @return true if target property is not enabled in target context, otherwise return false
+     */
+    public boolean isIllegalContextProperty(String context, String property){
+        if(!contextMap.containsKey(context)){
+            System.out.println("[WARNING] context '" + context + "' does not exist.");
+            return true;
+        }else{
+            ArrayList<String> properties = contextMap.get(context);
+            return !properties.contains(property);
+        }
+    }
+
+    /**
+     * check if given context is available<br>
+     * note that context 'general' is treated as default
      * @param context given context
      * @return true if available, otherwise false
      */
@@ -94,19 +93,6 @@ public class Vocabulary {
     public ArrayList<String> getOutputConcept(){
         return conceptMap.get("Output");
     }
-//    /**
-//     * create hashmap of custom mapping list
-//     */
-//    public void createCustomMappingHashMap(){
-//        HashMap<String, CustomMapping> mapping = new HashMap<>();
-//        for(CustomMapping map: customMappingList)
-//            mapping.put(map.mappingName, map);
-//        this.customMappingHashMap = mapping;
-//    }
-
-//    public HashMap<String, CustomMapping> getCustomMappingHashMap(){
-//        return this.customMappingHashMap;
-//    }
 
     @Override
     public String toString(){

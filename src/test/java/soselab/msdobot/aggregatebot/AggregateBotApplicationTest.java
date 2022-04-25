@@ -13,6 +13,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Service.*;
+import soselab.msdobot.aggregatebot.Service.Discord.DiscordOnMessageListener;
+import soselab.msdobot.aggregatebot.Service.Discord.JDAConnect;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -32,6 +34,10 @@ class AggregateBotApplicationTest {
     private RasaService rasaService;
     @Autowired
     private Orchestrator orchestrator;
+    @Autowired
+    private DiscordOnMessageListener onMsgListener;
+    @Autowired
+    private JDAConnect jdaConnect;
 
     /**
      * test if properties file load correctly
@@ -40,14 +46,6 @@ class AggregateBotApplicationTest {
     void propertiesTest(){
         System.out.println(service.loadEnv());
         Assertions.assertEquals(service.loadEnv(), "test stuff");
-    }
-
-    /**
-     * test if agent yaml setting file load successfully
-     */
-    @Test
-    void loadAgentConfigTest(){
-        configLoader.loadAgentConfig();
     }
 
     /**
@@ -169,6 +167,12 @@ class AggregateBotApplicationTest {
     void testCustomMappingRequest(){
         RasaIntent intent = new RasaIntent("ask_job_view_list", "Cinema");
         orchestrator.capabilitySelector(intent);
+    }
+
+    @Test
+    void testSendReportMsg(){
+        RasaIntent intent = new RasaIntent("ask_job_view_list", "Cinema");
+        jdaConnect.send(onMsgListener.createReportMessage(orchestrator.capabilitySelector(intent)));
     }
 
     /**

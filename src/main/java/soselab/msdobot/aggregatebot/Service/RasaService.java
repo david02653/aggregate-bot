@@ -36,6 +36,12 @@ public class RasaService {
         Pattern testPattern = Pattern.compile("^test report.*$");
     }
 
+    /**
+     * use regex to extract rasa analyze result<br>
+     * note that this method can only recognize 'ask_job_health_report' and 'ask_job_test_report'
+     * @param analyzeResult rasa analyze result
+     * @return rasa intent
+     */
     public RasaIntent restrictedIntentParsing(String analyzeResult){
         RasaIntent intentSet = new RasaIntent();
         if(analyzeResult.contains("ask_job_health_report") || analyzeResult.contains("ask_job_test_report")) {
@@ -50,6 +56,25 @@ public class RasaService {
             return intentSet;
         }
         return null;
+    }
+
+    /**
+     * use regex to extract rasa analyze result<br>
+     * note that this method can ONLY extract 'intent' and 'jobName' for now
+     * @param analyzeResult rasa analyze result
+     * @return rasa intent
+     */
+    public RasaIntent intentParsing(String analyzeResult){
+        RasaIntent intentSet = new RasaIntent();
+        Pattern jobNameExtractor = Pattern.compile("'jobName': '(.*?)'");
+        Matcher matcher = jobNameExtractor.matcher(analyzeResult);
+        if(matcher.find())
+            intentSet.setJobName(matcher.group(1));
+        Pattern intentExtractor = Pattern.compile("'intent': '(.*?)'");
+        matcher = intentExtractor.matcher(analyzeResult);
+        if(matcher.find())
+            intentSet.setIntent(matcher.group(1));
+        return intentSet;
     }
 
     public String analyze(String utterance){

@@ -2,13 +2,14 @@ package soselab.msdobot.aggregatebot.Entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CapabilityReport {
 
     public String capability;
     public String service;
+    // context - propertyName[]
     public HashMap<String, ArrayList<String>> contextProperty;
-//    public HashMap<String, HashMap<String, String>> serviceConfigReport;
 
     public CapabilityReport(){
         contextProperty = new HashMap<>();
@@ -30,21 +31,12 @@ public class CapabilityReport {
         this.contextProperty.put(contextName, temp);
     }
 
-//    /**
-//     * add new properties in service config report
-//     * @param serviceName target service name
-//     * @param contextName target property context
-//     * @param property target property
-//     */
-//    public void addContextProperty(String serviceName, String contextName, String property){
-//        if(serviceConfigReport.containsKey(serviceName)){
-//            serviceConfigReport.get(serviceName).put(contextName, property);
-//        }else{
-//            HashMap<String, String> temp = new HashMap<>();
-//            temp.put(contextName, property);
-//            serviceConfigReport.put(serviceName, temp);
-//        }
-//    }
-
+    public void mergeProperty(HashMap<String, ArrayList<String>> properties){
+        for(Map.Entry<String, ArrayList<String>> entry: properties.entrySet()){
+            for(String propertyName: entry.getValue()){
+                addProperty(entry.getKey(), propertyName);
+            }
+        }
+    }
 
 }

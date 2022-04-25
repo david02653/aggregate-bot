@@ -6,7 +6,7 @@ public class CapabilityOutput {
     public String type;
     public String dataLabel;
     public ArrayList<JsonInfo> jsonInfo;
-    public String rendering;
+    public AggregateDetail aggregateDetail;
 
     public CapabilityOutput(){}
 }

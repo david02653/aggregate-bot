@@ -62,7 +62,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>4.2.0_188</version>
+            <version>4.4.0_350</version>
         </dependency>
 
         <!-- xml parser -->
@@ -83,9 +83,9 @@
     <repositories>
         <!--        JDA repository-->
         <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>https://jcenter.bintray.com</url>
+            <id>dv8tion</id>
+            <name>m2-dv8tion</name>
+            <url>https://m2.dv8tion.net/releases</url>
         </repository>
     </repositories>
 

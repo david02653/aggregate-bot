@@ -14,10 +14,10 @@ serviceList:
         properties:
           - name: Api.endpoint
             value: http://soselab.asuscomm.com:10000
-          - name: User.username
-            value: linux
-          - name: Api.accessToken
-            value: 11eb26ac2812dda2527594fc7a423a98fd
+#          - name: User.username
+#            value: linux
+#          - name: Api.accessToken
+#            value: 11eb26ac2812dda2527594fc7a423a98fd
       - context: eureka
         properties:
           - name: User.username
@@ -34,10 +34,10 @@ serviceList:
             properties:
               - name: Api.endpoint
                 value: http://soselab.asuscomm.com:10000
-              - name: User.username
-                value: linux
-              - name: Api.accessToken
-                value: 11eb26ac2812dda2527594fc7a423a98fd
+#              - name: User.username
+#                value: linux
+#              - name: Api.accessToken
+#                value: 11eb26ac2812dda2527594fc7a423a98fd
       #          endpoint: http://soselab.asuscomm.com:10000
       #          username: linux
       #          accessToken: 11eb26ac2812dda2527594fc7a423a98fd
