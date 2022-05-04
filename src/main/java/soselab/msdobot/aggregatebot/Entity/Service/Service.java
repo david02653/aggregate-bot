@@ -39,6 +39,8 @@ public class Service {
             for(ContextConfig contextConfig: serviceConfig.properties){
                 propertyMap.put(contextConfig.name, contextConfig.value);
             }
+            // auto inject service name
+            propertyMap.put("Api.serviceName", this.name);
             map.put(serviceConfig.context, propertyMap);
         }
         this.configMap = map;
