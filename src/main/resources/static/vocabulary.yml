@@ -13,17 +13,30 @@ ConceptList:
       - serviceName
       - buildNumber
       - accessToken
+      - targetService
   - conceptName: AnalysisData
     properties:
       - healthData
       - cohesion
       - coupling
       - accessRecord
+      - countNumber
+  - conceptName: Data
+    properties:
+      - information
   - conceptName: Output
     properties:
       - json
       - plainText
       - aggregate
+      - rendering
+  - conceptName: AggregateMethod
+    properties:
+      - chart
+      - table
+      - function
+      - link
+      - json
 ContextList:
   - contextName: jenkins
     properties:
@@ -38,38 +51,10 @@ ContextList:
     properties:
       - User.username
       - User.password
-# ----- previous format -----
-#general:
-#  - accessToken
-#  - username
-#  - endpoint
-#  - targetService
-#  - buildNumber
-#output:
-#  - plainText
-#  - json
-#contextList:
-#  - contextName: general
-#    schema: "{}"
-#  - contextName: jenkins
-#    schema: "{}"
-#  - contextName: Eureka
-#    schema: "{}"
-#conceptList:
-#  - conceptName: configRetrieve
-#    schema: "{}"
-#conceptList:
-#  - conceptName: jenkins
-#    usedVocabulary:
-#      - username
-#  - conceptName: fake-concept
-#    usedVocabulary:
-#      - username
-#      - no
-#  - conceptName: fake-concept-2
-#    usedVocabulary:
-#      - fake-concept/username
-#      - username
-#  - conceptName: fake-concept-3
-#    usedVocabulary:
-#      - fake-concept-2/fake-concept/username
+  - contextName: pseudo
+    properties:
+      - Api.accessToken
+  - contextName: pseudo2
+    properties:
+      - Api.accessToken
+      - AnalysisData.countNumber

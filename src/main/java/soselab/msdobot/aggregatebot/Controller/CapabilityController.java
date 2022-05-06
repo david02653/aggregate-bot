@@ -3,11 +3,13 @@ package soselab.msdobot.aggregatebot.Controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import okhttp3.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import soselab.msdobot.aggregatebot.Service.JenkinsService;
+import soselab.msdobot.aggregatebot.Service.PseudoService;
 
 /**
  * declare all capability endpoint
@@ -17,11 +19,13 @@ import soselab.msdobot.aggregatebot.Service.JenkinsService;
 public class CapabilityController {
 
     private final JenkinsService jenkinsService;
+    private final PseudoService pseudoService;
     private final Gson gson;
 
     @Autowired
-    public CapabilityController(JenkinsService jenkinsService){
+    public CapabilityController(JenkinsService jenkinsService, PseudoService pseudoService){
         this.jenkinsService = jenkinsService;
+        this.pseudoService = pseudoService;
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
@@ -106,5 +110,23 @@ public class CapabilityController {
     public ResponseEntity<String> requestJenkinsViewList(@RequestBody String requestBody){
         System.out.println(requestBody);
         return ResponseEntity.ok(jenkinsService.getJenkinsViewList(requestBody));
+    }
+
+    @PostMapping(value = "/pseudo-detail")
+    public ResponseEntity<String> requestPseudoServiceDetail(@RequestBody String requestBody){
+        System.out.println("[DEBUG][controller] pseudo-detail triggered");
+        return ResponseEntity.ok(pseudoService.getServiceDetailPartA(requestBody));
+    }
+
+    @PostMapping(value = "/pseudo-api")
+    public ResponseEntity<String> requestPseudoServiceAPI(@RequestBody String requestBody){
+        System.out.println("[DEBUG][controller] pseudo-api triggered");
+        return ResponseEntity.ok(pseudoService.getServiceApiData(requestBody));
+    }
+
+    @PostMapping(value = "/pseudo-aggregate")
+    public ResponseEntity<String> aggregatePseudoServiceDetail(@RequestBody String requestBody){
+        System.out.println("[DEBUG][controller] pseudo-aggregate triggered");
+        return ResponseEntity.ok(pseudoService.aggregateServiceDetail(requestBody));
     }
 }

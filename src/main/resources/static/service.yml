@@ -2,29 +2,20 @@ serviceList:
   - name: Cinema
     type: system
     description: simple cinema system
-    #    context:
-    #      - contextName: jenkins
-    #        usedProperties:
-    #          Api-accessToken: 11eb26ac2812dda2527594fc7a423a98fd
-    #          User-username: linux
-    #          Api-endpoint: http://soselab.asuscomm.com:10000
     config:
       # this endpoint is one of the parameter, used by SKILL, not requesting skill
       - context: jenkins
         properties:
           - name: Api.endpoint
             value: http://soselab.asuscomm.com:10000
-#          - name: User.username
-#            value: linux
-#          - name: Api.accessToken
-#            value: 11eb26ac2812dda2527594fc7a423a98fd
+          - name: User.username
+            value: linux
+          - name: Api.accessToken
+            value: 11eb26ac2812dda2527594fc7a423a98fd
       - context: eureka
         properties:
           - name: User.username
             value: name
-    #      jenkins-endpoint: http://soselab.asuscomm.com:10000
-    #      jenkins-username: linux
-    #      accessToken: 11eb26ac2812dda2527594fc7a423a98fd
     service:
       - name: Ordering
         type: service
@@ -80,4 +71,29 @@ serviceList:
             properties:
               - name: User.username
                 value: fake two
-#          username: fake two
+  - name: Pseudo
+    type: system
+    description: pseudo system
+    config:
+      - context: pseudo
+        properties:
+          - name: Api.accessToken
+            value: 12345
+          - name: User.password
+            value: 00000
+      - context: pseudo2
+        properties:
+          - name: Api.accessToken
+            value: 56789
+    service:
+      - name: Member
+        type: service
+        description: member service
+        config:
+          - context: pseudo
+            properties:
+              - name: User.password
+                value: 456789
+      - name: Game
+        type: service
+        description: game service

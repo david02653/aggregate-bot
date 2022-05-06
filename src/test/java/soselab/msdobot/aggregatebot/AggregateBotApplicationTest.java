@@ -1,8 +1,12 @@
 package soselab.msdobot.aggregatebot;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.jakewharton.fliptables.FlipTable;
 import com.jayway.jsonpath.JsonPath;
+import net.bytebuddy.description.method.MethodDescription;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -17,6 +21,8 @@ import soselab.msdobot.aggregatebot.Service.Discord.DiscordOnMessageListener;
 import soselab.msdobot.aggregatebot.Service.Discord.JDAConnect;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -143,6 +149,13 @@ class AggregateBotApplicationTest {
         orchestrator.capabilitySelector(intent);
     }
 
+    @Test
+    void
+    testSkillSelector2(){
+        RasaIntent intent = new RasaIntent("ask_jenkins_job_build_number", "Cinema");
+        orchestrator.capabilitySelector(intent);
+    }
+
     /**
      * test user input works find
      * include rasa analyze, rasa intent extraction and orchestrator skill picking
@@ -171,8 +184,9 @@ class AggregateBotApplicationTest {
 
     @Test
     void testSendReportMsg(){
+        // temporarily disable this testing method, try to update report workflow
         RasaIntent intent = new RasaIntent("ask_job_view_list", "Cinema");
-        jdaConnect.send(onMsgListener.createReportMessage(orchestrator.capabilitySelector(intent)));
+//        jdaConnect.send(onMsgListener.createReportMessage(orchestrator.capabilitySelector(intent)));
     }
 
     /**
@@ -230,5 +244,97 @@ class AggregateBotApplicationTest {
         obj.addProperty("test", "raw content");
         obj.addProperty("test", "fixed content");
         System.out.println(obj);
+    }
+
+    @Test
+    void testFlipTable(){
+        String[] header = {"init", ""};
+        String[][] body = {
+                {"row1", "row11"},
+                {"row2", "row21"}
+        };
+        System.out.println(FlipTable.of(header, body));
+    }
+
+    @Test
+    void testToArray(){
+        ArrayList<ArrayList<String>> test = new ArrayList<>();
+        ArrayList<String> body = new ArrayList<>();
+        ArrayList<String> body1 = new ArrayList<>();
+        body.add("1");
+        body.add("2");
+        body.add("3");
+        test.add(body);
+        body1.add("a");
+        body1.add("b");
+        body1.add("c");
+        test.add(body1);
+        // print
+//        ArrayList<String>[] half = (ArrayList<String>[]) test.toArray();
+//        String[][] comp = (String[][]) Arrays.stream(half).toArray();
+        Gson gson = new Gson();
+        System.out.println(gson.toJson(test));
+        String[][] comp = new String[2][3];
+        for(ArrayList<String> first: test){
+            for(String second: first){
+                comp[test.indexOf(first)][first.indexOf(second)] = second;
+            }
+        }
+        System.out.println(gson.toJson(comp));
+    }
+
+    @Test
+    void testDefaultRendering(){
+        JsonArray keyArray = new JsonArray();
+        keyArray.add("1");
+        keyArray.add("2");
+        keyArray.add("3");
+        JsonArray valueArray = new JsonArray();
+        valueArray.add("a");
+        valueArray.add("b");
+        valueArray.add("c");
+        JsonArray resultArray = new JsonArray();
+        resultArray.add(keyArray);
+        resultArray.add(valueArray);
+        RenderingService rendering = new RenderingService(null, resultArray);
+        System.out.println(rendering.parseToSimpleAsciiArtTable());
+    }
+
+    @Test
+    void testHashCode(){
+//        ArrayList<String> a = new ArrayList<>();
+//        a.add("A");
+//        a.add("B");
+//        ArrayList<String> b = new ArrayList<>();
+//        b.add("A");
+//        b.add("B");
+        String a = "AB";
+        String b = "A";
+        b = b + "B";
+        if(a.hashCode() == b.hashCode())
+            System.out.println("equal");
+        else
+            System.out.println("non");
+    }
+
+    @Test
+    void testGsonConvert(){
+        Gson gson = new Gson();
+        HashMap<String, String> test = new HashMap<>();
+        test.put("a", "b");
+        test.put("c", "d");
+        System.out.println(gson.toJson(test));
+        String raw = gson.toJson(test);
+        java.lang.reflect.Type type = new TypeToken<HashMap<String, String>>(){}.getType();
+        HashMap<String, String> reform = gson.fromJson(raw, type);
+        System.out.println(reform.size());
+        System.out.println(reform.get("a"));
+        System.out.println(gson.toJson(reform));
+    }
+
+    @Test
+    void testPseudoIntents(){
+        RasaIntent intent = new RasaIntent("pseudo-service-detail-go", "Pseudo");
+        orchestrator.capabilitySelector(intent);
     }
 }

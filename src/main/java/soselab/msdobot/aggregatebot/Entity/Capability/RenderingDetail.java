@@ -4,17 +4,12 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
-public class AggregateDetail {
+public class RenderingDetail {
 
     // what kinds of data are used to execute this aggregation process
     public ArrayList<AggregateSource> dataSource;
-    // should this aggregation result be stored
-    public boolean storeResult;
-    // what material should be used to retrieve this result
-    public AggregateDataMaterial usedMaterial;
 
-    public AggregateDetail(){
-    }
+    public RenderingDetail(){}
 
     @Override
     public String toString(){

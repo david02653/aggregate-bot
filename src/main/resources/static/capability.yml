@@ -1,33 +1,29 @@
 - name: record-analyze
   context: general
+  isAggregateMethod: false
   accessLevel: service
   description: analyze access record in specific time zone
   method: POST
   atomicIntent: check-record-time
   apiEndpoint: http://check-record-time
   input:
+    # AnalysisData.accessTRecord
     - AnalysisData.accessRecord
     - timeZone
   output:
     type: json
     # type: aggregate
-    # aggregateDetail:
-    #   # how to aggregate?
-        # QoS data, insight, risk
-    #   method: <chart? table? analyze function? webPage link? json>
-    #   dataSource:
-    #     - context: general
-    #       from: User.username
-    #       outputName: username
     jsonInfo:
       - jsonPath: $.status
         description: access record
+        dataLabel: accessRecord
   usedMappingList:
     - mappingName: timeZone
       description: target time zone
       schema: "{start: %{Time.startTime}, end: %{Time.endTime}}"
 - name: access-record
   context: general
+  isAggregateMethod: false
   accessLevel: service
   description: search user access recor
   method: POST
@@ -46,12 +42,12 @@
     input:
       - from: Api.serviceName
         to: Api.serviceName
-        addToGlobal: true
     output:
       - from: accessRecord
         to: AnalysisData.accessRecord
 - name: Jenkins-health
   context: jenkins
+  isAggregateMethod: false
   accessLevel: service
   description: check job health status on jenkins server
   method: POST
@@ -67,10 +63,13 @@
     jsonInfo:
       - jsonPath: $[0].description
         description: health summary
+        dataLabel: healthSummary
       - jsonPath: $[1].description
         description: build summary
+        dataLabel: buildSummary
 - name: Jenkins-test-report
   context: jenkins
+  isAggregateMethod: false
   accessLevel: service
   description: check test report of specific job on jenkins server
   method: POST
@@ -82,17 +81,20 @@
     - Api.endpoint
     - Api.serviceName
   output:
-    type: json
+    #    type: json
+    type: plainText
+    dataLabel: testReport
   storedData:
     input:
       - from: User.username
         to: User.username
       - from: Api.accessToken
-        to: Api.username
+        to: Api.accessToken
       - from: Api.serviceName
         to: Api.serviceName
 - name: Jenkins-latest-build-number
   context: jenkins
+  isAggregateMethod: false
   accessLevel: service
   description: get latest jenkins job build number
   method: POST
@@ -119,6 +121,7 @@
         to: Api.buildNumber
 - name: Jenkins-semi-test-report
   context: jenkins
+  isAggregateMethod: false
   accessLevel: service
   description: get jenkins test report
   method: POST
@@ -132,6 +135,7 @@
     - Api.buildNumber
   output:
     type: plainText
+    dataLabel: testReport
   storedData:
     input:
       - from: User.username
@@ -142,6 +146,7 @@
         to: Api.serviceName
 - name: Jenkins-view-list
   context: jenkins
+  isAggregateMethod: false
   accessLevel: system
   description: get jenkins view list
   method: POST
@@ -151,12 +156,14 @@
     - jenkinsInfo
   output:
     type: plainText
+    dataLabel: viewList
   usedMappingList:
     - mappingName: jenkinsInfo
       description: basic jenkins information
       schema: "{name: %{User.username}, token: %{Api.accessToken}, url: %{Api.endpoint}}"
 - name: Fake-test-capability
   context: general
+  isAggregateMethod: false
   accessLevel: service
   description: try to use get method with request param
   method: GET
@@ -169,6 +176,7 @@
     type: plainText
 - name: Fake-capability-pathvariable
   context: general
+  isAggregateMethod: false
   accessLevel: service
   description: try to use get method with path variable
   method: GET
@@ -180,6 +188,7 @@
     type: plainText
 - name: illegal-capability
   context: general
+  isAggregateMethod: false
   accessLevel: service
   description: dummy illegal capability
   method: POST
@@ -190,190 +199,152 @@
     - User.name
   output:
     type: plainText
-#- name: illegal-capability
-#  context: general
-#  accessLevel: service
-#  description: dummy illegal capability
-#  type: AGGREGATE
-#  method: GET/POST
-#  atomicIntent: none
-#  apiEndpoint: url
-#  input:
-#    - fake.input
-#    - User.name
-#  output:
-#    type: plainText
-#    renderingDetail:
-#    aggregateDetail:
-#      method:
-#      dataSource:
-#        - to:
-#          from:
-#          context:
-
-  #availableCapabilityList:
-  #  - name: record-analyze
-  #    accessLevel: service
-  #    description: analyze access record in specific time zone
-  #    method: POST
-  #    atomicIntent: check-record-time
-  #    apiEndpoint: http://check-record-time
-  #    input:
-  #      - accessRecord
-  #      - timeZone
-  #    output:
-  #      type: json
-  #      jsonInfo:
-  #        - jsonPath: $.status
-  #          description: access record
-  #    usedMappingList:
-  #      - mappingName: timeZone
-  #        description: target time zone
-  #        schema: "{start: %{startTime}, end: %{endTime}}"
-  #  - name: access-record
-  #    accessLevel: service
-  #    description: search user access record
-  #    method: POST
-  #    atomicIntent: check-user-access
-  #    apiEndpoint: http://check-user-access
-  #    input:
-  #      - username
-  #      - serviceName
-  #    output:
-  #      type: json
-  #      jsonInfo:
-  #        - jsonPath: $.record
-  #          dataLabel: buildNumber
-  #          description: access record
-  #    storedData:
-  #      input:
-  #        - label: serviceName
-  #          concept: Api-serviceName
-  #      output:
-  #        - Api-buildNumber
-  #  - name: Jenkins-health
-  #    context: jenkins
-  #    accessLevel: service
-  #    description: check job health status on jenkins server
-  #    method: POST
-  #    atomicIntent: ask_job_health_report
-  #    apiEndpoint: http://localhost:8888/capability/jenkins-health
-  #    input:
-  #      - username
-  #      - accessToken
-  #      - endpoint
-  #      - targetService
-  #    output:
-  #      type: json
-  #      jsonInfo:
-  #        - jsonPath: $[0].description
-  #          description: health summary
-  #        - jsonPath: $[1].description
-  #          description: build summary
-  #      # rendering: rendering-type
-  #  - name: Jenkins-test-report
-  #    accessLevel: service
-  #    description: check test report of specific job on jenkins server
-  #    method: POST
-  #    atomicIntent: ask_job_test_report
-  #    apiEndpoint: http://localhost:8888/capability/jenkins-testReport
-  #    input:
-  #      - username
-  #      - accessToken
-  #      - endpoint
-  #      - targetService
-  #    output:
-  #      type: json
-  #  - name: Jenkins-latest-build-number
-  #    accessLevel: service
-  #    description: get latest jenkins job build number
-  #    method: POST
-  #    atomicIntent: ask_jenkins_job_build_number
-  #    apiEndpoint: http://localhost:8888/capability/jenkins-buildNumber
-  #    input:
-  #      - username
-  #      - accessToken
-  #      - endpoint
-  #      - targetService
-  #    output:
-  #      type: plainText
-  #      storedData: buildNumber
-  #  - name: Jenkins-semi-test-report
-  #    accessLevel: service
-  #    description: get jenkins test report
-  #    method: POST
-  #    atomicIntent: ask_jenkins_semi_test_report
-  #    apiEndpoint: http://localhost:8888/capability/jenkins-testReport-semi
-  #    input:
-  #      - username
-  #      - accessToken
-  #      - endpoint
-  #      - targetService
-  #      - buildNumber
-  #    output:
-  #      type: plainText
-  #  - name: Jenkins-view-list
-  #    accessLevel: system
-  #    description: get jenkins view list
-  #    method: POST
-  #    atomicIntent: ask_job_view_list
-  #    apiEndpoint: http://localhost:8888/capability/jenkins-view-list
-  #    input:
-  #      - Jenkins-info
-  #    output:
-  #      type: plainText
-  #  - name: Fake-test-skill
-  #    accessLevel: service
-  #    description: try to use get method with request param
-  #    method: GET
-  #    atomicIntent: get_this
-  #    apiEndpoint: http://localhost:8888/capability/fake
-  #    input:
-  #      - username
-  #      - accessToken
-  #    output:
-  #      type: plaintext
-  #  - name: Fake-skill-pathvariable
-  #    accessLevel: service
-  #    description: try to use get method with path variable
-  #    method: GET
-  #    atomicIntent: get_path
-  #    apiEndpoint: http://localhost:8888/capability/fake-variable/{username}
-  #    input:
-  #      - username
-  #    output:
-  #      type: plainText
-  #  - name: illegal-skill
-  #    accessLevel: service
-  #    description: dummy illegal capability
-  #    method: POST
-  #    atomicIntent: none
-  #    apiEndpoint: url
-  #    input:
-  #      - fake-input
-  #      - username
-  #    output:
-  #      type: plainText
-#customMappingList:
-#  - mappingName: struct
-#    description: mapping struct
-#    schema: "{name: %{jenkins/username}, test: %{jenkins/not}}"
-##    usedConcept:
-##      - conceptName: jenkins
-##        usedVocabulary:
-##          - username
-#  - mappingName: jsonObject
-#    description: custom json object mapping example
-#    schema: "{myDataUser: %{username}, myAccessToken: %{accessToken}}"
-#  - mappingName: jsonArray
-#    description: custom json array mapping example
-#    schema: "[%{username}, %{accessToken}]"
-#  - mappingName: illegal-pattern-1
-#    description: fake mapping with illegal vocabulary
-#    schema: "{}"
-#  - mappingName: illegal-pattern-2
-#    description: fake mapping with illegal schema
-#    schema: "{error: }"
-#  - mappingName: Jenkins-info
-#    description: basic jenkins info, include username, accessToken and endpoint
-#    schema: "{name: %{username}, token: %{accessToken}, url: %{endpoint}}"
+# aggregate capability config example
+- name: full-example-of-aggregate-capability
+  context: general
+  isAggregateMethod: true
+  # use accessLevel to define what service is used in this capability
+  # example: analyze something about service x -> service level
+  # example: analyze something about system z -> system level
+  accessLevel: system
+  description: full example of aggregate capability
+  # method, apiEndpoint are used to define 'how to access the aggregate endpoint'
+  method: POST
+  # atomicIntent defines what intent used to trigger this capability, has nothing to do here since this is an aggregate capability
+  atomicIntent: none
+  apiEndpoint: full-aggregate-example
+  # no need to use input since aggregation capability use 'aggregateSource' to define what data should be used
+  # no need to use output since aggregation result has fixed format, and it is nearly unable to predict what service might be used in the first place
+  # use aggregateDetail to define what kind of data should be used and where do they come from
+  input:
+  output:
+  aggregateDetail:
+    # determine if this aggregation result needs to be stored or not
+    storeResult: true
+    # usedMaterial -> usedComponent
+    usedMaterial:
+      context:
+        - jenkins
+        - eureka
+      property:
+        - User.username
+    dataSource:
+      - useAs: username
+        isAggregationData: false
+        context: jenkins
+        from: User.username
+      - useAs: aggregate-result-1
+        isAggregationData: true
+        aggregationLevel: service
+        aggregateDataMaterial:
+          context:
+            - jenkins
+          property:
+            - User.username
+      - useAs: aggregate-result-2
+        isAggregationData: true
+        aggregationLevel: system
+        aggregateDataMaterial:
+          context:
+            - eureka
+          property:
+            - User.username
+# rendering capability example
+- name: rendering example
+  # determine whether this capability is a rendering capability
+  isRenderingMethod: true
+  description: rendering capability example
+  method: POST
+  atomicIntent: none
+  apiEndpoint: rendering_endpoint
+  # same as aggregate capability, rendering capability should be able to access all type of config, no need to use input
+  input:
+  # rendering capability has no customize output
+  output:
+  # rendering capability use dataSource to define what kins of data it can use
+  renderingDetail:
+    dataSource:
+      - useAs: username
+        isAggregationData: false
+        context: jenkins
+        from: User.username
+      - useAs: aggregate-result-1
+        isAggregationData: true
+        aggregationLevel: service
+        aggregateDataMaterial:
+          context:
+            - jenkins
+          property:
+            - User.username
+      - useAs: aggregate-result-2
+        isAggregationData: true
+        aggregationLevel: system
+        aggregateDataMaterial:
+          context:
+            - eureka
+          property:
+            - User.username
+- name: Pseudo-service-detail
+  context: pseudo
+  isAggregateMethod: false
+  accessLevel: service
+  description: check service detail
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8888/capability/pseudo-detail
+  input:
+    - Api.serviceName
+    - Api.accessToken
+  output:
+    type: plainText
+    dataLabel: serviceDetail
+  storedData:
+    output:
+      - from: serviceDetail
+        to: Data.information
+- name: Pseudo-service-api-detail
+  context: pseudo2
+  isAggregateMethod: false
+  accessLevel: service
+  description: check service api detail
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8888/capability/pseudo-api
+  input:
+    - Api.serviceName
+    - Api.accessToken
+  output:
+    type: plainText
+    dataLabel: apiNumber
+  storedData:
+    output:
+      - from: apiNumber
+        to: AnalysisData.countNumber
+- name: pseudo-aggregate
+  context: general
+  isAggregateMethod: true
+  accessLevel: system
+  description: aggregate pseudo service detail
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8888/capability/pseudo-aggregate
+  input:
+  output:
+  aggregateDetail:
+    storeResult: true
+    usedMaterial:
+      context:
+        - pseudo
+        - pseudo2
+      property:
+        - Data.information
+        - AnalysisData.countNumber
+    dataSource:
+      - useAs: serviceDetail
+        isAggregationData: false
+        context: pseudo
+        from: Data.information
+      - useAs: apiDetail
+        isAggregationData: false
+        context: pseudo2
+        from: AnalysisData.countNumber

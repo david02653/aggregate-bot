@@ -3,7 +3,6 @@ package soselab.msdobot.aggregatebot.Service.Discord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.GenericEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +16,7 @@ import soselab.msdobot.aggregatebot.Service.RasaService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -66,7 +66,8 @@ public class DiscordOnMessageListener extends ListenerAdapter {
         RasaIntent intent = rasaService.intentParsing(rasaService.analyze(receivedMsg.getContentDisplay()));
 
         // use orchestrator to decide what to do next
-        HashMap<String, ArrayList<CapabilityReport>> report = orchestrator.capabilitySelector(intent);
+        // todo: update orchestrator workflow and change normal message handle workflow
+//        HashMap<String, ArrayList<CapabilityReport>> report = orchestrator.capabilitySelector(intent);
 //        createReportMessage(report, event);
     }
 
@@ -74,7 +75,7 @@ public class DiscordOnMessageListener extends ListenerAdapter {
      * create report message from config missing report
      * @param finalReport
      */
-    public Message createReportMessage(HashMap<String, ArrayList<CapabilityReport>> finalReport){
+    public Message createMissingReportMessage(HashMap<String, ArrayList<CapabilityReport>> finalReport){
         if(finalReport.isEmpty()) return null;
         EmbedBuilder embedBuilder = new EmbedBuilder();
         MessageBuilder messageBuilder = new MessageBuilder();
@@ -86,16 +87,15 @@ public class DiscordOnMessageListener extends ListenerAdapter {
             // todo : might have to many element in single message
             for(CapabilityReport report : serviceReport){
                 String serviceName = report.service;
-                HashMap<String, ArrayList<String>> contextProperties = report.contextProperty;
+                HashMap<String, HashSet<String>> contextProperties = report.missingContextProperty;
                 StringBuilder contextMsg = new StringBuilder();
-                for(Map.Entry<String, ArrayList<String>> properties: contextProperties.entrySet()){
+                for(Map.Entry<String, HashSet<String>> properties: contextProperties.entrySet()){
                     contextMsg.append(properties.getKey() + "." + properties.getValue());
                 }
                 embedBuilder.addField(serviceName, contextMsg.toString(), false);
             }
         }
         return messageBuilder.setEmbeds(embedBuilder.build()).build();
-//        event.getJDA().getGuildById("737233839709225001").getTextChannelById("966378622560665610").sendMessage(messageBuilder.setEmbeds(embedBuilder.build()).build()).queue();
     }
 
     /**

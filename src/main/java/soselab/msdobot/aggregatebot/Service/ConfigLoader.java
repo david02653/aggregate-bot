@@ -235,63 +235,101 @@ public class ConfigLoader {
         while(capabilityIterator.hasNext()){
             Capability currentCapability = capabilityIterator.next();
             System.out.println("[DEBUG] checking capability '" + currentCapability.name + "'");
-            /* check context */
-            String context = currentCapability.context;
-            if(!vocabularyList.isAvailableContext(context)){
-                System.out.println("[Error] Error code: C01");
-                System.out.println("[WARNING] context '" + context + "' found in capability '" + currentCapability.name + "' is illegal");
-                System.out.println("[WARNING] this capability will be ignored by system from now on.");
-                capabilityIterator.remove();
+            if(currentCapability.isRenderingMethod){
+                // todo: verify rendering method
                 continue;
             }
-            /* check used mapping */
-            final ArrayList<String> legalMappingList;
-            try {
-                if(currentCapability.usedMappingList != null)
-                    legalMappingList = getLegalCustomMapping(currentCapability.usedMappingList);
-                else
-                    legalMappingList = new ArrayList<>();
-            }catch (IllegalConceptException ic){
-                System.out.println("[WARNING] verification failed when processing custom mapping, this capability will be ignored from now on.");
-                capabilityIterator.remove();
-                continue;
-            }
-            /* check input */
-            if(currentCapability.input.stream().anyMatch(input -> isPropertyIllegal(input, legalMappingList))){
-                System.out.println("[WARNING] verification failed when processing input properties, this capability will be ignored from now on.");
-                capabilityIterator.remove();
-                continue;
-            }
-            /* check output */
-            final ArrayList<String> outputStoredDataLabelList;
-            try{
-                outputStoredDataLabelList = getOutputStoredDataList(currentCapability.output);
-            }catch (IllegalConceptException ic){
-                System.out.println("[Error] Error code: C05");
-                System.out.println("[WARNING] verification failed when processing output config, this capability will be ignored from now on.");
-                capabilityIterator.remove();
-                continue;
-            }
-            /* check aggregate data */
-            if(currentCapability.output != null && currentCapability.output.type.equals("aggregate")){
-                // check aggregate detail: context, from
-                if(!isAggregateDetailLegal(currentCapability, legalMappingList)){
-                    System.out.println("[WARNING] verification failed when processing aggregate details, this capability will be ignored from now on.");
+            if(!currentCapability.isAggregateMethod){
+                /* check context */
+                String context = currentCapability.context;
+                if (!vocabularyList.isAvailableContext(context)) {
+                    System.out.println("[Error] Error code: C01");
+                    System.out.println("[WARNING] context '" + context + "' found in capability '" + currentCapability.name + "' is illegal");
+                    System.out.println("[WARNING] this capability will be ignored by system from now on.");
                     capabilityIterator.remove();
                     continue;
                 }
-            }
-            /* check stored data */
-            if(currentCapability.storedData != null) {
-                // input
-                if (!isStoredDataInputLegal(currentCapability.storedData.input, currentCapability.input)) {
-                    System.out.println("[WARNING] verification failed when processing storedData input config, this capability will be ignored from now on.");
+                /* check used mapping */
+                final ArrayList<String> legalMappingList;
+                try {
+                    if (currentCapability.usedMappingList != null)
+                        legalMappingList = getLegalCustomMapping(currentCapability.usedMappingList);
+                    else
+                        legalMappingList = new ArrayList<>();
+                } catch (IllegalConceptException ic) {
+                    System.out.println("[WARNING] verification failed when processing custom mapping, this capability will be ignored from now on.");
                     capabilityIterator.remove();
                     continue;
                 }
-                // output
-                if (!isStoredDataOutputLegal(currentCapability.storedData.output, outputStoredDataLabelList)) {
-                    System.out.println("[WARNING] illegal output label found in storedData, this capability will be ignored from now on.");
+                /* check input */
+                if (currentCapability.input.stream().anyMatch(input -> isPropertyIllegal(input, legalMappingList))) {
+                    System.out.println("[WARNING] verification failed when processing input properties, this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                    continue;
+                }
+                /* check output */
+                if (missingDataLabel(currentCapability.output)) {
+                    System.out.println("[WARNING] verification failed when processing output config, this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                    continue;
+                }
+                final ArrayList<String> outputStoredDataLabelList;
+                try {
+                    outputStoredDataLabelList = getOutputStoredDataList(currentCapability.output);
+                } catch (IllegalConceptException ic) {
+                    System.out.println("[Error] Error code: C05");
+                    System.out.println("[WARNING] verification failed when processing output config, this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                    continue;
+                }
+                /* check stored data */
+                if (currentCapability.storedData != null) {
+                    // input
+                    if (!isStoredDataInputLegal(currentCapability.storedData.input, currentCapability.input)) {
+                        System.out.println("[WARNING] verification failed when processing storedData input config, this capability will be ignored from now on.");
+                        capabilityIterator.remove();
+                        continue;
+                    }
+                    // output
+                    if (!isStoredDataOutputLegal(currentCapability.storedData.output, outputStoredDataLabelList)) {
+                        System.out.println("[WARNING] illegal output label found in storedData, this capability will be ignored from now on.");
+                        capabilityIterator.remove();
+                    }
+                }
+            } else {
+                // verify aggregate capability
+                AggregateDetail aggregateDetail = currentCapability.aggregateDetail;
+                /* check if aggregate detail is even exist */
+                if(aggregateDetail == null){
+                    System.out.println("[Error] Error code: C16");
+                    System.out.println("[WARNING] aggregate capability found but missing aggregate detail, this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                    continue;
+                }
+                /* check used material */
+                if(aggregateDetail.storeResult){
+                    if(aggregateDetail.usedMaterial == null){
+                        System.out.println("[Error] Error code: C17.");
+                        System.out.println("[WARNING] missing stored data about aggregate result, this capability will be ignored from now on.");
+                        capabilityIterator.remove();
+                        continue;
+                    }
+                    if(isUsedMaterialIllegal(aggregateDetail.usedMaterial, currentCapability.accessLevel)){
+                        System.out.println("[WARNING] illegal config found in used material config, this capability will be ignored from now on.");
+                        capabilityIterator.remove();
+                        continue;
+                    }
+                }
+                /* check aggregate capability data source */
+                if(aggregateDetail.dataSource == null){
+                    // check if aggregate data source do exist
+                    System.out.println("[Error] Error code: C20");
+                    System.out.println("[WARNING] no input data source found in aggregate capability '" + currentCapability.name + "', this capability will be ignored from now on.");
+                    capabilityIterator.remove();
+                    continue;
+                }
+                if(isAggregateDataSourceIllegal(currentCapability)){
+                    System.out.println("[WARNING] error occurs when verifying aggregate data source, this capability will be ignored from now on");
                     capabilityIterator.remove();
                 }
             }
@@ -301,45 +339,71 @@ public class ConfigLoader {
     }
 
     /**
-     * verify capability aggregate detail config
-     * @param capability target capability
-     * @param legalMappingList used custom mapping list
-     * @return true if aggregate detail is legal, otherwise false
+     * check if used material in aggregate detail contains illegal config
+     * @param usedMaterial used material in aggregate detail
+     * @param accessLevel capability access level
+     * @return true if any config goes wrong, otherwise return false
      */
-    private boolean isAggregateDetailLegal(Capability capability, ArrayList<String> legalMappingList){
-        boolean result = true;
-        if(capability.output.aggregateDetail == null) return false;
-        CapabilityOutput output = capability.output;
-        ArrayList<String> input = capability.input;
-        // check aggregate method
-        if(vocabularyList.isIllegalConceptProperty("Aggregate", output.aggregateDetail.method)) {
-            System.out.println("[Error] Error code: C10");
-            System.out.println("[WARNING] illegal capability aggregate method found.");
-            return false;
-        }
-        // check aggregate context/from
-        for(AggregateSource source: output.aggregateDetail.dataSource){
-            // check aggregate context is available
-            if(!vocabularyList.isAvailableContext(source.context)){
-                System.out.println("[Error] Error code: C11");
-                System.out.println("[WARNING] illegal aggregate source context '" + source.context + "' found.");
-                result = false;
-            }
-            // check aggregate source property is legal
-            if(isPropertyIllegal(source.from, legalMappingList)){
-                System.out.println("[Error] Error code: C12");
-                System.out.println("[WARNING] illegal aggregate source property '" + source.from + "' found");
-                result = false;
-            }
-            // todo: need to check given aggregate property exist in input list ?
-            // check if given property is not mapping and enabled in context domain
-            if(vocabularyList.isIllegalContextProperty(source.context, source.from) && !legalMappingList.contains(source.from)){
-                System.out.println("[Error] Error code: C13");
-                System.out.println("[WARNING] given aggregate property does not exist in given context");
-                result = false;
+    private boolean isUsedMaterialIllegal(AggregateDataMaterial usedMaterial, String accessLevel){
+        // check context in used material
+        for(String context: usedMaterial.context){
+            if(!vocabularyList.isAvailableContext(context)){
+                System.out.println("[Error] Error code: C18");
+                System.out.println("[WARNING] context '" + context + "' found in used material is not available.");
+                return true;
             }
         }
-        return result;
+        // check property in used material (is property exist and legal ?)
+        for(String property: usedMaterial.property){
+            if(isPropertyIllegal(property)){
+                System.out.println("[Error] Error code: C19");
+                System.out.println("[WARNING] property '" + property + "' found in used material is not available.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * verify capability aggregate data source config
+     * @param capability target capability
+     * @return true if any aggregate data source is illegal, otherwise false
+     */
+    private boolean isAggregateDataSourceIllegal(Capability capability){
+        AggregateDetail aggregateDetail = capability.aggregateDetail;
+        for(AggregateSource dataSource: aggregateDetail.dataSource){
+            if(dataSource.isAggregationData){
+                AggregateDataMaterial materials = dataSource.aggregateDataMaterial;
+                // check aggregate data input
+                for(String context: materials.context){
+                    if(!vocabularyList.isAvailableContext(context)){
+                        System.out.println("[Error] Error code: C20");
+                        System.out.println("[WARNING] assigned context '" + context + "' in aggregate data source is not available");
+                        return true;
+                    }
+                }
+                for(String property: materials.property){
+                    if(isPropertyIllegal(property)){
+                        System.out.println("[Error] Error code: C21");
+                        System.out.println("[WARNING] assign property '" + property + "' in aggregate data source is not available");
+                        return true;
+                    }
+                }
+            }else{
+                // check normal property input
+                if(!vocabularyList.isAvailableContext(dataSource.context)){
+                    System.out.println("[Error] Error code: C22");
+                    System.out.println("[WARNING] context '" + dataSource.context + "' found in data source is illegal");
+                    return true;
+                }
+                if(isPropertyIllegal(dataSource.from)){
+                    System.out.println("[Error] Error code: C23");
+                    System.out.println("[WARNING] property '" + dataSource.from + "' found in data source is illegal");
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -349,6 +413,8 @@ public class ConfigLoader {
      * @return true if all stored data input label are legal, otherwise return false
      */
     private boolean isStoredDataInputLegal(ArrayList<DataLabel> dataLabelList, ArrayList<String> inputList){
+        if(dataLabelList == null)
+            return true;
         for(DataLabel dataSet: dataLabelList){
             if(isPropertyIllegal(dataSet.to)) {
                 System.out.println("[Error] Error code: C06");
@@ -471,6 +537,36 @@ public class ConfigLoader {
     }
 
     /**
+     * check if output config missing any data label<br>
+     * check direct data label if output type is plainText<br>
+     * check json info data label if output type is json<br>
+     * return true if any label is missing
+     * @param output target capability output
+     * @return true if any data label is missing, otherwise return false
+     */
+    private boolean missingDataLabel(CapabilityOutput output) {
+        if(output.type.equals("plainText")){
+            // check data label
+            if(output.dataLabel == null || output.dataLabel.isEmpty()) {
+                System.out.println("[Error] Error code: C14");
+                System.out.println("[WARNING] output type is 'plainText' but no data label found.");
+                return true;
+            }
+        }else if(output.type.equals("json")){
+            // check json info
+            ArrayList<JsonInfo> infos = output.jsonInfo;
+            for(JsonInfo info: infos){
+                if(info.dataLabel == null || info.dataLabel.isEmpty()){
+                    System.out.println("[Error code: C15]");
+                    System.out.println("[WARNING] found json info with no data label.");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
      * get all dataLabel in output config
      * @param output output config
      * @return output stored data label list
@@ -510,6 +606,8 @@ public class ConfigLoader {
      * @return capability list
      */
     public ArrayList<Capability> getUpperIntentCapabilityListByIntent(String upperIntent){
+        System.out.println("[DEBUG] start to check upper intent");
+        System.out.println(new Gson().toJson(upperIntentList));
         ArrayList<Capability> semiCapabilityList = upperIntentList.getSemiCapabilityList(upperIntent);
         ArrayList<Capability> resultList = new ArrayList<>();
         for(Capability semiCapability: semiCapabilityList){

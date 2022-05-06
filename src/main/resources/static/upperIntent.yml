@@ -9,3 +9,15 @@ crossCapabilityList:
       - name: Jenkins-semi-test-report
         order: 1
         description: get latest job test report
+  - name: test-pseudo-service-detail
+    upperIntent: pseudo-service-detail-go
+    sequencedCapabilityList:
+      - name: Pseudo-service-detail
+        order: 0
+        description: get service detail about pseudo service
+      - name: Pseudo-service-api-detail
+        order: 1
+        description: get service api detail about pseudo service
+      - name: pseudo-aggregate
+        order: 2
+        description: aggregate pseudo service details

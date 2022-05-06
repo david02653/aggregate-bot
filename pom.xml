@@ -65,6 +65,15 @@
             <version>4.4.0_350</version>
         </dependency>
 
+        <!-- ascii table library -->
+        <!-- https://mvnrepository.com/artifact/com.jakewharton.fliptables/fliptables -->
+        <dependency>
+            <groupId>com.jakewharton.fliptables</groupId>
+            <artifactId>fliptables</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+
+
         <!-- xml parser -->
         <!-- https://mvnrepository.com/artifact/org.w3c/dom -->
         <dependency>
