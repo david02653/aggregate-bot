@@ -221,8 +221,11 @@
   aggregateDetail:
     # determine if this aggregation result needs to be stored or not
     storeResult: true
-    # usedMaterial -> usedComponent
-    usedMaterial:
+    # endpoint response result data key should use this
+    # system: {[sample], [content]}
+    # service: {[serviceA.sample, serviceB.sample], [contentA, contentB]}
+    resultName: sample
+    usedComponent:
       context:
         - jenkins
         - eureka
@@ -236,7 +239,7 @@
       - useAs: aggregate-result-1
         isAggregationData: true
         aggregationLevel: service
-        aggregateDataMaterial:
+        aggregateDataComponent:
           context:
             - jenkins
           property:
@@ -244,7 +247,7 @@
       - useAs: aggregate-result-2
         isAggregationData: true
         aggregationLevel: system
-        aggregateDataMaterial:
+        aggregateDataComponent:
           context:
             - eureka
           property:
@@ -271,7 +274,7 @@
       - useAs: aggregate-result-1
         isAggregationData: true
         aggregationLevel: service
-        aggregateDataMaterial:
+        aggregateDataComponent:
           context:
             - jenkins
           property:
@@ -279,7 +282,7 @@
       - useAs: aggregate-result-2
         isAggregationData: true
         aggregationLevel: system
-        aggregateDataMaterial:
+        aggregateDataComponent:
           context:
             - eureka
           property:
@@ -332,7 +335,7 @@
   output:
   aggregateDetail:
     storeResult: true
-    usedMaterial:
+    usedComponent:
       context:
         - pseudo
         - pseudo2

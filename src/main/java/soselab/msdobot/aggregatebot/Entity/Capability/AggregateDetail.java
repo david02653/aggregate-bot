@@ -10,8 +10,10 @@ public class AggregateDetail {
     public ArrayList<AggregateSource> dataSource;
     // should this aggregation result be stored
     public boolean storeResult;
-    // what material should be used to retrieve this result
-    public AggregateDataMaterial usedMaterial;
+    // what component should be used to retrieve this result
+    public AggregateDataComponent usedComponent;
+    // how to call to result
+    public String resultName;
 
     public AggregateDetail(){
     }

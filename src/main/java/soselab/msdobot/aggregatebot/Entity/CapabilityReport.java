@@ -14,7 +14,9 @@ import java.util.Map;
  */
 public class CapabilityReport {
 
+    // capability name
     public String capability;
+    // target service name
     public String service;
     // error property map
     // context - propertyName[]

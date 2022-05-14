@@ -26,7 +26,7 @@ public class DiscordOnMessageListener extends ListenerAdapter {
     public ConcurrentHashMap<String, Boolean> configMissingList;
     private RasaService rasaService;
     private Orchestrator orchestrator;
-    private String testChannelName = "test";
+    private String testChannelName = "msdobot";
 
     @Autowired
     public DiscordOnMessageListener(Environment environment, RasaService rasa, Orchestrator orchestrator){
@@ -48,12 +48,12 @@ public class DiscordOnMessageListener extends ListenerAdapter {
         * normal message: rasa analyze
         * config filling message: check given message, fall back to previous message event if config filling process complete
         */
-        if(isFillingConfig(event.getAuthor(), event.getMessage())){
-            // todo: fill in missing config
-        }else{
-            // normal message workflow
-            normalMessageHandle(event);
-        }
+//        if(isFillingConfig(event.getAuthor(), event.getMessage())){
+//            // todo: fill in missing config
+//        }else{
+//            // normal message workflow
+//        }
+        normalMessageHandle(event);
     }
 
     /**
@@ -67,35 +67,8 @@ public class DiscordOnMessageListener extends ListenerAdapter {
 
         // use orchestrator to decide what to do next
         // todo: update orchestrator workflow and change normal message handle workflow
-//        HashMap<String, ArrayList<CapabilityReport>> report = orchestrator.capabilitySelector(intent);
-//        createReportMessage(report, event);
-    }
-
-    /**
-     * create report message from config missing report
-     * @param finalReport
-     */
-    public Message createMissingReportMessage(HashMap<String, ArrayList<CapabilityReport>> finalReport){
-        if(finalReport.isEmpty()) return null;
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        MessageBuilder messageBuilder = new MessageBuilder();
-        for(Map.Entry<String, ArrayList<CapabilityReport>> capabilityReport: finalReport.entrySet()){
-            String capabilityName = capabilityReport.getKey();
-            ArrayList<CapabilityReport> serviceReport = capabilityReport.getValue();
-            embedBuilder.setTitle("Missing Config");
-            embedBuilder.setDescription("missing config while executing capability '" + capabilityName + "'");
-            // todo : might have to many element in single message
-            for(CapabilityReport report : serviceReport){
-                String serviceName = report.service;
-                HashMap<String, HashSet<String>> contextProperties = report.missingContextProperty;
-                StringBuilder contextMsg = new StringBuilder();
-                for(Map.Entry<String, HashSet<String>> properties: contextProperties.entrySet()){
-                    contextMsg.append(properties.getKey() + "." + properties.getValue());
-                }
-                embedBuilder.addField(serviceName, contextMsg.toString(), false);
-            }
-        }
-        return messageBuilder.setEmbeds(embedBuilder.build()).build();
+        var resultMsg = orchestrator.capabilitySelector(intent);
+        event.getTextChannel().sendMessage(resultMsg).queue();
     }
 
     /**

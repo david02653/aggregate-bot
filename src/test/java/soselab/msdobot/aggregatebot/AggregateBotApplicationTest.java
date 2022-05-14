@@ -1,6 +1,7 @@
 package soselab.msdobot.aggregatebot;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -15,12 +16,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
+import soselab.msdobot.aggregatebot.Entity.Capability.Capability;
+import soselab.msdobot.aggregatebot.Entity.DiscordEmbedFieldTemplate;
+import soselab.msdobot.aggregatebot.Entity.DiscordEmbedTemplate;
+import soselab.msdobot.aggregatebot.Entity.DiscordMessageTemplate;
 import soselab.msdobot.aggregatebot.Entity.RasaIntent;
 import soselab.msdobot.aggregatebot.Service.*;
 import soselab.msdobot.aggregatebot.Service.Discord.DiscordOnMessageListener;
 import soselab.msdobot.aggregatebot.Service.Discord.JDAConnect;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -30,8 +36,6 @@ import java.util.regex.Pattern;
 @TestPropertySource("classpath:application-dev.properties")
 class AggregateBotApplicationTest {
 
-    @Autowired
-    private LoadService service;
     @Autowired
     private JenkinsService jenkinsService;
     @Autowired
@@ -44,15 +48,6 @@ class AggregateBotApplicationTest {
     private DiscordOnMessageListener onMsgListener;
     @Autowired
     private JDAConnect jdaConnect;
-
-    /**
-     * test if properties file load correctly
-     */
-    @Test
-    void propertiesTest(){
-        System.out.println(service.loadEnv());
-        Assertions.assertEquals(service.loadEnv(), "test stuff");
-    }
 
     /**
      * test if service yaml setting file load successfully
@@ -84,26 +79,6 @@ class AggregateBotApplicationTest {
     @Test
     void loadVocabularyConfigTest(){
         configLoader.loadVocabularyConfig();
-    }
-
-    @Test
-    void testVocabularyCustomMappingValidation(){
-        // todo: update custom mapping verify test
-//        configLoader.loadVocabularyConfig();
-//        configLoader.verifyCustomMappingVocabulary();
-    }
-
-    private boolean isValidJsonString(String raw){
-        try{
-            new JSONObject(raw);
-        }catch (JSONException je){
-            try{
-                new JSONArray(raw);
-            }catch (JSONException jae){
-                return false;
-            }
-        }
-        return true;
     }
 
     /**
@@ -146,14 +121,16 @@ class AggregateBotApplicationTest {
     @Test
     void testSkillSelector(){
         RasaIntent intent = new RasaIntent("test-jenkins-health", "Cinema");
-        orchestrator.capabilitySelector(intent);
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
     }
 
     @Test
     void
     testSkillSelector2(){
         RasaIntent intent = new RasaIntent("ask_jenkins_job_build_number", "Cinema");
-        orchestrator.capabilitySelector(intent);
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
     }
 
     /**
@@ -164,7 +141,8 @@ class AggregateBotApplicationTest {
     void testUserInput(){
         String userUtterance = "test report of Ordering";
         RasaIntent intent = rasaService.restrictedIntentParsing(rasaService.analyze(userUtterance));
-        orchestrator.capabilitySelector(intent);
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
     }
 
     /**
@@ -179,7 +157,8 @@ class AggregateBotApplicationTest {
     @Test
     void testCustomMappingRequest(){
         RasaIntent intent = new RasaIntent("ask_job_view_list", "Cinema");
-        orchestrator.capabilitySelector(intent);
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
     }
 
     @Test
@@ -335,6 +314,59 @@ class AggregateBotApplicationTest {
     @Test
     void testPseudoIntents(){
         RasaIntent intent = new RasaIntent("pseudo-service-detail-go", "Pseudo");
-        orchestrator.capabilitySelector(intent);
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void testLastElement(){
+        ArrayList<String> list = new ArrayList<>();
+        list.add("element 1");
+        list.add("element 2");
+        String test = "element 2";
+        for(String ele: list){
+            if(list.indexOf(ele) == list.size() - 1)
+                System.out.println(ele);
+        }
+    }
+
+    @Test
+    void testDiscordMessageTemplate(){
+        var template = new DiscordMessageTemplate("testing content");
+        jdaConnect.send(RenderingService.createDiscordMessage(template));
+    }
+
+    @Test
+    void testDiscordMessageEmbedTemplate(){
+        var template = new DiscordMessageTemplate("top");
+        var embed = new DiscordEmbedTemplate();
+        embed.setTitle("embed title");
+        embed.setDescription("embed description");
+        var field = new DiscordEmbedFieldTemplate("field name", "field value");
+        embed.setFieldList(new ArrayList<DiscordEmbedFieldTemplate>(Collections.singletonList(field)));
+        template.setEmbedList(new ArrayList<DiscordEmbedTemplate>(Collections.singletonList(embed)));
+        jdaConnect.send(RenderingService.createDiscordMessage(template));
+    }
+
+    @Test
+    void testInput(){
+//        Capability capability, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> specificAggregateData, HashMap<String, HashMap<String, String>> properties
+        var aggregateDate = new HashMap<String, String>();
+        var specificData = new HashMap<String, HashMap<String, String>>();
+        var properties = new HashMap<String, HashMap<String, String>>();
+        aggregateDate.put("systemDataKey", "systemData");
+        var tempMap = new HashMap<String, String>();
+        tempMap.put("serviceA", "content A");
+        specificData.put("specific", tempMap);
+        tempMap = new HashMap<String, String>();
+        tempMap.put("property key", "property value");
+        properties.put("property context", tempMap);
+    }
+
+    @Test
+    void testMap(){
+        var map = new HashMap<String, String>();
+        map.put("head", "body");
+        System.out.println(new Gson().toJson(map));
     }
 }

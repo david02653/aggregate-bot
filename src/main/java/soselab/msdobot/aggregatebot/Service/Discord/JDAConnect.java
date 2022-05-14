@@ -85,14 +85,23 @@ public class JDAConnect {
 
     /**
      * only for testing purpose, send message
-     * @param msg
+     * @param msg message content
      */
     public void send(Message msg){
         System.out.println("[DEBUG] send msg");
         JDA.getGuildById("737233839709225001").getTextChannelById("966378622560665610").sendMessage(msg).queue();
-//        List<TextChannel> channels = JDA.getTextChannelsByName(channel, true);
-//        for(TextChannel ch: channels){
-//            ch.sendMessage(msg).queue();
 //        }
+    }
+
+    /**
+     * send message to target text channel<br>
+     * should only be used by rabbitMQ message handler<br>
+     * note that given channel id might not be found in guild
+     * @param msg message content
+     * @param channelId target channel id
+     */
+    public void send(Message msg, String channelId){
+        System.out.println("[DEBUG] send msg to channel '" + channelId + "'");
+        JDA.getGuildById("737233839709225001").getTextChannelById(channelId).sendMessage(msg).queue();
     }
 }

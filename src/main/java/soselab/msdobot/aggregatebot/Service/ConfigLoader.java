@@ -308,13 +308,13 @@ public class ConfigLoader {
                 }
                 /* check used material */
                 if(aggregateDetail.storeResult){
-                    if(aggregateDetail.usedMaterial == null){
+                    if(aggregateDetail.usedComponent == null){
                         System.out.println("[Error] Error code: C17.");
                         System.out.println("[WARNING] missing stored data about aggregate result, this capability will be ignored from now on.");
                         capabilityIterator.remove();
                         continue;
                     }
-                    if(isUsedMaterialIllegal(aggregateDetail.usedMaterial, currentCapability.accessLevel)){
+                    if(isUsedMaterialIllegal(aggregateDetail.usedComponent, currentCapability.accessLevel)){
                         System.out.println("[WARNING] illegal config found in used material config, this capability will be ignored from now on.");
                         capabilityIterator.remove();
                         continue;
@@ -344,7 +344,7 @@ public class ConfigLoader {
      * @param accessLevel capability access level
      * @return true if any config goes wrong, otherwise return false
      */
-    private boolean isUsedMaterialIllegal(AggregateDataMaterial usedMaterial, String accessLevel){
+    private boolean isUsedMaterialIllegal(AggregateDataComponent usedMaterial, String accessLevel){
         // check context in used material
         for(String context: usedMaterial.context){
             if(!vocabularyList.isAvailableContext(context)){
@@ -373,7 +373,7 @@ public class ConfigLoader {
         AggregateDetail aggregateDetail = capability.aggregateDetail;
         for(AggregateSource dataSource: aggregateDetail.dataSource){
             if(dataSource.isAggregationData){
-                AggregateDataMaterial materials = dataSource.aggregateDataMaterial;
+                AggregateDataComponent materials = dataSource.aggregateDataComponent;
                 // check aggregate data input
                 for(String context: materials.context){
                     if(!vocabularyList.isAvailableContext(context)){

@@ -1,10 +1,9 @@
 package soselab.msdobot.aggregatebot.Service;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.jayway.jsonpath.JsonPath;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
@@ -36,9 +35,10 @@ public class Orchestrator {
     // missing config found: service - context - propertyKey
     public static ConcurrentHashMap<String, HashMap<String, HashSet<String>>> missingConfigMap;
     // previous aggregate result, use sorted server + sorted context + sorted property hash as key
-    public static ConcurrentHashMap<Integer, String> aggregateDataMap;
+    public static ConcurrentHashMap<String, String> aggregateDataMap;
     private final String expireTrigger;
     private final ConfigLoader configLoader;
+    private final RenderingService renderingService;
 
     public Orchestrator(Environment env, ConfigLoader configLoader){
         contextSessionData = new ConcurrentHashMap<>();
@@ -47,36 +47,38 @@ public class Orchestrator {
         aggregateDataMap = new ConcurrentHashMap<>();
         expireTrigger = env.getProperty("bot.session.expire.trigger");
         this.configLoader = configLoader;
+        this.renderingService = new RenderingService();
     }
 
-    public void capabilitySelector(RasaIntent intent){
-//        HashMap<String, CapabilityReport> finalReport = new HashMap<>();
+    /**
+     * select and execute correspond capabilities<br>
+     * return discord message if capabilities are successfully executed/ execution failed due to lacking of config
+     * @param intent rasa intent
+     * @return execute result message
+     */
+    public Message capabilitySelector(RasaIntent intent){
         HashMap<String, ArrayList<CapabilityReport>> finalReport = new HashMap<>();
         String intentName = intent.getIntent();
         String jobName = intent.getJobName();
         // check if try to expire session
         if(intentName.equals(expireTrigger)){
             expireAllSessionData();
-            checkCapabilityExecuteResult(finalReport);
-            return;
-//            return finalReport;
+            return RenderingService.createSimpleMessage("ok, all current session data removed.");
         }
         Gson gson = new Gson();
         final ExecutorService executor = Executors.newFixedThreadPool(5);
         final List<Future<CapabilityReport>> futures = new ArrayList<>();
         Future<CapabilityReport> future;
 
-        // get correspond capability by intent name
+        /* get correspond capability by intent name */
         ArrayList<Capability> capabilityList = getCorrespondCapabilityList(intentName);
         if(capabilityList == null || capabilityList.isEmpty()) {
-            System.out.println(">> [DEBUG] No available skill found.");
-            checkCapabilityExecuteResult(finalReport);
-            return;
-//            return finalReport;
+            System.out.println(">> [DEBUG] No available capability found.");
+            return RenderingService.createSimpleMessage("No available capability found.");
         }
-        System.out.println("[DEBUG] available skill detected : " + gson.toJson(capabilityList));
+        System.out.println("[DEBUG] available capability detected : " + gson.toJson(capabilityList));
 
-        // get service list
+        /* get service list */
         // try to extract service name from general config if service name is not available
         if(jobName == null || jobName.isEmpty())
             jobName = generalSessionData.getOrDefault("Api.serviceName", "");
@@ -84,20 +86,24 @@ public class Orchestrator {
         System.out.println("[DEBUG] todo subService list: " + gson.toJson(serviceList));
         if(serviceList.isEmpty()) {
             System.out.println("[DEBUG] target service not exist.");
-            checkCapabilityExecuteResult(finalReport);
-            return;
+            return RenderingService.createSimpleMessage("No correspond service found.");
 //            return finalReport;
         }
 
-        boolean singleTurn = false;
-        singleTurn = capabilityList.size() == 1;
+        // default message, use this variable to store message if default aggregate and rendering triggered
+        Message defaultMessage = new MessageBuilder().append("init orchestrator message.").build();
         /* execute sequenced capability list */
         for(Capability capability : capabilityList){
             // fire skill request for every sub-service
             if(capability.isAggregateMethod || capability.isRenderingMethod){
                 // todo: handle aggregate and rendering capabilities
-                future = executor.submit(() -> handleAggregateCapability(capability, serviceList));
-                futures.add(future);
+                if(capability.isAggregateMethod) {
+                    future = executor.submit(() -> handleAggregateCapability(capability, serviceList));
+                    futures.add(future);
+                }else{
+                    // todo: handle rendering capability, return result message
+                    return handleRenderingCapability(capability, serviceList);
+                }
             }else {
                 /* POST method */
                 if (capability.method.equals("POST")) {
@@ -141,12 +147,11 @@ public class Orchestrator {
                 }
                 // if any error report found, return current report
                 if(reportFlag) {
-                    checkCapabilityExecuteResult(finalReport);
-                    return;
-//                    return finalReport;
+                    // create and return missing report message from current capability report (may have multiple)
+                    return renderingService.createMissingReportMessage(finalReport.get(capability.name));
                 }
-                // if selected capabilities only contain single capability, run default aggregate and rendering
-                if(singleTurn || checkLastCapability(capabilityList, capability)){
+                // if last capability, check capability type, run default aggregation and rendering if no rendering capability assigned
+                if(checkLastCapability(capabilityList, capability)){
                     // collect capability execute result
                     ArrayList<CapabilityReport> results = new ArrayList<>();
                     for(Future<CapabilityReport> report: futures){
@@ -157,43 +162,44 @@ public class Orchestrator {
                     // default rendering
                     RenderingService rendering = new RenderingService(serviceList, aggregateReport);
                     String resultTable = rendering.parseToSimpleAsciiArtTable();
+                    // return default rendering result
+                    defaultMessage = RenderingService.createSimpleMessage(resultTable);
                 }
                 futures.clear();
             }catch (InterruptedException | ExecutionException e){
                 e.printStackTrace();
             }
         }
-        checkCapabilityExecuteResult(finalReport);
-//        return finalReport;
+        return defaultMessage;
     }
 
     /**
-     * check if given capability is the last element of capability list and whether it is an aggregate capability or not
+     * check if given capability is the last element of capability list and whether it is a rendering capability or not
      * @param capabilityList capability list
      * @param currentCapability target capability
-     * @return true if given capability is the last one and is an aggregate capability, otherwise return false
+     * @return true if given capability is not the last one and is an aggregate capability, otherwise return false
      */
     private boolean checkLastCapability(ArrayList<Capability> capabilityList, Capability currentCapability){
         // check if current capability is the last capability
         if((capabilityList.size() -1) == capabilityList.indexOf(currentCapability)){
             // todo: change aggregate capability check to rendering capability check
-            return !currentCapability.isAggregateMethod;
+//            return !currentCapability.isAggregateMethod;
+            return !currentCapability.isRenderingMethod;
         }
-        return false;
+        return true;
     }
 
-    private void checkCapabilityExecuteResult(HashMap<String, ArrayList<CapabilityReport>> report){
-        // todo: handle capability final report
-        // report contains error, return error message
-    }
+//    private void checkCapabilityExecuteResult(HashMap<String, ArrayList<CapabilityReport>> report){
+//        // todo: handle capability final report
+//        // report contains error, return error message
+//    }
 
     /**
-     * add new missing config in previous report map<br>
+     * add new missing config in previous report map
      * @param reportMap previous report map, use capability name as key, service report list as value
      * @param report new report
      */
     private void mergeMissingReport(HashMap<String, ArrayList<CapabilityReport>> reportMap, CapabilityReport report){
-        // todo: merge report
         if(reportMap.containsKey(report.capability)){
             // has previous service config
             ArrayList<CapabilityReport> reportList = reportMap.get(report.capability);
@@ -418,41 +424,142 @@ public class Orchestrator {
     public CapabilityReport handleAggregateCapability(Capability capability, ArrayList<Service> serviceList){
         CapabilityReport report = new CapabilityReport();
         report.setCapability(capability.name);
-        // collect required config
+        /* collect required config */
         AggregateDetail aggregateDetail = capability.aggregateDetail;
         ArrayList<AggregateSource> dataSources = aggregateDetail.dataSource;
+        // aggregateDataName - aggregateDataValue, use this to store no service-specific aggregate data
         HashMap<String, String> aggregateData = new HashMap<>();
+        // aggregateDataName - serviceName - aggregateDataValue, use this to store service-specific aggregate data
+        HashMap<String, HashMap<String, String>> specificAggregateData = new HashMap<>();
+        // propertyName - serviceName - propertyValue
         HashMap<String, HashMap<String, String>> properties = new HashMap<>();
+        // contextName - propertyName[]
         HashMap<String, HashSet<String>> missingPropertyMap = new HashMap<>();
-        collectRequiredAggregateConfig(dataSources, serviceList, aggregateData, properties, missingPropertyMap);
-        // check if any required data is missing
+        collectRequiredAggregateConfig(dataSources, serviceList, aggregateData, specificAggregateData, properties, missingPropertyMap);
+        /* check if any required data is missing */
         if(missingPropertyMap.size() > 0){
             report.setMissingContextProperty(missingPropertyMap);
             System.out.println("[WARNING][handle aggregate] missing config");
             return report;
         }
-        // todo: request aggregate endpoint
+        /* request endpoint */
         String requestMethod = capability.method;
         String requestEndpoint = capability.apiEndpoint;
         String rawAggregateReport = "";
-        if(requestMethod.equals("POST"))
-            rawAggregateReport = postRequestAggregateEndpoint(capability, aggregateData, properties);
-        else {
-            // todo: complete get method request to aggregate endpoint
-            if(!hasPathVariable(requestEndpoint))
-                getRequestAggregateEndpoint();
-            else
-                getRequestAggregateEndpointViaPathVariable();
-        }
-        // todo: parse and store aggregate result
+        // todo: assume all aggregate capability only use POST method for now
+        rawAggregateReport = postRequestEndpointWithDataSource(capability, aggregateData, specificAggregateData, properties);
+        /* parse and store aggregate result */
+        // use access level to determine data should be stored seperated or not
+        // key: context-service-property, if multiple service involved, include all service name
         JsonArray aggregateReport = new Gson().fromJson(rawAggregateReport, JsonArray.class);
-        AggregateDataMaterial usedMaterial = aggregateDetail.usedMaterial;
-        storeAggregateResult(usedMaterial.context, usedMaterial.property, collectServiceName(serviceList), rawAggregateReport);
+        AggregateDataComponent usedComponent = aggregateDetail.usedComponent;
+        // todo: add storeResult check
+        if(capability.accessLevel.equals("system")) {
+            storeAggregateResult(usedComponent.context, usedComponent.property, collectServiceName(serviceList), extractSystemAggregateData(aggregateReport, aggregateDetail.resultName));
+        }else{
+            // store each service result
+            for(Service service: serviceList){
+                storeAggregateResult(usedComponent.context, usedComponent.property, new ArrayList<String>(Collections.singletonList(service.name)), extractServiceSpecificAggregateData(aggregateReport, service.name, aggregateDetail.resultName));
+            }
+        }
+        // add aggregate data in capability execution report
         report.addResultFromAggregateReport(aggregateReport);
         return report;
     }
 
-    private String postRequestAggregateEndpoint(Capability capability, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> properties){
+    /**
+     * get system level aggregate data from aggregate report<br>
+     * expect report like: {[targetDataName], [dataContent]}
+     * @param aggregateReport json array aggregate report
+     * @param targetDataName aggregate data key name
+     * @return aggregate data content
+     */
+    private String extractSystemAggregateData(JsonArray aggregateReport, String targetDataName){
+        var keyArray = aggregateReport.get(RenderingService.AGGREGATE_RESULT_KEY).getAsJsonArray();
+        var valueArray = aggregateReport.get(RenderingService.AGGREGATE_RESULT_VALUE).getAsJsonArray();
+        int index = 0;
+        for(JsonElement key: keyArray){
+            if(key.getAsString().equals(targetDataName))
+                return valueArray.get(index).getAsString();
+            index++;
+        }
+        return "";
+    }
+
+    /**
+     * get service specific aggregate data from aggregate report<br>
+     * expect report like: {[serviceA.targetDataName, serviceB.targetDataName], [contentA, contentB]}
+     * @param aggregateReport json array aggregate report
+     * @param serviceName target service name
+     * @param targetDataName aggregate data key name
+     * @return aggregate data content
+     */
+    private String extractServiceSpecificAggregateData(JsonArray aggregateReport, String serviceName, String targetDataName){
+        var keyArray = aggregateReport.get(RenderingService.AGGREGATE_RESULT_KEY).getAsJsonArray();
+        var valueArray = aggregateReport.get(RenderingService.AGGREGATE_RESULT_VALUE).getAsJsonArray();
+        int index = 0;
+        for(JsonElement key: keyArray){
+            var keyName = key.getAsString();
+            if(keyName.startsWith(serviceName) && keyName.contains(targetDataName))
+                return valueArray.get(index).getAsString();
+            index++;
+        }
+        return "";
+    }
+
+    /**
+     * handle rendering capability and convert rendering result into discord message<br>
+     * return missing properties message if any required resource is unavailable<br>
+     * run default aggregate and rendering if given rendering result is illegal
+     * @param capability target capability
+     * @param serviceList applied service list
+     * @return result discord message
+     */
+    private Message handleRenderingCapability(Capability capability, ArrayList<Service> serviceList){
+        /* collect data from configured data source */
+        RenderingDetail detail = capability.renderingDetail;
+        ArrayList<AggregateSource> dataSource = detail.dataSource;
+        HashMap<String, String> aggregateData = new HashMap<>();
+        HashMap<String, HashMap<String, String>> specificAggregateData = new HashMap<>();
+        HashMap<String, HashMap<String, String>> properties = new HashMap<>();
+        HashMap<String, HashSet<String>> missingPropertyMap = new HashMap<>();
+        collectRequiredAggregateConfig(dataSource, serviceList, aggregateData, specificAggregateData, properties, missingPropertyMap);
+        /* return missing properties message if required resource is missing */
+        if(missingPropertyMap.size() > 0){
+            System.out.println("[WARNING][handle aggregate] missing config");
+            return RenderingService.createMissingReportMessage(missingPropertyMap);
+        }
+        /* request rendering endpoint */
+        String requestMethod = capability.method;
+        String requestEndpoint = capability.apiEndpoint;
+        String rawRenderingReport = "";
+        // todo: assume all rendering capability use POST method for now
+        rawRenderingReport = postRequestEndpointWithDataSource(capability, aggregateData, specificAggregateData, properties);
+        /* run default aggregate and rendering if given rendering result is illegal */
+        Message resultMessage = new MessageBuilder().append("init rendering result").build();
+        if(RenderingService.templateFormatCheck(rawRenderingReport)){
+            // convert rendering result
+            var resultMessageTemplate = RenderingService.parseRenderingResult(rawRenderingReport);
+            resultMessage = RenderingService.createDiscordMessage(resultMessageTemplate);
+        }else{
+            // run default aggregate and rendering
+            var resultMessageTemplate = renderingService.defaultRendering(aggregateData, specificAggregateData, properties);
+            resultMessage = RenderingService.createDiscordMessage(resultMessageTemplate);
+        }
+        // return rendering result
+        return resultMessage;
+    }
+
+    /**
+     * request endpoint with data collected from dataSource<br>
+     * this method could be used to request aggregate and rendering endpoint
+     * @param capability target capability
+     * @param aggregateData data from aggregate result
+     * @param specificAggregateData data from service-specific aggregate result
+     * @param properties data from normal properties
+     * @return request result
+     */
+    private String postRequestEndpointWithDataSource(Capability capability, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> specificAggregateData, HashMap<String, HashMap<String, String>> properties){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -460,15 +567,19 @@ public class Orchestrator {
         Gson gson = new Gson();
         for(AggregateSource dataSource: capability.aggregateDetail.dataSource){
             if(dataSource.isAggregationData){
-                requestBody.addProperty(dataSource.useAs, aggregateData.get(dataSource.useAs));
+                if(dataSource.aggregationLevel.equals("system")){
+                    requestBody.addProperty(dataSource.useAs, aggregateData.get(dataSource.useAs));
+                }else{
+                    requestBody.addProperty(dataSource.useAs, gson.toJson(specificAggregateData.get(dataSource.useAs)));
+                }
             }else{
                 requestBody.addProperty(dataSource.useAs, gson.toJson(properties.get(dataSource.useAs)));
             }
         }
-        System.out.println("[DEBUG][orchestrator][POST aggregate] requestBody: " + requestBody);
+        System.out.println("[DEBUG][orchestrator][POST dataSource] requestBody: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody.toString(), headers);
-        System.out.println("[DEBUG] try to request aggregate capability with body " + new Gson().toJson(requestBody));
-        System.out.println("[DEBUG] try to request aggregate capability from " + capability.apiEndpoint);
+        System.out.println("[DEBUG] try to request capability (dataSource) with body " + new Gson().toJson(requestBody));
+        System.out.println("[DEBUG] try to request capability (dataSource) from " + capability.apiEndpoint);
         ResponseEntity<String> resp = restTemplate.exchange(capability.apiEndpoint, HttpMethod.POST, entity, String.class);
         return resp.getBody();
     }
@@ -530,22 +641,35 @@ public class Orchestrator {
     }
 
     /**
-     * collect used data from aggregate capability
+     * collect used data from aggregate capability<br>
+     * result data will be stored in given variable of aggregate data and properties
      * @param dataSources target aggregate capability data source
      * @param serviceList target service list
      * @param aggregateData result aggregate data set
+     * @param specificAggregateData result specific aggregate data set
      * @param properties result property data set
      * @param missingPropertyMap missing properties
      */
-    private void collectRequiredAggregateConfig(ArrayList<AggregateSource> dataSources, ArrayList<Service> serviceList, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> properties, HashMap<String, HashSet<String>> missingPropertyMap){
+    // todo: should consider capability access level
+    private void collectRequiredAggregateConfig(ArrayList<AggregateSource> dataSources, ArrayList<Service> serviceList, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> specificAggregateData, HashMap<String, HashMap<String, String>> properties, HashMap<String, HashSet<String>> missingPropertyMap){
         ArrayList<String> serviceNameList = collectServiceName(serviceList);
         // todo: collect required config in aggregate capability
         for(AggregateSource source: dataSources){
             if(source.isAggregationData){
-                // todo: retrieve aggregate data
+                // retrieve aggregate data
                 try{
-                    String aggregateResult = retrieveAggregateData(source.aggregateDataMaterial.context, source.aggregateDataMaterial.property, serviceNameList);
-                    aggregateData.put(source.useAs, aggregateResult);
+                    String aggregateResult;
+                    if(source.aggregationLevel.equals("system")){
+                        // system level aggregate data, use all service list to retrieve data
+                        aggregateResult = retrieveAggregateData(source.aggregateDataComponent.context, source.aggregateDataComponent.property, serviceNameList);
+                        aggregateData.put(source.useAs, aggregateResult);
+                    }else{
+                        // service level aggregate data, use each service to retrieve data
+                        for(String serviceName: serviceNameList){
+                            aggregateResult = retrieveAggregateData(source.aggregateDataComponent.context, source.aggregateDataComponent.property, new ArrayList<String>(Collections.singletonList(serviceName)));
+                            addSpecificAggregateData(specificAggregateData, source.useAs, serviceName, aggregateResult);
+                        }
+                    }
                 }catch (NoSessionFoundException e){
                     System.out.println("[WARNING][retrieve aggregate] aggregate data not found");
                     addAggregateMissingProperty("Aggregate", source.useAs, missingPropertyMap);
@@ -569,66 +693,102 @@ public class Orchestrator {
     }
 
     /**
+     * add new property in specific aggregate data hash map<br>
+     * result data format: propertyName - serviceName - propertyValue
+     * @param specificAggregateData result specific aggregate data
+     * @param propertyName target property name
+     * @param serviceName applied service name
+     * @param propertyValue target property value
+     */
+    private void addSpecificAggregateData(HashMap<String, HashMap<String, String>> specificAggregateData, String propertyName, String serviceName, String propertyValue){
+        if(specificAggregateData.containsKey(propertyName)){
+            var serviceMap = specificAggregateData.get(propertyName);
+            serviceMap.put(serviceName, propertyValue);
+            specificAggregateData.put(propertyName, serviceMap);
+        }else{
+            var tempMap = new HashMap<String, String>();
+            tempMap.put(serviceName, propertyValue);
+            specificAggregateData.put(propertyName, tempMap);
+        }
+    }
+
+    /**
      * store new aggregate result in aggregate result hash map<br>
-     * use sorted material hashcode as key
+     * use sorted component as key
+     * component order: service - context - propertyName
      * @param contextSet
      * @param propertySet
      * @param serviceList
      * @param aggregateResult
      */
     private void storeAggregateResult(HashSet<String> contextSet, HashSet<String> propertySet, ArrayList<String> serviceList, String aggregateResult){
-        // todo: check aggregate result could belongs to property map
-        int materialHash = getAggregateResultKey(contextSet, propertySet, serviceList);
-        aggregateDataMap.put(materialHash, aggregateResult);
+        String dataKey = getAggregateResultKey(contextSet, propertySet, serviceList);
+        aggregateDataMap.put(dataKey, aggregateResult);
     }
 
     /**
-     * retrieve aggregate data with given aggregate material
-     * @param contextSet
-     * @param propertySet
-     * @param serviceList
+     * retrieve aggregate data with given aggregate component and applied service list
+     * @param contextSet used context
+     * @param propertySet used property
+     * @param serviceList applied service
      * @return target aggregate result
      * @throws NoSessionFoundException if no aggregate result found
      */
     private String retrieveAggregateData(HashSet<String> contextSet, HashSet<String> propertySet, ArrayList<String> serviceList) throws NoSessionFoundException {
-        int materialHash = getAggregateResultKey(contextSet, propertySet, serviceList);
-        if(aggregateDataMap.containsKey(materialHash))
-            return aggregateDataMap.get(materialHash);
+        String dataKey = getAggregateResultKey(contextSet, propertySet, serviceList);
+        if(aggregateDataMap.containsKey(dataKey))
+            return aggregateDataMap.get(dataKey);
         else
             throw new NoSessionFoundException("no aggregate result found");
     }
 
     /**
-     * generate aggregate result key with given material<br>
-     * sort all given service, context, property and concat every material before hashcode
+     * generate aggregate result key with given component<br>
+     * sort all given service, context, property and concat every component with '.'
+     * result component order: service - context - property
      * @param contextSet
      * @param propertySet
      * @param serviceList
-     * @return sorted and concatenated material hash code
+     * @return
      */
-    private int getAggregateResultKey(HashSet<String> contextSet, HashSet<String> propertySet, ArrayList<String> serviceList){
+    private String getAggregateResultKey(HashSet<String> contextSet, HashSet<String> propertySet, ArrayList<String> serviceList){
         StringBuilder fullContext = new StringBuilder();
         StringBuilder fullProperty = new StringBuilder();
         StringBuilder fullService = new StringBuilder();
-        String fullMaterial = "";
+        String fullKey = "";
         // sort context
         ArrayList<String> contextList = new ArrayList<>(contextSet);
         Collections.sort(contextList);
-        for(String context: contextList)
-            fullContext.append(context);
+        for(String context: contextList) {
+            if(contextList.indexOf(context) == 0)
+                fullContext.append(context);
+            else
+                fullContext.append("+").append(context);
+        }
         // sort property
         ArrayList<String> propertyList = new ArrayList<>(propertySet);
         Collections.sort(propertyList);
-        for(String property: propertyList)
-            fullProperty.append(property);
+        for(String property: propertyList) {
+            if(propertyList.indexOf(property) == 0)
+                fullProperty.append(property);
+            else
+                fullProperty.append("+").append(property);
+        }
         // sort service
         Collections.sort(serviceList);
-        for(String service: serviceList)
-            fullService.append(service);
-        fullMaterial += fullService.toString();
-        fullMaterial += fullContext.toString();
-        fullMaterial += fullProperty.toString();
-        return fullMaterial.hashCode();
+        for(String service: serviceList) {
+            if(serviceList.indexOf(service) == 0)
+                fullService.append(service);
+            else
+                fullService.append("+").append(service);
+        }
+        // service - context - property
+        fullKey += fullService.toString();
+        fullKey += "/";
+        fullKey += fullContext.toString();
+        fullKey += "/";
+        fullKey += fullProperty.toString();
+        return fullKey;
     }
 
     /**
@@ -880,6 +1040,9 @@ public class Orchestrator {
      */
     private void expireAllSessionData(){
         Orchestrator.contextSessionData = new ConcurrentHashMap<>();
+        Orchestrator.generalSessionData = new ConcurrentHashMap<>();
+        Orchestrator.missingConfigMap = new ConcurrentHashMap<>();
+        Orchestrator.aggregateDataMap = new ConcurrentHashMap<>();
         System.out.println("[DEBUG] all session config is expired !");
     }
 

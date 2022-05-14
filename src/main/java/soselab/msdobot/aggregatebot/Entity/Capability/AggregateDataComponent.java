@@ -5,7 +5,7 @@ import java.util.HashSet;
 /**
  * materials used to retrieve aggregation result
  */
-public class AggregateDataMaterial {
+public class AggregateDataComponent {
 
     public HashSet<String> context;
 //    public HashSet<String> service;
