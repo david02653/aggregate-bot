@@ -551,6 +551,80 @@ public class Orchestrator {
     }
 
     /**
+     * construct data source request body with required data sets<br>
+     * result body should contain three main json object: aggregateData, specificAggregateData and properties<br>
+     * aggregateData contains normal data pairs<br>
+     * specificAggregateData and properties contains 'keyName - serviceName - value' data sets<br>
+     * for example: {spec: {spec-1: {serviceA: a, serviceB: b}, spec-2: {serviceA: a2, serviceB: b2}}}
+     * @param dataSources defined data source
+     * @param aggregateData system aggregate data
+     * @param specificAggregateData service specific aggregate data
+     * @param properties service properties
+     * @return request body
+     */
+    public JsonObject constructDataSourceBody(ArrayList<AggregateSource> dataSources, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> specificAggregateData, HashMap<String, HashMap<String, String>> properties){
+        var resultBody = new JsonObject();
+        var gson = new Gson();
+        var aggregateObj = new JsonObject();
+        var specAggregateObj = new JsonObject();
+        var propObj = new JsonObject();
+        // insert data into temp variable
+        for(AggregateSource source: dataSources){
+            if (source.isAggregationData){
+                // system and service aggregate data
+                if(source.aggregationLevel.equals("system")){
+                    aggregateObj.addProperty(source.useAs, aggregateData.get(source.useAs));
+                }else{
+//                    JsonObject tempObj;
+//                    if(specAggregateObj.has(source.useAs))
+//                        tempObj = specAggregateObj.get(source.useAs).getAsJsonObject();
+//                    else
+//                        tempObj = new JsonObject();
+//                    for (Map.Entry<String, String> specData: specificAggregateData.get(source.useAs).entrySet())
+//                        tempObj.addProperty(specData.getKey(), specData.getValue());
+//                    specAggregateObj.add(source.useAs, gson.toJsonTree(tempObj));
+                    constructSpecDataJson(source, specificAggregateData, specAggregateObj);
+                }
+            }else{
+//                JsonObject tempObj;
+//                // properties
+//                if(propObj.has(source.useAs))
+//                    tempObj = propObj.get(source.useAs).getAsJsonObject();
+//                else
+//                    tempObj = new JsonObject();
+//                // loop each service properties
+//                for(Map.Entry<String, String> property: properties.get(source.useAs).entrySet())
+//                    tempObj.addProperty(property.getKey(), property.getValue());
+//                propObj.add(source.useAs, gson.toJsonTree(tempObj));
+                constructSpecDataJson(source, properties, propObj);
+            }
+        }
+        // insert each data in to result body
+        resultBody.add("aggregate", gson.toJsonTree(aggregateObj));
+        resultBody.add("specificAggregate", gson.toJsonTree(specAggregateObj));
+        resultBody.add("properties", gson.toJsonTree(propObj));
+        return resultBody;
+    }
+
+    /**
+     * add data from specific aggregate data and service properties into result json object
+     * @param source data mapping
+     * @param resource resource data
+     * @param result result jsonObject
+     */
+    private void constructSpecDataJson(AggregateSource source, HashMap<String, HashMap<String, String>> resource, JsonObject result){
+        var gson = new Gson();
+        JsonObject tempObj;
+        if(result.has(source.useAs))
+            tempObj = result.get(source.useAs).getAsJsonObject();
+        else
+            tempObj = new JsonObject();
+        for (Map.Entry<String, String> specData: resource.get(source.useAs).entrySet())
+            tempObj.addProperty(specData.getKey(), specData.getValue());
+        result.add(source.useAs, gson.toJsonTree(tempObj));
+    }
+
+    /**
      * request endpoint with data collected from dataSource<br>
      * this method could be used to request aggregate and rendering endpoint
      * @param capability target capability
@@ -564,18 +638,19 @@ public class Orchestrator {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JsonObject requestBody = new JsonObject();
-        Gson gson = new Gson();
-        for(AggregateSource dataSource: capability.aggregateDetail.dataSource){
-            if(dataSource.isAggregationData){
-                if(dataSource.aggregationLevel.equals("system")){
-                    requestBody.addProperty(dataSource.useAs, aggregateData.get(dataSource.useAs));
-                }else{
-                    requestBody.addProperty(dataSource.useAs, gson.toJson(specificAggregateData.get(dataSource.useAs)));
-                }
-            }else{
-                requestBody.addProperty(dataSource.useAs, gson.toJson(properties.get(dataSource.useAs)));
-            }
-        }
+//        Gson gson = new Gson();
+//        for(AggregateSource dataSource: capability.aggregateDetail.dataSource){
+//            if(dataSource.isAggregationData){
+//                if(dataSource.aggregationLevel.equals("system")){
+//                    requestBody.addProperty(dataSource.useAs, aggregateData.get(dataSource.useAs));
+//                }else{
+//                    requestBody.addProperty(dataSource.useAs, gson.toJson(specificAggregateData.get(dataSource.useAs)));
+//                }
+//            }else{
+//                requestBody.addProperty(dataSource.useAs, gson.toJson(properties.get(dataSource.useAs)));
+//            }
+//        }
+        requestBody = constructDataSourceBody(capability.aggregateDetail.dataSource, aggregateData, specificAggregateData, properties);
         System.out.println("[DEBUG][orchestrator][POST dataSource] requestBody: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody.toString(), headers);
         System.out.println("[DEBUG] try to request capability (dataSource) with body " + new Gson().toJson(requestBody));
