@@ -14,6 +14,22 @@ public class AggregateSource {
     public AggregateSource(){
     }
 
+    public void setUseAs(String useAs) {
+        this.useAs = useAs;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public String getUseAs() {
+        return useAs;
+    }
+
     @Override
     public String toString(){
         return new Gson().toJson(this);

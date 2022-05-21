@@ -27,12 +27,12 @@ public class Vocabulary {
         if(conceptMap.containsKey(concept)){
             conceptProperties = conceptMap.get(concept);
             if(!conceptProperties.contains(property)) {
-                System.out.println("[WARNING] property '" + property + "' does not exist in concept '" + concept + "'.");
+                System.out.println("  [WARNING] property '" + property + "' does not exist in concept '" + concept + "'.");
                 return true;
             }else
                 return false;
         }else {
-            System.out.println("[WARNING] concept '" + concept + "' does not exist.");
+            System.out.println("  [WARNING] concept '" + concept + "' does not exist.");
             return true;
         }
     }
@@ -45,7 +45,7 @@ public class Vocabulary {
      */
     public boolean isIllegalContextProperty(String context, String property){
         if(!contextMap.containsKey(context)){
-            System.out.println("[WARNING] context '" + context + "' does not exist.");
+            System.out.println("  [WARNING] context '" + context + "' does not exist.");
             return true;
         }else{
             ArrayList<String> properties = contextMap.get(context);
@@ -62,7 +62,7 @@ public class Vocabulary {
     public boolean isAvailableContext(String context){
         if(context.equals("general")) return true;
         if(!contextMap.containsKey(context)){
-            System.out.println("[WARNING] context '" + context + "' does not exist.");
+            System.out.println("  [WARNING] context '" + context + "' does not exist.");
             return false;
         }
         return true;

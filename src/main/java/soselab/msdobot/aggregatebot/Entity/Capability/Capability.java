@@ -22,6 +22,14 @@ public class Capability {
     public AggregateDetail aggregateDetail;
     public RenderingDetail renderingDetail;
 
+    public void setAggregateMethod(boolean aggregateMethod) {
+        isAggregateMethod = aggregateMethod;
+    }
+
+    public void setRenderingMethod(boolean renderingMethod) {
+        isRenderingMethod = renderingMethod;
+    }
+
     public Capability(){}
 
     @Override
