@@ -24,6 +24,8 @@ ConceptList:
   - conceptName: Data
     properties:
       - information
+      - errorLog
+      - log
   - conceptName: Output
     properties:
       - json
@@ -51,10 +53,14 @@ ContextList:
     properties:
       - User.username
       - User.password
-  - contextName: pseudo
+  - contextName: pseudoServiceInfo
     properties:
-      - Api.accessToken
-  - contextName: pseudo2
+      - Data.information
+      - Data.errorLog
+  - contextName: pseudoServiceGateway
     properties:
-      - Api.accessToken
-      - AnalysisData.countNumber
+      - Data.information
+      - Data.log
+  - contextName: pseudoServiceBuild
+    properties:
+      - Data.log

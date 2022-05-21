@@ -594,9 +594,9 @@ public class ConfigLoader {
      */
     public ArrayList<Capability> getCorrespondCapabilityByIntent(String intent){
         // check normal capability
-        if(capabilityList.stream().anyMatch(capability -> capability.atomicIntent.equals(intent)))
+        if(capabilityList.stream().anyMatch(capability -> capability.atomicIntent.equals(intent))) {
             return new ArrayList<>(List.of(capabilityList.stream().filter(capability -> capability.atomicIntent.equals(intent)).findFirst().get()));
-        else
+        } else
             return new ArrayList<>();
     }
 

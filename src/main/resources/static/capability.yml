@@ -224,7 +224,9 @@
     # endpoint response result data key should use this
     # system: {[sample], [content]}
     # service: {[serviceA.sample, serviceB.sample], [contentA, contentB]}
+    # used to extract data from response
     resultName: sample
+    # determine what key should be used when STORING data in temporary storage
     usedComponent:
       context:
         - jenkins
@@ -263,6 +265,7 @@
   # same as aggregate capability, rendering capability should be able to access all type of config, no need to use input
   input:
   # rendering capability has no customize output
+  # rendering capability has no output-related definition since rendering response are expected to be a discord message template
   output:
   # rendering capability use dataSource to define what kins of data it can use
   renderingDetail:
@@ -287,17 +290,17 @@
             - eureka
           property:
             - User.username
-- name: Pseudo-service-detail
-  context: pseudo
+- name: pseudo-service-detail
+  context: pseudoServiceInfo
   isAggregateMethod: false
+  isRenderingMethod: false
   accessLevel: service
-  description: check service detail
+  description: get service detail info
   method: POST
   atomicIntent: none
-  apiEndpoint: http://localhost:8888/capability/pseudo-detail
+  apiEndpoint: http://localhost:8088/serviceDetail
   input:
     - Api.serviceName
-    - Api.accessToken
   output:
     type: plainText
     dataLabel: serviceDetail
@@ -305,49 +308,207 @@
     output:
       - from: serviceDetail
         to: Data.information
-- name: Pseudo-service-api-detail
-  context: pseudo2
+- name: pseudo-service-api-detail
+  context: pseudoServiceGateway
   isAggregateMethod: false
+  isRenderingMethod: false
   accessLevel: service
-  description: check service api detail
+  description: get service api detail info
   method: POST
   atomicIntent: none
-  apiEndpoint: http://localhost:8888/capability/pseudo-api
+  apiEndpoint: http://localhost:8088/serviceApiDetail
   input:
     - Api.serviceName
-    - Api.accessToken
   output:
     type: plainText
-    dataLabel: apiNumber
+    dataLabel: apiInfo
   storedData:
     output:
-      - from: apiNumber
-        to: AnalysisData.countNumber
-- name: pseudo-aggregate
+      - from: apiInfo
+        to: Data.information
+- name: pseudo-service-detail-aggregate
   context: general
   isAggregateMethod: true
-  accessLevel: system
+  accessLevel: service
   description: aggregate pseudo service detail
   method: POST
   atomicIntent: none
-  apiEndpoint: http://localhost:8888/capability/pseudo-aggregate
+  apiEndpoint: http://localhost:8088/aggregateServiceInfo
   input:
   output:
   aggregateDetail:
     storeResult: true
+    resultName: serviceDetailInfo
     usedComponent:
       context:
-        - pseudo
-        - pseudo2
+        - pseudoServiceInfo
+        - pseudoServiceGateway
       property:
         - Data.information
-        - AnalysisData.countNumber
     dataSource:
       - useAs: serviceDetail
         isAggregationData: false
-        context: pseudo
+        context: pseudoServiceInfo
         from: Data.information
       - useAs: apiDetail
         isAggregationData: false
-        context: pseudo2
-        from: AnalysisData.countNumber
+        context: pseudoServiceGateway
+        from: Data.information
+- name: pseudo-rendering-service-detail
+  isRenderingMethod: true
+  description: render pseudo service detail
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/renderDetail
+  input:
+  output:
+  renderingDetail:
+    dataSource:
+      - useAs: serviceDetail
+        isAggregationData: true
+        aggregationLevel: service
+        aggregateDataComponent:
+          context:
+            - pseudoServiceInfo
+            - pseudoServiceGateway
+          property:
+            - Data.information
+- name: pseudo-service-error-log
+  context: pseudoServiceInfo
+  isAggregateMethod: false
+  isRenderingMethod: false
+  accessLevel: service
+  description: get service error log
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/errorLog
+  input:
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: serviceErrorLog
+  storedData:
+    output:
+      - from: serviceErrorLog
+        to: Data.errorLog
+- name: pseudo-analyze-service-error-log
+  context: general
+  isAggregateMethod: true
+  isRenderingMethod: false
+  accessLevel: service
+  description: analyze error log, get error time zone
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/logErrorAnalyze
+  input:
+  output:
+  aggregateDetail:
+    storeResult: true
+    resultName: errorTimeZone
+    usedComponent:
+      context:
+        - pseudoServiceInfo
+      property:
+        - Data.errorLog
+    dataSource:
+      - useAs: serviceLog
+        isAggregationData: false
+        context: pseudoServiceInfo
+        from: Data.errorLog
+- name: pseudo-context-build-detail
+  context: pseudoServiceBuild
+  isAggregateMethod: false
+  isRenderingMethod: false
+  accessLevel: service
+  description: get service build log
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/buildErrLog
+  input:
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: buildErrLog
+  storedData:
+    output:
+      - from: buildErrLog
+        to: Data.log
+- name: pseudo-context-api-detail
+  context: pseudoServiceGateway
+  isAggregateMethod: false
+  isRenderingMethod: false
+  accessLevel: service
+  description: get service api log
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/apiErrLog
+  input:
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: apiErrLog
+  storedData:
+    output:
+      - from: apiErrLog
+        to: Data.log
+- name: pseudo-aggregate-context-error
+  context: general
+  isAggregateMethod: true
+  isRenderingMethod: false
+  accessLevel: service
+  description: aggregate service context error report
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/extractSpecificLog
+  input:
+  output:
+  aggregateDetail:
+    storeResult: true
+    resultName: errorLog
+    usedComponent:
+      context:
+        - pseudoServiceInfo
+        - pseudoServiceBuild
+        - pseudoServiceGateway
+      property:
+        - Data.errorLog
+        - Data.log
+    dataSource:
+      - useAs: errorTimeZone
+        isAggregationData: true
+        aggregationLevel: service
+        aggregateDataComponent:
+          context:
+            - pseudoServiceInfo
+          property:
+            - Data.errorLog
+      - useAs: buildLog
+        isAggregationData: false
+        context: pseudoServiceBuild
+        from: Data.log
+      - useAs: apiLog
+        isAggregationData: false
+        context: pseudoServiceGateway
+        from: Data.log
+- name: pseudo-render-error-time-zone
+  isAggregateMethod: false
+  isRenderingMethod: true
+  description: render final error report message
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/renderErrLog
+  input:
+  output:
+  renderingDetail:
+    dataSource:
+      - useAs: errorLog
+        isAggregationData: true
+        aggregationLevel: service
+        aggregateDataComponent:
+          context:
+            - pseudoServiceInfo
+            - pseudoServiceBuild
+            - pseudoServiceGateway
+          property:
+            - Data.errorLog
+            - Data.log

@@ -1,23 +1,58 @@
 crossCapabilityList:
-  - name: test-jenkins-health
-    upperIntent: test-jenkins-health
+  # single/multi service - multi step - single context
+  - name: test-jenkins-testReport
+    upperIntent: test-jenkins-report
     sequencedCapabilityList:
-      # use capabilities that are already existed !
       - name: Jenkins-latest-build-number
         order: 0
         description: get latest job build number
       - name: Jenkins-semi-test-report
         order: 1
         description: get latest job test report
-  - name: test-pseudo-service-detail
+  # todo: add all multi-capability upper intent test case
+  # todo: single/multi service - multi step - multi context (cross context aggregate)
+  # multi-step / multi-context (not cross context)
+  - name: pseudo-service-detail
     upperIntent: pseudo-service-detail-go
+    description: multi-context, no cross context aggregate data usage, no rendering assigned
     sequencedCapabilityList:
-      - name: Pseudo-service-detail
+      - name: pseudo-service-detail
         order: 0
         description: get service detail about pseudo service
-      - name: Pseudo-service-api-detail
+      - name: pseudo-service-api-detail
         order: 1
         description: get service api detail about pseudo service
-      - name: pseudo-aggregate
+      - name: pseudo-service-detail-aggregate
         order: 2
         description: aggregate pseudo service details
+      - name: pseudo-rendering-service-detail
+        order: 3
+        description: render message from service detail aggregate report
+  # multi-step / multi-context (cross context)
+  - name: pseudo-check-error-time-zone
+    upperIntent: pseudo-check-error-zone
+    description: multi-context, has cross context aggregate data usage, check error status on each context in specific time zone
+    sequencedCapabilityList:
+      - name: pseudo-service-error-log
+        order: 0
+        description: get service error log
+      - name: pseudo-analyze-service-error-log
+        order: 1
+        description: analyze error log
+      - name: pseudo-context-build-detail
+        order: 2
+        description: get service context build error detail
+      - name: pseudo-context-api-detail
+        order: 3
+        description: get service context api error detail
+      - name: pseudo-aggregate-context-error
+        order: 4
+        description: aggregate service context error report
+      - name: pseudo-render-error-time-zone
+        order: 5
+        description: render final error report message
+  # multi-step / single-context (cross service)
+  # find most used service in system
+  # multi-step / multi-context (cross context)
+  # highest error rate service in system
+  # collect error rate report, analyze error rate, get result service detail

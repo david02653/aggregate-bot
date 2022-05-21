@@ -204,6 +204,7 @@ public class RenderingService implements RenderingTemplate {
             embed.setFieldList(fieldList);
             embedList.add(embed);
         }
+        template.setMainMessage("Missing Config Detected");
         template.setEmbedList(embedList);
         return createDiscordMessage(template);
     }
@@ -253,7 +254,7 @@ public class RenderingService implements RenderingTemplate {
             index++;
         }
         var builder = new MessageBuilder();
-        builder.append(FlipTable.of(header, body));
+        builder.appendCodeBlock(FlipTable.of(header, body), "");
         return builder.build();
     }
 

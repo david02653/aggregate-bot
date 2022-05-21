@@ -129,4 +129,18 @@ public class CapabilityController {
         System.out.println("[DEBUG][controller] pseudo-aggregate triggered");
         return ResponseEntity.ok(pseudoService.aggregateServiceDetail(requestBody));
     }
+
+    /**
+     * testing method to print rendering endpoint request body
+     * @param requestBody
+     * @return
+     */
+    @PostMapping(value = "/test-input")
+    public ResponseEntity<String> testRenderingInput(@RequestBody String requestBody){
+        System.out.println("[DEBUG][pseudo] test input raw");
+        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(gson.fromJson(requestBody, JsonObject.class)));
+        System.out.println("-----");
+        System.out.println("[DEBUG][controller] test rendering api input");
+        return ResponseEntity.ok(pseudoService.printInput(requestBody));
+    }
 }

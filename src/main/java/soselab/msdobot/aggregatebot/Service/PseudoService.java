@@ -5,6 +5,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import org.springframework.stereotype.Service;
+import soselab.msdobot.aggregatebot.Entity.DiscordMessageTemplate;
 
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
@@ -87,5 +88,28 @@ public class PseudoService {
     }
 
     public void renderServiceDetail(){
+    }
+
+    /**
+     * testing method to print request input
+     * @param requestBody
+     * @return
+     */
+    public String printInput(String requestBody){
+        System.out.println("[DEBUG][pseudo] print given message");
+        var checker = RenderingService.templateFormatCheck(requestBody);
+        if(checker)
+            System.out.println("[pseudo check] PASS");
+        else
+            System.out.println("[pseudo check] FAIL");
+        // convert received request body in Discord Message and parse back to json string
+        if(checker){
+            var template = gson.fromJson(requestBody, DiscordMessageTemplate.class);
+            System.out.println("> print msg");
+            System.out.println(template);
+            System.out.println("> done");
+            return gson.toJson(template);
+        }
+        return requestBody;
     }
 }

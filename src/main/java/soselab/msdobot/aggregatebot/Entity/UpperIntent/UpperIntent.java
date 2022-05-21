@@ -11,6 +11,7 @@ public class UpperIntent {
 
     public String name;
     public String upperIntent;
+    private String description;
     public ArrayList<Capability> sequencedCapabilityList;
 
     public UpperIntent(){
@@ -23,6 +24,14 @@ public class UpperIntent {
 
     public void sortSequencedCapabilityList(){
         this.sequencedCapabilityList.sort(Comparator.comparingInt((Capability capability) -> Integer.parseInt(capability.order)));
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override

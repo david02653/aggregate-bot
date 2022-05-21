@@ -71,29 +71,13 @@ serviceList:
             properties:
               - name: User.username
                 value: fake two
-  - name: Pseudo
+  - name: DemoOnly
     type: system
     description: pseudo system
-    config:
-      - context: pseudo
-        properties:
-          - name: Api.accessToken
-            value: 12345
-          - name: User.password
-            value: 00000
-      - context: pseudo2
-        properties:
-          - name: Api.accessToken
-            value: 56789
     service:
       - name: Member
         type: service
         description: member service
-        config:
-          - context: pseudo
-            properties:
-              - name: User.password
-                value: 456789
       - name: Game
         type: service
         description: game service

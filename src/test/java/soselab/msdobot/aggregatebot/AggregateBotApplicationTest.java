@@ -15,7 +15,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.web.client.RestTemplate;
 import soselab.msdobot.aggregatebot.Entity.Capability.Capability;
 import soselab.msdobot.aggregatebot.Entity.DiscordEmbedFieldTemplate;
 import soselab.msdobot.aggregatebot.Entity.DiscordEmbedTemplate;
@@ -348,25 +353,129 @@ class AggregateBotApplicationTest {
         jdaConnect.send(RenderingService.createDiscordMessage(template));
     }
 
+    /**
+     * test rendering api input format
+     */
     @Test
     void testInput(){
-//        Capability capability, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> specificAggregateData, HashMap<String, HashMap<String, String>> properties
+        Gson gson = new Gson();
+        // system aggregate data
         var aggregateDate = new HashMap<String, String>();
+        // service specific aggregate data
         var specificData = new HashMap<String, HashMap<String, String>>();
+        // properties data
         var properties = new HashMap<String, HashMap<String, String>>();
-        aggregateDate.put("systemDataKey", "systemData");
+        aggregateDate.put("systemDataKey-1", "systemData-1");
+        aggregateDate.put("systemDataKey-2", "systemData-2");
+        // create fake specific aggregate data
         var tempMap = new HashMap<String, String>();
-        tempMap.put("serviceA", "content A");
-        specificData.put("specific", tempMap);
+        tempMap.put("serviceA", "content A1");
+        tempMap.put("serviceB", "content B1");
+        specificData.put("specific data set 1", tempMap);
         tempMap = new HashMap<String, String>();
-        tempMap.put("property key", "property value");
-        properties.put("property context", tempMap);
+        tempMap.put("serviceA", "content A2");
+        tempMap.put("serviceB", "content B2");
+        specificData.put("specific data set 2", tempMap);
+        // create fake property data
+        tempMap = new HashMap<String, String>();
+        tempMap.put("serviceA", "p1-service A");
+        tempMap.put("serviceB", "p1-service B");
+        properties.put("property context set 1", tempMap);
+        tempMap = new HashMap<String, String>();
+        tempMap.put("serviceA", "p2-service A");
+        tempMap.put("serviceB", "p2-service B");
+        properties.put("property context set 2", tempMap);
+        // print all data
+        System.out.println(gson.toJson(aggregateDate));
+        System.out.println("---");
+        System.out.println(gson.toJson(specificData));
+        System.out.println("---");
+        System.out.println(gson.toJson(properties));
+        // simulate rendering endpoint request
+        var restTemplate = new RestTemplate();
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        var body = new JsonObject();
+        // system aggregate
+        var tempObj = new JsonObject();
+        for(Map.Entry<String, String> entry: aggregateDate.entrySet()){
+            tempObj.addProperty(entry.getKey(), entry.getValue());
+        }
+        body.add("aggregate", gson.toJsonTree(tempObj));
+        // service aggregate
+        var upperObj = new JsonObject();
+        for(Map.Entry<String, HashMap<String, String>> spec: specificData.entrySet()){
+            tempObj = new JsonObject();
+            for(Map.Entry<String, String> specData: spec.getValue().entrySet()){
+                tempObj.addProperty(specData.getKey(), specData.getValue());
+            }
+            upperObj.add(spec.getKey(), gson.toJsonTree(tempObj));
+        }
+        body.add("specificAggregate", gson.toJsonTree(upperObj));
+        // service property
+        upperObj = new JsonObject();
+        for(Map.Entry<String, HashMap<String, String>> prop: properties.entrySet()){
+            tempObj = new JsonObject();
+            for(Map.Entry<String, String> propData: prop.getValue().entrySet()){
+                tempObj.addProperty(propData.getKey(), propData.getValue());
+            }
+            upperObj.add(prop.getKey(), gson.toJsonTree(tempObj));
+        }
+        body.add("properties", gson.toJsonTree(upperObj));
+        // request endpoint
+        var entity = new HttpEntity<String>(gson.toJson(body), headers);
+        String endpoint = "http://localhost:8088/rendering";
+        var resp = restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class);
+        // print result
+        System.out.println("---");
+        System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(resp.getBody()));
+    }
+
+    /**
+     * request fake rendering endpoint and parse response discord message template json string into discord message
+     */
+    @Test
+    void testDiscordTemplateParsing(){
+        var gson = new Gson();
+        var restTemplate = new RestTemplate();
+        var headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        var body = new JsonObject();
+        // request endpoint
+        var entity = new HttpEntity<String>(gson.toJson(body), headers);
+        String endpoint = "http://localhost:8088/fakeMsg";
+        var resp = restTemplate.exchange(endpoint, HttpMethod.POST, entity, String.class);
+        var result = resp.getBody();
+        // parse result
+        if(RenderingService.templateFormatCheck(result)) {
+            System.out.println("[res parse check] PASS !");
+            System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(RenderingService.parseRenderingResult(result)));
+        }else
+            System.out.println("[res parse check] FAIL !");
     }
 
     @Test
-    void testMap(){
-        var map = new HashMap<String, String>();
-        map.put("head", "body");
-        System.out.println(new Gson().toJson(map));
+    void testJsonAdd(){
+        var test = new JsonObject();
+        var gson = new Gson();
+        test.addProperty("test", "value1");
+        System.out.println(gson.toJson(test));
+        test.addProperty("test", "new one");
+        System.out.println(gson.toJson(test));
+    }
+
+    @Test
+    void testPseudoDetail(){
+        RasaIntent intent = new RasaIntent("pseudo-service-detail-go", "Game");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+        System.out.println(msg);
+    }
+
+    @Test
+    void testPseudoErrorTimeZone(){
+        RasaIntent intent = new RasaIntent("pseudo-check-error-zone", "DemoOnly");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
     }
 }

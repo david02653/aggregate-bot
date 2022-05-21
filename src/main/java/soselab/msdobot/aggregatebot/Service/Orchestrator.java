@@ -98,10 +98,12 @@ public class Orchestrator {
             if(capability.isAggregateMethod || capability.isRenderingMethod){
                 // todo: handle aggregate and rendering capabilities
                 if(capability.isAggregateMethod) {
+                    System.out.println("[Orchestrator] aggregate capability found");
                     future = executor.submit(() -> handleAggregateCapability(capability, serviceList));
                     futures.add(future);
                 }else{
                     // todo: handle rendering capability, return result message
+                    System.out.println("[Orchestrator] rendering capability found");
                     return handleRenderingCapability(capability, serviceList);
                 }
             }else {
@@ -140,6 +142,7 @@ public class Orchestrator {
                     System.out.println(new GsonBuilder().setPrettyPrinting().create().toJson(tempReport));
                     System.out.println("-----");
                     if(tempReport.hasError()) {
+                        System.out.println("\n>> MISSING CONFIG, SET FLAG TO TRUE\n");
                         mergeMissingReport(finalReport, tempReport);
                         addMissingConfig(tempReport);
                         reportFlag = true;
@@ -152,6 +155,7 @@ public class Orchestrator {
                 }
                 // if last capability, check capability type, run default aggregation and rendering if no rendering capability assigned
                 if(checkLastCapability(capabilityList, capability)){
+                    System.out.println("\n>>> RUN DEFAULT AGGREGATE AND RENDERING <<<\n");
                     // collect capability execute result
                     ArrayList<CapabilityReport> results = new ArrayList<>();
                     for(Future<CapabilityReport> report: futures){
@@ -164,6 +168,7 @@ public class Orchestrator {
                     String resultTable = rendering.parseToSimpleAsciiArtTable();
                     // return default rendering result
                     defaultMessage = RenderingService.createSimpleMessage(resultTable);
+                    System.out.println("=====");
                 }
                 futures.clear();
             }catch (InterruptedException | ExecutionException e){
@@ -301,14 +306,21 @@ public class Orchestrator {
      * @return
      */
     public String retrieveConfig(Service service, String context, String propertyName) throws NoSessionFoundException {
-        System.out.println("[DEBUG] try to retrieve '" + propertyName + "' from context '" + context + "'");
+        System.out.println("[DEBUG][" + service.name + "] try to retrieve '" + propertyName + "' from context '" + context + "'");
         String serviceName = service.name;
+        // add service name back handler
+//        if(propertyName.equals("Api.serviceName")) return serviceName;
         HashMap<String, HashMap<String, String>> serviceConfigMap = service.getConfigMap();
         System.out.println("[DEBUG] config map: " + new Gson().toJson(serviceConfigMap));
         if(serviceConfigMap.containsKey(context) && serviceConfigMap.get(context).containsKey(propertyName))
             return serviceConfigMap.get(context).get(propertyName);
-        else
-            return retrieveSessionConfig(serviceName, context, propertyName);
+        else{
+            // check general context again
+            if(serviceConfigMap.containsKey("general") && serviceConfigMap.get("general").containsKey(propertyName))
+                return serviceConfigMap.get("general").get(propertyName);
+            else
+                return retrieveSessionConfig(serviceName, context, propertyName);
+        }
     }
 
     /**
@@ -402,6 +414,8 @@ public class Orchestrator {
      * @param propertyValue property value
      */
     public void addServiceSessionConfig(String serviceName, String context, String propertyName, String propertyValue){
+        System.out.println("[add session] serviceName: " + serviceName + ", context: " + context + ", propertyName: " + propertyName);
+        System.out.println("[add session] property value: " + propertyValue);
         if(context.equals("general")){
             generalSessionData.put(propertyName, propertyValue);
         }else{
@@ -452,6 +466,7 @@ public class Orchestrator {
         // use access level to determine data should be stored seperated or not
         // key: context-service-property, if multiple service involved, include all service name
         JsonArray aggregateReport = new Gson().fromJson(rawAggregateReport, JsonArray.class);
+        System.out.println("[DEBUG] aggregate request response: " + new Gson().toJson(aggregateReport));
         AggregateDataComponent usedComponent = aggregateDetail.usedComponent;
         // todo: add storeResult check
         if(capability.accessLevel.equals("system")) {
@@ -650,7 +665,14 @@ public class Orchestrator {
 //                requestBody.addProperty(dataSource.useAs, gson.toJson(properties.get(dataSource.useAs)));
 //            }
 //        }
-        requestBody = constructDataSourceBody(capability.aggregateDetail.dataSource, aggregateData, specificAggregateData, properties);
+        // check which data source should be used
+        if(capability.isAggregateMethod) {
+            requestBody = constructDataSourceBody(capability.aggregateDetail.dataSource, aggregateData, specificAggregateData, properties);
+            // inject aggregate result key and access level
+            requestBody.addProperty("resultName", capability.aggregateDetail.resultName);
+            requestBody.addProperty("accessLevel", capability.accessLevel);
+        }else
+            requestBody = constructDataSourceBody(capability.renderingDetail.dataSource, aggregateData, specificAggregateData, properties);
         System.out.println("[DEBUG][orchestrator][POST dataSource] requestBody: " + requestBody);
         HttpEntity<String> entity = new HttpEntity<>(requestBody.toString(), headers);
         System.out.println("[DEBUG] try to request capability (dataSource) with body " + new Gson().toJson(requestBody));
@@ -673,6 +695,7 @@ public class Orchestrator {
     private ArrayList<String> collectServiceName(ArrayList<Service> serviceList){
         ArrayList<String> serviceNameList = new ArrayList<>();
         for (Service service : serviceList) {
+            if(service.type.equals("system")) continue;
             serviceNameList.add(service.name);
         }
         return serviceNameList;
@@ -727,10 +750,12 @@ public class Orchestrator {
      */
     // todo: should consider capability access level
     private void collectRequiredAggregateConfig(ArrayList<AggregateSource> dataSources, ArrayList<Service> serviceList, HashMap<String, String> aggregateData, HashMap<String, HashMap<String, String>> specificAggregateData, HashMap<String, HashMap<String, String>> properties, HashMap<String, HashSet<String>> missingPropertyMap){
+        System.out.println("[DEBUG] start to collect data from dataSource");
         ArrayList<String> serviceNameList = collectServiceName(serviceList);
         // todo: collect required config in aggregate capability
         for(AggregateSource source: dataSources){
             if(source.isAggregationData){
+                System.out.println("[retrieve aggregate data]" + source);
                 // retrieve aggregate data
                 try{
                     String aggregateResult;
@@ -755,6 +780,7 @@ public class Orchestrator {
                 try {
                     // retrieve property from each service
                     for(Service service: serviceList){
+                        if(service.type.equals("system")) continue;
 //                        currentServiceName = service.name;
                         String property = retrieveConfig(service, source.context, source.from);
                         addAggregateNormalProperty(service.name, source.useAs, property, properties);
@@ -810,6 +836,7 @@ public class Orchestrator {
      * @throws NoSessionFoundException if no aggregate result found
      */
     private String retrieveAggregateData(HashSet<String> contextSet, HashSet<String> propertySet, ArrayList<String> serviceList) throws NoSessionFoundException {
+        System.out.println("[F: retrieve aggregate data] serviceList :" + new Gson().toJson(serviceList));
         String dataKey = getAggregateResultKey(contextSet, propertySet, serviceList);
         if(aggregateDataMap.containsKey(dataKey))
             return aggregateDataMap.get(dataKey);
@@ -1076,10 +1103,13 @@ public class Orchestrator {
             for (DataLabel outputData : storedData.output) {
                 String outputType = capability.output.type;
                 if (outputType.equals("plainText")) {
-                    if (outputData.from.equals(capability.output.dataLabel))
+                    if (outputData.from.equals(capability.output.dataLabel)) {
+                        System.out.println("[parse result] store plain text result");
                         addServiceSessionConfig(service.name, capabilityContext, outputData.to, output);
-                    if(outputData.addToGlobal)
+                    }
+                    if(outputData.addToGlobal) {
                         addServiceSessionConfig(service.name, "general", outputData.to, output);
+                    }
                 } else if (outputType.equals("json")) {
                     ArrayList<JsonInfo> jsonInfos = capability.output.jsonInfo;
                     JsonInfo targetInfo = jsonInfos.stream().filter(jsonInfo -> jsonInfo.dataLabel.equals(outputData.from)).findFirst().get();

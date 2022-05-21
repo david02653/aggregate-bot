@@ -1,5 +1,6 @@
 package soselab.msdobot.aggregatebot.Service;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import soselab.msdobot.aggregatebot.Entity.Capability.Capability;
 import soselab.msdobot.aggregatebot.Entity.CapabilityReport;
@@ -37,6 +38,7 @@ public class AggregateService {
         }
         aggregateReport.add(keyArray);
         aggregateReport.add(valueArray);
+        System.out.println("[Default Aggregate] " + new Gson().toJson(aggregateReport));
         return aggregateReport;
     }
 
@@ -48,7 +50,8 @@ public class AggregateService {
      */
     private static String getResultPropertyName(String service, String propertyName){
         StringBuilder builder = new StringBuilder();
-        builder.append(service).append(".");
+        if(service != null && service.length() > 0)
+            builder.append(service).append(".");
         builder.append(propertyName);
         return builder.toString();
     }
