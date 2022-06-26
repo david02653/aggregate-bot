@@ -125,7 +125,7 @@ class AggregateBotApplicationTest {
      */
     @Test
     void testSkillSelector(){
-        RasaIntent intent = new RasaIntent("test-jenkins-health", "Cinema");
+        RasaIntent intent = new RasaIntent("ask_job_health_report", "Cinema");
         var msg = orchestrator.capabilitySelector(intent);
         jdaConnect.send(msg);
     }
@@ -466,7 +466,7 @@ class AggregateBotApplicationTest {
 
     @Test
     void testPseudoDetail(){
-        RasaIntent intent = new RasaIntent("pseudo-service-detail-go", "Game");
+        RasaIntent intent = new RasaIntent("pseudo-service-detail-go", "DemoOnly");
         var msg = orchestrator.capabilitySelector(intent);
         jdaConnect.send(msg);
         System.out.println(msg);
@@ -475,6 +475,119 @@ class AggregateBotApplicationTest {
     @Test
     void testPseudoErrorTimeZone(){
         RasaIntent intent = new RasaIntent("pseudo-check-error-zone", "DemoOnly");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void testSingleDemo(){
+        RasaIntent intent = new RasaIntent("pseudo-service-api-detail-single", "Game");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void testErrorTop(){
+        RasaIntent intent = new RasaIntent("pseudo-service-detail-error-go", "DemoOnly");
+        var msg = orchestrator.capabilitySelector(intent);
+        System.out.println(msg);
+        jdaConnect.send(msg);
+    }
+
+    /**
+     * thesis final test case 2 and final test case 4
+     * single/multiple service, single tool, multiple capability
+     * jenkins test report
+     */
+    @Test
+    void finalTestCase2(){
+        RasaIntent intent = new RasaIntent("ask_job_test_report", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void finalTestCase2P2(){
+        RasaIntent intent = new RasaIntent("ask_job_health_report", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void finalTestCase2P3(){
+        RasaIntent intent = new RasaIntent("ask_jenkins_job_build_number", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void finalTestCase2P4(){
+        RasaIntent intent = new RasaIntent("check-kmamiz-struct", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    /**
+     * thesis final test case 1
+     * restler test
+     */
+    @Test
+    void finalTestCase1(){
+        RasaIntent intent = new RasaIntent("check-restler", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    /**
+     * thesis final test case 3 (part 1)
+     * actuator health
+     */
+    @Test
+    void finalTestCase3P1(){
+        RasaIntent intent = new RasaIntent("check-actuator-health", "UserService");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    /**
+     * thesis final test case 3 (part 2)
+     * actuator info
+     */
+    @Test
+    void finalTestCase3P2(){
+        RasaIntent intent = new RasaIntent("check-actuator-info", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    /**
+     * thesis final test case 3 (part 3)
+     * swagger api list
+     */
+    @Test
+    void finalTestCase3P3(){
+        RasaIntent intent = new RasaIntent("check-swagger-api-list", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void finalTestCase3(){
+        RasaIntent intent = new RasaIntent("service-basic-info", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void finalTestCase5(){
+        RasaIntent intent = new RasaIntent("kmamiz-high-risk", "PDAS");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
+
+    @Test
+    void finalTestCase6(){
+        RasaIntent intent = new RasaIntent("kmamiz-high-risk-detail", "PDAS");
         var msg = orchestrator.capabilitySelector(intent);
         jdaConnect.send(msg);
     }

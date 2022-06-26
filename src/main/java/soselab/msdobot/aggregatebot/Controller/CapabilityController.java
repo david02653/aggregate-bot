@@ -38,6 +38,7 @@ public class CapabilityController {
     public ResponseEntity<String> requestJenkinsHealthData(@RequestBody String requestBody){
         JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
         System.out.println(gson.toJson(requestBody));
+        System.out.println("obj: " + gson.toJson(requestObj));
 //        Config config = new Config(requestBody.username, requestBody.accessToken, requestBody.endpoint);
         return ResponseEntity.ok(jenkinsService.getJenkinsHealthReport(requestObj, requestObj.get("Api.serviceName").getAsString()));
     }
@@ -142,5 +143,11 @@ public class CapabilityController {
         System.out.println("-----");
         System.out.println("[DEBUG][controller] test rendering api input");
         return ResponseEntity.ok(pseudoService.printInput(requestBody));
+    }
+
+    @PostMapping(value = "/restler")
+    public ResponseEntity<String> restler(@RequestBody String requestBody){
+        System.out.println("[DEBUG][restler] restler method triggered");
+        return ResponseEntity.ok(pseudoService.checkRESTlerInfo(requestBody));
     }
 }

@@ -14,6 +14,7 @@ ConceptList:
       - buildNumber
       - accessToken
       - targetService
+      - monitorData
   - conceptName: AnalysisData
     properties:
       - healthData
@@ -21,11 +22,13 @@ ConceptList:
       - coupling
       - accessRecord
       - countNumber
+      - errorCount
   - conceptName: Data
     properties:
       - information
       - errorLog
       - log
+      - versionNumber
   - conceptName: Output
     properties:
       - json
@@ -40,8 +43,32 @@ ConceptList:
       - link
       - json
 ContextList:
+  - contextName: Kmamiz
+    properties:
+      - Api.endpoint
+      - Api.serviceName
+      - Data.information
+      - Api.monitorData
+  - contextName: restler
+    properties:
+      - Api.endpoint
+      - Api.serviceName
+      - Data.errorLog
+  - contextName: actuator
+    properties:
+      - Api.endpoint
+      - Api.serviceName
+      - AnalysisData.healthData
+      - Data.versionNumber
+  - contextName: swagger
+    properties:
+      - Api.endpoint
+      - Api.serviceName
+      - Data.information
   - contextName: jenkins
     properties:
+      - Api.endpoint
+      - Api.serviceName
       - User.username
       - User.password
       - User.err
@@ -61,6 +88,7 @@ ContextList:
     properties:
       - Data.information
       - Data.log
+      - AnalysisData.errorCount
   - contextName: pseudoServiceBuild
     properties:
       - Data.log

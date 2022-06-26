@@ -56,3 +56,94 @@ crossCapabilityList:
   # multi-step / multi-context (cross context)
   # highest error rate service in system
   # collect error rate report, analyze error rate, get result service detail
+  - name: pseudo-high-error-service-detail
+    upperIntent: pseudo-service-detail-error-go
+    description: service detail of highest error service
+    sequencedCapabilityList:
+      - name: pseudo-list-error
+        order: 0
+        description: get all service error
+      - name: pseudo-check-highest-error-service
+        order: 1
+        description: check highest error service
+      - name: pseudo-service-detail
+        order: 2
+        description: get service detail about pseudo service
+      - name: pseudo-service-api-detail
+        order: 3
+        description: get service api detail about pseudo service
+      - name: pseudo-service-detail-aggregate-error
+        order: 4
+        description: aggregate pseudo service details
+      - name: pseudo-rendering-service-detail-error
+        order: 5
+        description: render message from service detail aggregate report
+  # final demo test case 3
+  # Actuator + Swagger
+  # get actuator health, actuator info, get swagger api list
+  - name: service-actuator-swagger-info
+    upperIntent: service-basic-info
+    description: get actuator health/info and swagger api list
+    sequencedCapabilityList:
+      - name: get-actuator-health
+        order: 0
+        description: get actuator health
+      - name: get-actuator-info
+        order: 1
+        description: get actuator info
+      - name: get-api-list
+        order: 2
+        description: get swagger api list
+      - name: get-service-structure
+        order: 3
+        description: get service structure from Kmamiz
+      - name: render-service-info
+        order: 4
+        description: render actuator health and info with swagger api list
+  # final demo test case 5
+  # Kmamiz
+  # find service with highest risk recently
+  - name: find-highest-risk-service
+    upperIntent: kmamiz-high-risk
+    description: get highest risk service
+    sequencedCapabilityList:
+      - name: get-kmamiz-monitor-data
+        order: 0
+        description: get monitor data from kmamiz
+      - name: analyze-kmamiz-risk
+        order: 1
+        description: get highest risk service (aggregate)
+      - name: render-kmamiz-data
+        order: 2
+        description: render kmamiz service data
+  # final demo test case 6
+  # Kmamiz + Actuator + Swagger
+  # find highest usage service info
+  - name: find-highest-risk-service-detail
+    upperIntent: kmamiz-high-risk-detail
+    description: find service info with highest risk
+    sequencedCapabilityList:
+      - name: get-kmamiz-monitor-data
+        order: 0
+        description: get monitor data from kmamiz
+      - name: analyze-kmamiz-risk
+        order: 1
+        description: get highest risk service
+#      - name: render-kmamiz-data
+#        order: 2
+#        description: render kmamiz service data
+      - name: get-actuator-health
+        order: 2
+        description: get actuator health
+      - name: get-actuator-info
+        order: 3
+        description: get actuator info
+      - name: get-api-list
+        order: 4
+        description: get swagger api list
+      - name: get-service-structure
+        order: 5
+        description: get service structure from Kmamiz
+      - name: render-risk-service-info
+        order: 6
+        description: render actuator health and info with swagger api list about risk service

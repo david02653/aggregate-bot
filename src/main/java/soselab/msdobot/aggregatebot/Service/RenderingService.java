@@ -12,7 +12,6 @@ import soselab.msdobot.aggregatebot.Entity.DiscordEmbedTemplate;
 import soselab.msdobot.aggregatebot.Entity.DiscordMessageTemplate;
 import soselab.msdobot.aggregatebot.Entity.Service.Service;
 
-import java.sql.Array;
 import java.util.*;
 
 public class RenderingService implements RenderingTemplate {
@@ -95,10 +94,11 @@ public class RenderingService implements RenderingTemplate {
             String key = data.getKey();
             String value = data.getValue();
             body[count][0] = key;
-            if(value.length() > 150)
-                body[count][1] = value.substring(0, 100);
-            else
-                body[count][1] = value;
+//            if(value.length() > 150)
+//                body[count][1] = value.substring(0, 100);
+//            else
+//                body[count][1] = value;
+            body[count][1] = value;
             count++;
         }
         String resultTable = FlipTable.of(header, body);
@@ -141,14 +141,19 @@ public class RenderingService implements RenderingTemplate {
      * @return discord message
      */
     public static Message createDiscordMessage(DiscordMessageTemplate messageTemplate){
+//        System.out.println(messageTemplate);
         // create discord message from message template
         var messageBuilder = new MessageBuilder();
         messageBuilder.append(messageTemplate.getMainMessage());
         var embedList = new ArrayList<MessageEmbed>();
         for(DiscordEmbedTemplate embed: messageTemplate.getEmbedList()){
             var embedBuilder = new EmbedBuilder();
-            if(embed.getTitle() != null)
-                embedBuilder.setTitle(embed.getTitle());
+            if(embed.getTitle() != null) {
+                if(embed.getTitleLink() != null)
+                    embedBuilder.setTitle(embed.getTitle(), embed.getTitleLink());
+                else
+                    embedBuilder.setTitle(embed.getTitle());
+            }
             if(embed.getDescription() != null)
                 embedBuilder.setDescription(embed.getDescription());
             if(embed.getImageLink() != null)
@@ -168,16 +173,47 @@ public class RenderingService implements RenderingTemplate {
      * @param message message content
      * @return discord message of given content
      */
-    public static Message createSimpleMessage(String message){
+    public static ArrayList<Message> createSimpleMessage(String message){
         // create discord message with simple string message
         var messageBuilder = new MessageBuilder();
-        if(message.length() <= 2000)
+        var length = message.length();
+        System.out.println("[create simple message] length = " + message.length());
+        if(message.length() <= 2000) {
             messageBuilder.appendCodeBlock(message, "");
+            return new ArrayList<Message>(Collections.singletonList(messageBuilder.build()));
+        }
         else{
             // todo: handle over size message
-            messageBuilder.appendCodeBlock(message.substring(0, 1999), "");
+//            messageBuilder.appendCodeBlock(message.substring(0, 1999), "");
+            ArrayList<Message> resultList = new ArrayList<>();
+//            for(var i=0; i<=length/1500; i++){
+//                if(1499+(i*1500) > length){
+//                    resultList.add(new MessageBuilder().appendCodeBlock(message.substring(i * 1500, length), "").build());
+//                }else {
+//                    resultList.add(new MessageBuilder().appendCodeBlock(message.substring(i * 1500, 1499 + (i * 1500)), "").build());
+//                }
+//            }
+//            return resultList;
+            String[] token = message.split("\n");
+            var msgList = new ArrayList<String>();
+            String current = "";
+            for(String tok: token){
+                var test = current + tok;
+                if(test.length() <= 1900){
+                    current += tok + "\n";
+                }else{
+                    msgList.add(current);
+                    current = "";
+                }
+            }
+            msgList.add(current);
+            System.out.println(">> simple msg count " + msgList.size());
+            for(String msg: msgList){
+                System.out.println(msg.length());
+                resultList.add(new MessageBuilder().appendCodeBlock(msg, "").build());
+            }
+            return resultList;
         }
-        return messageBuilder.build();
     }
 
     /**
@@ -188,6 +224,8 @@ public class RenderingService implements RenderingTemplate {
      * @return
      */
     public Message createMissingReportMessage(ArrayList<CapabilityReport> capabilityReports){
+        System.out.println(">> start to create missing report message");
+//        System.out.println(new Gson().toJson(capabilityReports));
         var template = new DiscordMessageTemplate();
         var embedList = new ArrayList<DiscordEmbedTemplate>();
         for(CapabilityReport capabilityReport: capabilityReports){
@@ -204,9 +242,25 @@ public class RenderingService implements RenderingTemplate {
             embed.setFieldList(fieldList);
             embedList.add(embed);
         }
-        template.setMainMessage("Missing Config Detected");
+        template.setMainMessage(createMissingReportDescription(capabilityReports));
         template.setEmbedList(embedList);
+//        System.out.println(template);
         return createDiscordMessage(template);
+    }
+
+    private String createMissingReportDescription(ArrayList<CapabilityReport> reports){
+        var builder = new StringBuilder("**Missing Config Detected**\n");
+        builder.append("Capability Name: ").append(reports.get(0).capability).append("\n");
+        builder.append("Target Service List: ");
+        var serviceList = new JsonArray();
+        for(CapabilityReport report: reports){
+            var serviceName = report.service;
+            if(serviceName != null && !serviceName.isBlank()){
+                serviceList.add(serviceName);
+            }
+        }
+        builder.append(new Gson().toJson(serviceList));
+        return builder.toString();
     }
 
     /**

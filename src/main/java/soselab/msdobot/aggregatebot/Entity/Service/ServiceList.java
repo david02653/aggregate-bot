@@ -35,6 +35,8 @@ public class ServiceList {
      */
     public ArrayList<Service> getSubServiceList(String systemName){
         ArrayList<Service> serviceList = new ArrayList<>();
+        if(systemName.isBlank())
+            return serviceList;
         // normal service level
         if(serviceMap.get(systemName).type.equals("service"))
             serviceList.add(serviceMap.get(systemName));

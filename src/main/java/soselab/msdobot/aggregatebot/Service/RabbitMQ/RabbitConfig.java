@@ -29,12 +29,15 @@ public class RabbitConfig {
 
     private final RabbitMessageHandler rabbitMessageHandler;
 
+    // todo: maybe exchange, queue and routing key could be read from application properties
     public RabbitConfig(RabbitMessageHandler rabbitMessageHandler){
         this.rabbitMessageHandler = rabbitMessageHandler;
+        this.JENKINS_EXCHANGE = "jenkins";
+        this.JENKINS_QUEUE = "jChannel";
     }
 
-    public static final String JENKINS_EXCHANGE = "jenkins";
-    public static final String JENKINS_QUEUE = "jChannel";
+    public final String JENKINS_EXCHANGE;
+    public final String JENKINS_QUEUE;
 
 
     @Bean

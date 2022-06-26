@@ -7,9 +7,12 @@ import com.google.gson.reflect.TypeToken;
 import org.springframework.stereotype.Service;
 import soselab.msdobot.aggregatebot.Entity.DiscordMessageTemplate;
 
+import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * fake tool service
@@ -111,5 +114,37 @@ public class PseudoService {
             return gson.toJson(template);
         }
         return requestBody;
+    }
+
+    public String checkRESTlerInfo(String requestBody){
+        var flag = false;
+        JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
+        String serviceName = requestObj.get("Api.serviceName").getAsString();
+        var fileName = "src/main/resources/" + serviceName + ".txt";
+        var result = "Test result:";
+        try {
+            InputStream is = new FileInputStream(fileName);
+            BufferedReader buffer = new BufferedReader(new InputStreamReader(is));
+            var line = buffer.readLine();
+            while(line != null){
+                if(line.contains("below are the final stats:")) flag = true;
+                if(flag && (line.contains("/") || line.contains("Bug"))){
+                    result += "\n" + extractRestlerInfo(line);
+                }
+                line = buffer.readLine();
+            }
+        }catch (IOException e){
+            e.printStackTrace();
+            System.out.println("[DEBUG] failed to read file");
+        }
+        return result;
+    }
+
+    public String extractRestlerInfo(String raw){
+        Pattern pattern = Pattern.compile("^[\\d-]{10} [\\d:.]{13} (.*)");
+        Matcher matcher = pattern.matcher(raw);
+        if(matcher.find())
+            return matcher.group(1);
+        return "";
     }
 }

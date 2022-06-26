@@ -31,7 +31,7 @@ public class DiscordMessageTemplate {
     }
 
     public void setMainMessage(String message){
-        this.mainMessage = mainMessage;
+        this.mainMessage = message;
     }
 
     /**

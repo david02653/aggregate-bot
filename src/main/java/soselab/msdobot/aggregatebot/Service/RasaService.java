@@ -1,5 +1,7 @@
 package soselab.msdobot.aggregatebot.Service;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -88,5 +90,22 @@ public class RasaService {
         ResponseEntity<String> resp = template.exchange(rasaEndpoint, HttpMethod.POST, entity, String.class);
         System.out.println("[DEBUG] rasa analyze result: " + resp.getBody());
         return resp.getBody();
+    }
+
+    public RasaIntent directParse(String raw){
+//        System.out.println("[dirPar]");
+//        System.out.println(raw);
+//        System.out.println("---");
+        var gson = new Gson();
+        JsonArray obj = gson.fromJson(raw, JsonArray.class);
+//        System.out.println(gson.toJson(obj));
+//        System.out.println("---");
+        RasaIntent result = new RasaIntent();
+        JsonObject custom = obj.get(0).getAsJsonObject().get("custom").getAsJsonObject();
+//        System.out.println(gson.toJson(custom));
+//        System.out.println("---");
+        result.setIntent(custom.get("intent").getAsString());
+        result.setJobName(custom.get("jobName").getAsString());
+        return result;
     }
 }

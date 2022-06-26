@@ -42,6 +42,7 @@
     input:
       - from: Api.serviceName
         to: Api.serviceName
+        addToGlobal: true
     output:
       - from: accessRecord
         to: AnalysisData.accessRecord
@@ -57,7 +58,7 @@
     - User.username
     - Api.accessToken
     - Api.endpoint
-    - Api.targetService
+    - Api.serviceName
   output:
     type: json
     jsonInfo:
@@ -67,6 +68,10 @@
       - jsonPath: $[1].description
         description: build summary
         dataLabel: buildSummary
+  storedData:
+    output:
+      - from: healthSummary
+        to: AnalysisData.healthData
 - name: Jenkins-test-report
   context: jenkins
   isAggregateMethod: false
@@ -92,6 +97,7 @@
         to: Api.accessToken
       - from: Api.serviceName
         to: Api.serviceName
+        addToGlobal: true
 - name: Jenkins-latest-build-number
   context: jenkins
   isAggregateMethod: false
@@ -116,6 +122,7 @@
         to: Api.accessToken
       - from: Api.serviceName
         to: Api.serviceName
+        addToGlobal: true
     output:
       - from: buildNumber
         to: Api.buildNumber
@@ -144,6 +151,7 @@
         to: Api.accessToken
       - from: Api.serviceName
         to: Api.serviceName
+        addToGlobal: true
 - name: Jenkins-view-list
   context: jenkins
   isAggregateMethod: false
@@ -297,7 +305,7 @@
   accessLevel: service
   description: get service detail info
   method: POST
-  atomicIntent: none
+  atomicIntent: pseudo-service-detail-single
   apiEndpoint: http://localhost:8088/serviceDetail
   input:
     - Api.serviceName
@@ -315,10 +323,11 @@
   accessLevel: service
   description: get service api detail info
   method: POST
-  atomicIntent: none
+  atomicIntent: pseudo-service-api-detail-single
   apiEndpoint: http://localhost:8088/serviceApiDetail
   input:
     - Api.serviceName
+#    - Api.accessToken
   output:
     type: plainText
     dataLabel: apiInfo
@@ -354,6 +363,100 @@
         isAggregationData: false
         context: pseudoServiceGateway
         from: Data.information
+- name: pseudo-list-error
+  context: pseudoServiceGateway
+  isAggregateMethod: false
+  accessLevel: service
+  description: get all service error count
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/listError
+  input:
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: errorCount
+  storedData:
+    output:
+      - from: errorCount
+        to: AnalysisData.errorCount
+- name: pseudo-check-highest-error-service
+  context: pseudoServiceGateway
+  isAggregateMethod: true
+  accessLevel: system
+  description: check hightest error service name
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/checkHighError
+  aggregateDetail:
+    storeResult: true
+    resultName: errorServiceName
+    usedComponent:
+      context:
+        - pseudoServiceGateway
+      property:
+        - AnalysisData.errorCount
+    dataSource:
+      - useAs: serviceErrorCount
+        isAggregationData: false
+        context: pseudoServiceGateway
+        from: AnalysisData.errorCount
+# error version
+- name: pseudo-service-detail-aggregate-error
+  context: general
+  isAggregateMethod: true
+  accessLevel: service
+  description: aggregate pseudo service detail
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/aggregateServiceInfoError
+  input:
+  output:
+  aggregateDetail:
+    storeResult: true
+    resultName: serviceDetailInfo
+    usedComponent:
+      context:
+        - pseudoServiceInfo
+        - pseudoServiceGateway
+      property:
+        - Data.information
+    dataSource:
+      - useAs: serviceDetail
+        isAggregationData: false
+        context: pseudoServiceInfo
+        from: Data.information
+      - useAs: apiDetail
+        isAggregationData: false
+        context: pseudoServiceGateway
+        from: Data.information
+      - useAs: errorService
+        isAggregationData: true
+        aggregationLevel: system
+        aggregateDataComponent:
+          context:
+            - pseudoServiceGateway
+          property:
+            - AnalysisData.errorCount
+- name: pseudo-rendering-service-detail-error
+  isRenderingMethod: true
+  description: render pseudo service detail
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/renderDetailError
+  input:
+  output:
+  renderingDetail:
+    dataSource:
+      - useAs: serviceDetail
+        isAggregationData: true
+        aggregationLevel: service
+        aggregateDataComponent:
+          context:
+            - pseudoServiceInfo
+            - pseudoServiceGateway
+          property:
+            - Data.information
 - name: pseudo-rendering-service-detail
   isRenderingMethod: true
   description: render pseudo service detail
@@ -512,3 +615,275 @@
           property:
             - Data.errorLog
             - Data.log
+# final test case: simple restler test
+- name: restler-simple-test
+  context: restler
+  isAggregateMethod: false
+  isRenderingMethod: false
+  description: check restler test report
+  accessLevel: service
+  method: POST
+  atomicIntent: check-restler
+  apiEndpoint: http://localhost:8888/capability/restler
+  input:
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: restlerLog
+  storedData:
+    input:
+      - from: Api.serviceName
+        to: Api.serviceName
+        addToGlobal: true
+    output:
+      - from: restlerLog
+        to: Data.errorLog
+# final test case: actuator health
+- name: get-actuator-health
+  context: actuator
+  isAggregateMethod: false
+  isRenderingMethod: false
+  description: check actuator health status
+  accessLevel: service
+  method: POST
+  atomicIntent: check-actuator-health
+  apiEndpoint: http://localhost:8088/actuatorHealth
+  input:
+    - Api.serviceName
+    - Api.endpoint
+  output:
+    type: json
+    jsonInfo:
+      - jsonPath: $.status
+        description: actuator health
+        dataLabel: actuatorHealthStatus
+  storedData:
+    input:
+      - from: Api.serviceName
+        to: Api.serviceName
+        addToGlobal: true
+    output:
+      - from: actuatorHealthStatus
+        to: AnalysisData.healthData
+# final test case: actuator info
+- name: get-actuator-info
+  context: actuator
+  isAggregateMethod: false
+  isRenderingMethod: false
+  description: check actuator version info
+  accessLevel: service
+  method: POST
+  atomicIntent: check-actuator-info
+  apiEndpoint: http://localhost:8088/actuatorInfo
+  input:
+    - Api.serviceName
+    - Api.endpoint
+  output:
+    type: json
+    jsonInfo:
+      - jsonPath: $.version
+        description: actuator version info
+        dataLabel: actuatorVersionInfo
+  storedData:
+    input:
+      - from: Api.serviceName
+        to: Api.serviceName
+        addToGlobal: true
+    output:
+      - from: actuatorVersionInfo
+        to: Data.versionNumber
+# final test case: swagger api list
+- name: get-api-list
+  context: swagger
+  isAggregateMethod: false
+  isRenderingMethod: false
+  description: check swagger api list
+  accessLevel: service
+  method: POST
+  atomicIntent: check-swagger-api-list
+  apiEndpoint: http://localhost:8088/swaggerApiList
+  input:
+    - Api.serviceName
+    - Api.endpoint
+  output:
+    type: plainText
+    dataLabel: swaggerApiList
+  storedData:
+    input:
+      - from: Api.serviceName
+        to: Api.serviceName
+        addToGlobal: true
+    output:
+      - from: swaggerApiList
+        to: Data.information
+# final test case
+# rendering capability
+# actuator health + actuator info + swagger api list
+- name: render-service-info
+  isAggregateMethod: false
+  isRenderingMethod: true
+  description: render actuator health/info and swagger api list
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/renderServiceInfo
+  input:
+  output:
+  renderingDetail:
+    dataSource:
+#      - useAs: errorTimeZone
+#        isAggregationData: true
+#        aggregationLevel: service
+#        aggregateDataComponent:
+#          context:
+#            - pseudoServiceInfo
+#          property:
+#            - Data.errorLog
+      - useAs: swaggerApiList
+        isAggregationData: false
+        context: swagger
+        from: Data.information
+      - useAs: actuatorVersionInfo
+        isAggregationData: false
+        context: actuator
+        from: Data.versionNumber
+      - useAs: actuatorHealthStatus
+        isAggregationData: false
+        context: actuator
+        from: AnalysisData.healthData
+      - useAs: kmamizServiceStruct
+        isAggregationData: false
+        context: Kmamiz
+        from: Data.information
+# kmamiz structure
+- name: get-service-structure
+  context: Kmamiz
+  isAggregateMethod: false
+  isRenderingMethod: false
+  description: check kmamiz service structure
+  accessLevel: service
+  method: POST
+  atomicIntent: check-kmamiz-struct
+  apiEndpoint: http://localhost:8088/kmamizStruct
+  input:
+    - Api.endpoint
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: serviceStructure
+  storedData:
+    input:
+      - from: Api.serviceName
+        to: Api.serviceName
+        addToGlobal: true
+    output:
+      - from: serviceStructure
+        to: Data.information
+# kmamiz system monitor
+- name: get-kmamiz-monitor-data
+  context: Kmamiz
+  isAggregateMethod: false
+  isRenderingMethod: false
+  description: check kmamiz service structure
+  accessLevel: service
+  method: POST
+  atomicIntent: check-kmamiz-monitor
+  apiEndpoint: http://localhost:8088/kmamizMonitor
+  input:
+    - Api.serviceName
+  output:
+    type: plainText
+    dataLabel: kmamizMonitorData
+  storedData:
+    input:
+      - from: Api.serviceName
+        to: Api.serviceName
+        addToGlobal: true
+    output:
+      - from: kmamizMonitorData
+        to: Api.monitorData
+# kmamiz analyze risk
+- name: analyze-kmamiz-risk
+  context: Kmamiz
+  isAggregateMethod: true
+  isRenderingMethod: false
+  accessLevel: system
+  description: aggregate kmamiz highest service risk
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/kmamizRiskAnalyze
+  input:
+  output:
+  aggregateDetail:
+    storeResult: true
+    resultName: riskyService
+    usedComponent:
+      context:
+        - Kmamiz
+      property:
+        - Api.monitorData
+    dataSource:
+      - useAs: monitorData
+        isAggregationData: false
+        context: Kmamiz
+        from: Api.monitorData
+# kmamiz render service
+- name: render-kmamiz-data
+  context: Kmamiz
+  isAggregateMethod: false
+  isRenderingMethod: true
+  accessLevel: service
+  description: render kmamiz service monitor data
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/renderKmamizService
+  input:
+  output:
+  renderingDetail:
+    dataSource:
+      - useAs: monitorData
+        isAggregationData: false
+        context: Kmamiz
+        from: Api.monitorData
+      - useAs: targetService
+        isAggregationData: true
+        aggregationLevel: system
+        aggregateDataComponent:
+          context:
+            - Kmamiz
+          property:
+            - Api.monitorData
+- name: render-risk-service-info
+  isAggregateMethod: false
+  isRenderingMethod: true
+  description: render actuator health/info and swagger api list
+  method: POST
+  atomicIntent: none
+  apiEndpoint: http://localhost:8088/renderRiskServiceInfo
+  input:
+  output:
+  renderingDetail:
+    dataSource:
+      - useAs: targetService
+        isAggregationData: true
+        aggregationLevel: system
+        aggregateDataComponent:
+          context:
+            - Kmamiz
+          property:
+            - Api.monitorData
+      - useAs: swaggerApiList
+        isAggregationData: false
+        context: swagger
+        from: Data.information
+      - useAs: actuatorVersionInfo
+        isAggregationData: false
+        context: actuator
+        from: Data.versionNumber
+      - useAs: actuatorHealthStatus
+        isAggregationData: false
+        context: actuator
+        from: AnalysisData.healthData
+      - useAs: kmamizServiceStruct
+        isAggregationData: false
+        context: Kmamiz
+        from: Data.information

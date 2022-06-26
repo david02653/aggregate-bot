@@ -55,7 +55,7 @@ public class JenkinsService {
         String queryUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/api/json?depth=2&tree=healthReport[*]";
         System.out.println("> [url] " + queryUrl);
         try {
-            ResponseEntity<String> resp = basicJenkinsRequest(queryUrl, config.get("User.username").getAsString(), config.get("Api-accessToken").getAsString());
+            ResponseEntity<String> resp = basicJenkinsRequest(queryUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
 //            System.out.println(resp.getBody());
             Gson gson = new Gson();
             JsonObject body = gson.fromJson(resp.getBody(), JsonObject.class);
@@ -103,7 +103,8 @@ public class JenkinsService {
         System.out.println("[DEBUG][test report] try to request test report data from " + requestUrl);
         try{
             ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
-            return new Gson().toJson(resp.getBody());
+//            return new Gson().toJson(resp.getBody());
+            return testReportInfoExtractor(resp.getBody());
         }catch (RequestException je){
             je.printStackTrace();
             System.out.println("[DEBUG] failed requesting jenkins test report");
@@ -128,12 +129,29 @@ public class JenkinsService {
             ResponseEntity<String> testResp = basicJenkinsRequest(testReportRequestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
             System.out.println(">>> raw test report of " + targetService + ": " + gson.toJson(testResp.getBody()));
             System.out.println("-----");
-            return gson.toJson(testResp.getBody());
+//            return gson.toJson(testResp.getBody());
+            return testReportInfoExtractor(testResp.getBody());
         }catch (RequestException je){
             je.printStackTrace();
             System.out.println("[DEBUG] failed requesting jenkins build status.");
             return "error occurred while requesting build data / test report data";
         }
+    }
+
+    /**
+     * extract key information from jenkins test report<br>
+     * test duration, failed count, passed count and skipped count will be extracted
+     * @param rawReport raw report string
+     * @return result report string
+     */
+    private String testReportInfoExtractor(String rawReport){
+        JsonObject testReport = new Gson().fromJson(rawReport, JsonObject.class);
+        var duration = testReport.get("duration").getAsFloat();
+        var failCount = testReport.get("failCount").getAsInt();
+        var passCount = testReport.get("passCount").getAsInt();
+        var skipCount = testReport.get("skipCount").getAsInt();
+        var resultReport = String.format("Test Report: %d test case found, %d passed, %d failed, %d skipped, cost %.3f ms", failCount+passCount+skipCount, passCount, failCount, skipCount, duration);
+        return resultReport;
     }
 
     public String getJenkinsViewList(String config){

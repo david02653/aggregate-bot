@@ -81,3 +81,201 @@ serviceList:
       - name: Game
         type: service
         description: game service
+  # spring version PDAS system
+  - name: PDAS
+    type: system
+    description: spring eureka version pdas
+    config:
+      - context: jenkins
+        properties:
+          - name: Api.endpoint
+            value: http://140.121.196.23:10051
+          - name: User.username
+            value: linux
+          - name: Api.accessToken
+            value: 119a2165798e8a5fadd832568cf4e98253
+      - context: Kmamiz
+        properties:
+          - name: Api.endpoint
+            value: https://kmamiz-pdas-demo.stw.tw/
+    service:
+#      - name: Gateway
+#        type: service
+#        description: pdas-eureka-gateway
+#        config:
+#          - context: actuator
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10060/actuator
+#          - context: general
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10060
+      - name: ExternalRequestService
+        type: service
+        description: pdas-eureka-external-request-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10066/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10066/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=ZXh0ZXJuYWwtc2VydmljZQlwZGFz
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10066
+      - name: SignatureVerificationService
+        type: service
+        description: pdas-eureka-signature-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10064/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10064/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=c2lnbmF0dXJlLXNlcnZpY2UJcGRhcw%3D%3D
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10064
+      - name: BlockChainService
+        type: service
+        description: pdas-eureka-blockchain-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10063/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10063/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=YmxvY2tjaGFpbi1zZXJ2aWNlCXBkYXM%3D
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10063
+      - name: ContractService
+        type: service
+        description: pdas-eureka-contract-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10065/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10065/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=Y29udHJhY3Qtc2VydmljZQlwZGFz
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10065
+      - name: UserService
+        type: service
+        description: pdas-eureka-user-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10062/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10062/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=Y3JlZGVudGlhbC1zZXJ2aWNlCXBkYXM%3D
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10062
+      - name: CredentialService
+        type: service
+        description: pdas-eureka-credential-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10068/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10068/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=Y3JlZGVudGlhbC1zZXJ2aWNlCXBkYXM%3D
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10068
+#      - name: SignVerificationMethodRegistry
+#        type: service
+#        description: pdas-eureka-verification-service
+#        config:
+#          - context: actuator
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10067/actuator
+#          - context: general
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10060
+#      - name: EmailService
+#        type: service
+#        description: pdas-eureka-email-service
+#        config:
+#          - context: actuator
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10061/actuator
+#          - context: general
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10061
+#      - name: EurekaServer
+#        type: service
+#        description: pdas-eureka-eureka-server
+#        config:
+#          - context: actuator
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10069/actuator
+#          - context: general
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10069
+#      - name: ZipkinServer
+#        type: service
+#        description: pdas-zipkin-server
+#        config:
+#          - context: actuator
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10070/actuator
+#          - context: general
+#            properties:
+#              - name: Api.endpoint
+#                value: http://140.121.196.23:10070

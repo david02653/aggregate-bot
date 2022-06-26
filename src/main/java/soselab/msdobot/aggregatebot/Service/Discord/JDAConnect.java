@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.security.auth.login.LoginException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -93,6 +94,18 @@ public class JDAConnect {
 //        }
     }
 
+    public void send(ArrayList<Message> msgList){
+        System.out.println("[DEBUG] send msg");
+        msgList.forEach(msg -> {
+            JDA.getGuildById("737233839709225001").getTextChannelById("966378622560665610").sendMessage(msg).queue();
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     /**
      * send message to target text channel<br>
      * should only be used by rabbitMQ message handler<br>
@@ -103,5 +116,17 @@ public class JDAConnect {
     public void send(Message msg, String channelId){
         System.out.println("[DEBUG] send msg to channel '" + channelId + "'");
         JDA.getGuildById("737233839709225001").getTextChannelById(channelId).sendMessage(msg).queue();
+    }
+    public void send(ArrayList<Message> msgList, String channelId){
+        System.out.println("[DEBUG] send msg to channel '" + channelId + "'");
+        msgList.forEach(msg -> {
+            JDA.getGuildById("737233839709225001").getTextChannelById(channelId).sendMessage(msg).queue();
+
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

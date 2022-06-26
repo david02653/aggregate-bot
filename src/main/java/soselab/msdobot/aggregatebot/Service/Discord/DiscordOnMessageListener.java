@@ -63,12 +63,15 @@ public class DiscordOnMessageListener extends ListenerAdapter {
     private void normalMessageHandle(MessageReceivedEvent event){
         Message receivedMsg = event.getMessage();
         System.out.println("[DEBUG] trigger normal message handle");
-        RasaIntent intent = rasaService.intentParsing(rasaService.analyze(receivedMsg.getContentDisplay()));
+//        RasaIntent intent = rasaService.intentParsing(rasaService.analyze(receivedMsg.getContentDisplay()));
+        RasaIntent intent = rasaService.directParse(rasaService.analyze(receivedMsg.getContentDisplay()));
 
         // use orchestrator to decide what to do next
         // todo: update orchestrator workflow and change normal message handle workflow
         var resultMsg = orchestrator.capabilitySelector(intent);
-        event.getTextChannel().sendMessage(resultMsg).queue();
+        var channel = event.getTextChannel();
+//        event.getTextChannel().sendMessage(resultMsg).queue();
+        resultMsg.forEach(msg -> channel.sendMessage(msg).queue());
     }
 
     /**

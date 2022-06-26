@@ -56,10 +56,17 @@ public class Orchestrator {
      * @param intent rasa intent
      * @return execute result message
      */
-    public Message capabilitySelector(RasaIntent intent){
+    public ArrayList<Message> capabilitySelector(RasaIntent intent){
         HashMap<String, ArrayList<CapabilityReport>> finalReport = new HashMap<>();
+        System.out.println("[DEBUG][orch]" + intent);
         String intentName = intent.getIntent();
+
         String jobName = intent.getJobName();
+        // check rasa error default
+        if(jobName.equals("None") || jobName.equals("none")) {
+            // extract service
+            jobName = null;
+        }
         // check if try to expire session
         if(intentName.equals(expireTrigger)){
             expireAllSessionData();
@@ -80,8 +87,10 @@ public class Orchestrator {
 
         /* get service list */
         // try to extract service name from general config if service name is not available
-        if(jobName == null || jobName.isEmpty())
+        if(jobName == null || jobName.isEmpty()) {
             jobName = generalSessionData.getOrDefault("Api.serviceName", "");
+//            jobName = generalSessionData.get("Api.serviceName");
+        }
         ArrayList<Service> serviceList = ConfigLoader.serviceList.getSubServiceList(jobName);
         System.out.println("[DEBUG] todo subService list: " + gson.toJson(serviceList));
         if(serviceList.isEmpty()) {
@@ -91,7 +100,8 @@ public class Orchestrator {
         }
 
         // default message, use this variable to store message if default aggregate and rendering triggered
-        Message defaultMessage = new MessageBuilder().append("init orchestrator message.").build();
+//        Message defaultMessage = new MessageBuilder().append("init orchestrator message.").build();
+        ArrayList<Message> defaultMessage = new ArrayList<Message>(Collections.singletonList(new MessageBuilder().append("init orchestrator message.").build()));
         /* execute sequenced capability list */
         for(Capability capability : capabilityList){
             // fire skill request for every sub-service
@@ -104,7 +114,7 @@ public class Orchestrator {
                 }else{
                     // todo: handle rendering capability, return result message
                     System.out.println("[Orchestrator] rendering capability found");
-                    return handleRenderingCapability(capability, serviceList);
+                    return new ArrayList<Message>(Collections.singletonList(handleRenderingCapability(capability, serviceList)));
                 }
             }else {
                 /* POST method */
@@ -151,7 +161,8 @@ public class Orchestrator {
                 // if any error report found, return current report
                 if(reportFlag) {
                     // create and return missing report message from current capability report (may have multiple)
-                    return renderingService.createMissingReportMessage(finalReport.get(capability.name));
+                    System.out.println(">> try to create missing report");
+                    return new ArrayList<Message>(Collections.singletonList(renderingService.createMissingReportMessage(finalReport.get(capability.name))));
                 }
                 // if last capability, check capability type, run default aggregation and rendering if no rendering capability assigned
                 if(checkLastCapability(capabilityList, capability)){
