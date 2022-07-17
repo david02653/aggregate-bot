@@ -120,7 +120,7 @@ public class PseudoService {
         var flag = false;
         JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
         String serviceName = requestObj.get("Api.serviceName").getAsString();
-        var fileName = "src/main/resources/" + serviceName + ".txt";
+        var fileName = "src/main/resources/restler/" + serviceName + ".txt";
         var result = "Test result:";
         try {
             InputStream is = new FileInputStream(fileName);

@@ -206,7 +206,7 @@ serviceList:
           - context: Kmamiz
             properties:
               - name: Api.endpoint
-                value: https://kmamiz-pdas-demo.stw.tw/?s=Y3JlZGVudGlhbC1zZXJ2aWNlCXBkYXM%3D
+                value: https://kmamiz-pdas-demo.stw.tw/?s=dXNlci1zZXJ2aWNlCXBkYXM%3D
           - context: general
             properties:
               - name: Api.endpoint

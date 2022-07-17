@@ -169,11 +169,12 @@ public class RenderingService implements RenderingTemplate {
     }
 
     /**
-     * create discord message with simple string message
+     * create discord message with default method (code block mode)<br>
+     * will try to split message into multiple lines if received raw message is oversize
      * @param message message content
      * @return discord message of given content
      */
-    public static ArrayList<Message> createSimpleMessage(String message){
+    public static ArrayList<Message> createDefaultMessage(String message){
         // create discord message with simple string message
         var messageBuilder = new MessageBuilder();
         var length = message.length();
@@ -214,6 +215,24 @@ public class RenderingService implements RenderingTemplate {
             }
             return resultList;
         }
+    }
+
+    /**
+     * create simple discord message<br>
+     * switch to default message handle if received message is oversize
+     * @param message raw message
+     * @return discord message of given content
+     */
+    public static ArrayList<Message> createSimpleMessage(String message){
+        var messageBuilder = new MessageBuilder();
+        var length = message.length();
+        if(length > 1999) {
+            System.out.println("[DEBUG][simple msg] oversize, switch to default message handle");
+            return createDefaultMessage(message);
+        }else
+            System.out.println("[DEBUG][simple msg] try to create simple message");
+        messageBuilder.append(message);
+        return new ArrayList<Message>(Collections.singletonList(messageBuilder.build()));
     }
 
     /**

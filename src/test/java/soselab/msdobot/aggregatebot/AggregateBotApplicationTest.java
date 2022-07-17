@@ -591,4 +591,11 @@ class AggregateBotApplicationTest {
         var msg = orchestrator.capabilitySelector(intent);
         jdaConnect.send(msg);
     }
+
+    @Test
+    void overallTestCaseJenkinsGit(){
+        RasaIntent intent = new RasaIntent("test-jenkins-git-info", "UserService");
+        var msg = orchestrator.capabilitySelector(intent);
+        jdaConnect.send(msg);
+    }
 }

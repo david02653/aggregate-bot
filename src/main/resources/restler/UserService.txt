@@ -1,0 +1,956 @@
+Setting fuzzing schemes: directed-smoke-test
+2022-06-09 10:40:06.627: Going to fuzz a set with 25 requests
+2022-06-09 10:40:06.627: Request-0: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-1: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-2: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-3: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-4: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-5: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-6: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-7: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-8: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-9: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-10: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-11: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-12: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-13: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-14: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-15: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-16: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-17: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-18: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-19: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-20: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-21: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-22: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-23: Value Combinations: 1
+2022-06-09 10:40:06.627: Request-24: Value Combinations: 1
+2022-06-09 10:40:06.627: Avg. Value Combinations per Request: 1
+2022-06-09 10:40:06.627: Median Value Combinations per Request: 1
+2022-06-09 10:40:06.627: Min Value Combinations per Request: 1
+2022-06-09 10:40:06.627: Max Value Combinations per Request: 1
+2022-06-09 10:40:06.627: Total dependencies: 0
+
+2022-06-09 10:40:06.654: Generation: 1 / Sequences Collection Size: 25 
+(After directed-smoke-test Extend)
+
+Rendering request 0 from scratch
+
+2022-06-09 10:40:06.675: Request 0
+2022-06-09 10:40:06.675: Endpoint - /internal/user/update/dh
+2022-06-09 10:40:06.675: Hex Def - 0159bc3e7a4a6ee831fcb099b1c57dfb97096caf
+2022-06-09 10:40:06.675: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.675: Rendering VALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'update'
+		- restler_static_string: '/'
+		- restler_static_string: 'dh'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "organizationName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 1 from scratch
+
+2022-06-09 10:40:06.700: Request 1
+2022-06-09 10:40:06.700: Endpoint - /internal/user/user/email/{email}
+2022-06-09 10:40:06.700: Hex Def - 06ff825f2d67242a7221e5d4f7f8b885ab708916
+2022-06-09 10:40:06.700: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.700: Rendering VALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'email'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 2 from scratch
+
+2022-06-09 10:40:06.720: Request 2
+2022-06-09 10:40:06.720: Endpoint - /register
+2022-06-09 10:40:06.721: Hex Def - 216e0486b2f0574110147646b4eb9bf4db290b1b
+2022-06-09 10:40:06.721: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.721: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'register'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "callback":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "user":\n        {\n            "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certificates":\n            [\n                {\n                    "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n                    "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n                }\n            ],\n            "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "idNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "name":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '\n        }\n    }'
+		- restler_static_string: '\r\n'
+
+Rendering request 3 from scratch
+
+2022-06-09 10:40:06.740: Request 3
+2022-06-09 10:40:06.741: Endpoint - /ou/generalInfo
+2022-06-09 10:40:06.741: Hex Def - 2855a6403916b683515498034fb5403368e0a259
+2022-06-09 10:40:06.741: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.741: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'ou'
+		- restler_static_string: '/'
+		- restler_static_string: 'generalInfo'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "name":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 4 from scratch
+
+2022-06-09 10:40:06.766: Request 4
+2022-06-09 10:40:06.766: Endpoint - /dh/generalInfo
+2022-06-09 10:40:06.766: Hex Def - 38045708bfb5e0bd4fb305a3f2209c15efad47e7
+2022-06-09 10:40:06.766: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.766: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'dh'
+		- restler_static_string: '/'
+		- restler_static_string: 'generalInfo'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "organizationName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 5 from scratch
+
+2022-06-09 10:40:06.787: Request 5
+2022-06-09 10:40:06.787: Endpoint - /resetPassword/{token}
+2022-06-09 10:40:06.787: Hex Def - 5476f0d86bc442efc69bf36cef827695cf800a2b
+2022-06-09 10:40:06.787: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.787: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'resetPassword'
+		- restler_static_string: '/'
+		- restler_custom_payload_uuid4_suffix: 't'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\r\n'
+
+Rendering request 6 from scratch
+
+2022-06-09 10:40:06.807: Request 6
+2022-06-09 10:40:06.807: Endpoint - /dr/generalInfo
+2022-06-09 10:40:06.807: Hex Def - 5cd83e445d25118cef1124a305ed69e4a82474d8
+2022-06-09 10:40:06.807: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.808: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'dr'
+		- restler_static_string: '/'
+		- restler_static_string: 'generalInfo'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "organizationName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "principalName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 7 from scratch
+
+2022-06-09 10:40:06.829: Request 7
+2022-06-09 10:40:06.829: Endpoint - /internal/user/user/safe/type/{type}/id/{id}
+2022-06-09 10:40:06.829: Hex Def - 6681e0f24dc062b4607a23262fe5f1fd54df1244
+2022-06-09 10:40:06.829: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.829: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'safe'
+		- restler_static_string: '/'
+		- restler_static_string: 'type'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '/'
+		- restler_static_string: 'id'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 8 from scratch
+
+2022-06-09 10:40:06.855: Request 8
+2022-06-09 10:40:06.855: Endpoint - /sa/register/dh
+2022-06-09 10:40:06.855: Hex Def - 6cdc945a9d7c1113f53cff5a9bf381838d0504e3
+2022-06-09 10:40:06.855: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.856: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'sa'
+		- restler_static_string: '/'
+		- restler_static_string: 'register'
+		- restler_static_string: '/'
+		- restler_static_string: 'dh'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "callback":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "dataHolder":\n        {\n            "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certificates":\n            [\n                {\n                    "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n                    "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n                }\n            ],\n            "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "organizationName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '\n        }\n    }'
+		- restler_static_string: '\r\n'
+
+Rendering request 9 from scratch
+
+2022-06-09 10:40:06.877: Request 9
+2022-06-09 10:40:06.877: Endpoint - /user/generalInfo
+2022-06-09 10:40:06.877: Hex Def - 772302ff03a06ce344a36d6bf9508a698d314b4a
+2022-06-09 10:40:06.877: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.877: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'generalInfo'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 10 from scratch
+
+2022-06-09 10:40:06.939: Request 10
+2022-06-09 10:40:06.939: Endpoint - /internal/ouContractQuery/{originId}
+2022-06-09 10:40:06.939: Hex Def - 79d687b0665d2525bb761ccc1a4e912cb20a53a5
+2022-06-09 10:40:06.939: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.939: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'ouContractQuery'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 11 from scratch
+
+2022-06-09 10:40:06.960: Request 11
+2022-06-09 10:40:06.960: Endpoint - /internal/user/user/type/{type}/id/{id}
+2022-06-09 10:40:06.960: Hex Def - 8a6dd405f48bcd3a20d84297a960dccf5fee3e5f
+2022-06-09 10:40:06.960: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.961: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'type'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '/'
+		- restler_static_string: 'id'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 12 from scratch
+
+2022-06-09 10:40:06.979: Request 12
+2022-06-09 10:40:06.979: Endpoint - /user/password
+2022-06-09 10:40:06.979: Hex Def - 93c88fe21dd1919df8c4925aa817b740d7a3c60d
+2022-06-09 10:40:06.979: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:06.980: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'password'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "newPassword":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "oldPassword":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 13 from scratch
+
+2022-06-09 10:40:07.001: Request 13
+2022-06-09 10:40:07.001: Endpoint - /sa/userList
+2022-06-09 10:40:07.001: Hex Def - 9c175cd7100958e94de0fc6a368c888e32ab167f
+2022-06-09 10:40:07.001: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.001: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'sa'
+		- restler_static_string: '/'
+		- restler_static_string: 'userList'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 14 from scratch
+
+2022-06-09 10:40:07.033: Request 14
+2022-06-09 10:40:07.033: Endpoint - /register/dr
+2022-06-09 10:40:07.033: Hex Def - 9f33125a7eb54e968ea344cfe30e39b056245de6
+2022-06-09 10:40:07.033: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.033: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'register'
+		- restler_static_string: '/'
+		- restler_static_string: 'dr'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "callback":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "user":\n        {\n            "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certificates":\n            [\n                {\n                    "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n                    "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n                }\n            ],\n            "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "organizationName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "principalName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '\n        }\n    }'
+		- restler_static_string: '\r\n'
+
+Rendering request 15 from scratch
+
+2022-06-09 10:40:07.103: Request 15
+2022-06-09 10:40:07.103: Endpoint - /resetPassword
+2022-06-09 10:40:07.103: Hex Def - a79c4af968c240671ca09273feacbb8c1c88722f
+2022-06-09 10:40:07.103: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.103: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'resetPassword'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "callback":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 16 from scratch
+
+2022-06-09 10:40:07.125: Request 16
+2022-06-09 10:40:07.125: Endpoint - /resend
+2022-06-09 10:40:07.125: Hex Def - aac6fced6d0fe7e34bdc624fedf6d11e065272a8
+2022-06-09 10:40:07.125: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.125: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'resend'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "callback":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "uid":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 17 from scratch
+
+2022-06-09 10:40:07.145: Request 17
+2022-06-09 10:40:07.145: Endpoint - /internal/user/update/ou
+2022-06-09 10:40:07.145: Hex Def - cabfaa20281671fa60c6fcc9ec63d8c08bcd8da1
+2022-06-09 10:40:07.145: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.145: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'update'
+		- restler_static_string: '/'
+		- restler_static_string: 'ou'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "name":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 18 from scratch
+
+2022-06-09 10:40:07.171: Request 18
+2022-06-09 10:40:07.171: Endpoint - /internal/user/update/dr
+2022-06-09 10:40:07.171: Hex Def - d43b9c70f678b036b11767a7e6d106b92358322c
+2022-06-09 10:40:07.171: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.172: Rendering VALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'update'
+		- restler_static_string: '/'
+		- restler_static_string: 'dr'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "organizationName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "principalName":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 19 from scratch
+
+2022-06-09 10:40:07.189: Request 19
+2022-06-09 10:40:07.189: Endpoint - /verify
+2022-06-09 10:40:07.189: Hex Def - e14373b99feececab2762790ca6c944f76ffb06b
+2022-06-09 10:40:07.189: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.190: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'verify'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\r\n'
+
+Rendering request 20 from scratch
+
+2022-06-09 10:40:07.208: Request 20
+2022-06-09 10:40:07.209: Endpoint - /internal/user/update/sa
+2022-06-09 10:40:07.209: Hex Def - e3d326fada1d35b6d4bcb33a41fa8d1461aa1270
+2022-06-09 10:40:07.209: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.209: Rendering INVALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'update'
+		- restler_static_string: '/'
+		- restler_static_string: 'sa'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "certificates":\n    [\n        {\n            "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n        }\n    ],\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 21 from scratch
+
+2022-06-09 10:40:07.231: Request 21
+2022-06-09 10:40:07.231: Endpoint - /internal/user/user/type/{type}/email/{email}
+2022-06-09 10:40:07.231: Hex Def - e8ad73a6aeab9229fe5418642022e9a32e0bcf39
+2022-06-09 10:40:07.231: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.231: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'type'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '/'
+		- restler_static_string: 'email'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 22 from scratch
+
+2022-06-09 10:40:07.280: Request 22
+2022-06-09 10:40:07.280: Endpoint - /internal/user/cert
+2022-06-09 10:40:07.280: Hex Def - f6a44273febd0ca0ea2617fb0634ca74da4e0a62
+2022-06-09 10:40:07.280: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.281: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'cert'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "certB64":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "operator":\n        {\n            "address":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "certificates":\n            [\n                {\n                    "b64Certificate":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n                    "certSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n                }\n            ],\n            "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "mobilePhone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "password":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "telephone":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n            "userType":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: '\n        }\n    }'
+		- restler_static_string: '\r\n'
+
+Rendering request 23 from scratch
+
+2022-06-09 10:40:07.307: Request 23
+2022-06-09 10:40:07.307: Endpoint - /isInPwdResetQueue/{token}
+2022-06-09 10:40:07.307: Hex Def - fe5002ecb452d08414978f11be75aafab909d4f9
+2022-06-09 10:40:07.307: Sequence length that satisfies dependencies: 1
+2022-06-09 10:40:07.307: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'isInPwdResetQueue'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+Rendering request 24 from scratch
+
+2022-06-09 10:41:07.395: Request 24
+2022-06-09 10:41:07.395: Endpoint - /internal/user/user/id/{uid}
+2022-06-09 10:41:07.395: Hex Def - ff730f0a853a9d3f5f6cf0b910e59cd58473613f
+2022-06-09 10:41:07.395: Sequence length that satisfies dependencies: 1
+2022-06-09 10:41:07.395: Rendering VALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'id'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10062\r\n'
+		+ restler_refreshable_authentication_token: ['token_refresh_cmd', 'token_refresh_interval']
+		- restler_static_string: '\r\n'
+
+2022-06-09 10:41:07.396: Generation: 1 / Sequences Collection Size: 4 
+(After directed-smoke-test Render)
+
+2022-06-09 10:41:07.396: Final Swagger spec coverage: 4 / 25
+2022-06-09 10:41:07.396: Rendered requests: 22 / 25
+2022-06-09 10:41:07.396: Rendered requests with "valid" status codes: 4 / 22
+2022-06-09 10:41:07.396: Num fully valid requests (no resource creation failures): 4
+2022-06-09 10:41:07.396: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 10:41:07.396: Num invalid requests caused by failed resource creations: 0
+2022-06-09 10:41:07.396: Total Creations of Dyn Objects: 0
+2022-06-09 10:41:07.396: Total Requests Sent: {'gc': 0, 'main_driver': 22}
+2022-06-09 10:41:07.396: Bug Buckets: {'main_driver_500': 3}
+
+Testing completed -- below are the final stats:
+
+2022-06-09 10:41:07.404: Final Swagger spec coverage: 4 / 25
+2022-06-09 10:41:07.404: Rendered requests: 22 / 25
+2022-06-09 10:41:07.404: Rendered requests with "valid" status codes: 4 / 22
+2022-06-09 10:41:07.404: Num fully valid requests (no resource creation failures): 4
+2022-06-09 10:41:07.404: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 10:41:07.404: Num invalid requests caused by failed resource creations: 0
+2022-06-09 10:41:07.404: Total Creations of Dyn Objects: 0
+2022-06-09 10:41:07.404: Total Requests Sent: {'gc': 0, 'main_driver': 22}
+2022-06-09 10:41:07.404: Bug Buckets: {'main_driver_500': 3}

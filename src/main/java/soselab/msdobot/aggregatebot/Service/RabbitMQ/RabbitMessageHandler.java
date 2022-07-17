@@ -40,6 +40,6 @@ public class RabbitMessageHandler {
 
         // <-- maybe add some filter here
         // send message to discord
-        jdaService.send(RenderingService.createSimpleMessage(output), rabbitmqChannel);
+        jdaService.send(RenderingService.createDefaultMessage(output), rabbitmqChannel);
     }
 }

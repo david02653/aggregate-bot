@@ -1,0 +1,191 @@
+Setting fuzzing schemes: directed-smoke-test
+2022-06-08 23:59:43.196: Going to fuzz a set with 4 requests
+2022-06-08 23:59:43.196: Request-0: Value Combinations: 1
+2022-06-08 23:59:43.196: Request-1: Value Combinations: 1
+2022-06-08 23:59:43.196: Request-2: Value Combinations: 1
+2022-06-08 23:59:43.196: Request-3: Value Combinations: 1
+2022-06-08 23:59:43.196: Avg. Value Combinations per Request: 1
+2022-06-08 23:59:43.196: Median Value Combinations per Request: 1.0
+2022-06-08 23:59:43.196: Min Value Combinations per Request: 1
+2022-06-08 23:59:43.196: Max Value Combinations per Request: 1
+2022-06-08 23:59:43.196: Total dependencies: 0
+
+2022-06-08 23:59:43.198: Generation: 1 / Sequences Collection Size: 4 
+(After directed-smoke-test Extend)
+
+Rendering request 0 from scratch
+
+2022-06-08 23:59:43.247: Request 0
+2022-06-08 23:59:43.248: Endpoint - /blockchain/contract/{txHash}
+2022-06-08 23:59:43.248: Hex Def - 2942d0af902ae9497321c7d0f7d863bf5b577689
+2022-06-08 23:59:43.248: Sequence length that satisfies dependencies: 1
+2022-06-08 23:59:43.248: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'blockchain'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10063\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 1 from scratch
+
+2022-06-08 23:59:43.274: Request 1
+2022-06-08 23:59:43.274: Endpoint - /internal/blockchain/contract
+2022-06-08 23:59:43.274: Hex Def - 611adce6ced938296d5535d279b32971151a3291
+2022-06-08 23:59:43.274: Sequence length that satisfies dependencies: 1
+2022-06-08 23:59:43.274: Rendering VALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'blockchain'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10063\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "deadline":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "dhSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "drSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "firstSignDate":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "firstSignature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataHolder":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataRequester":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idOrdinaryUser":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "originBody":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "originId":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "ouSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "secondSignDate":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "secondSignature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "signState":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "transactionHash":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 2 from scratch
+
+2022-06-09 00:00:43.365: Request 2
+2022-06-09 00:00:43.365: Endpoint - /blockchain/publish
+2022-06-09 00:00:43.365: Hex Def - b1cd32b96d8474fead8ebd884b89389dbc428ae0
+2022-06-09 00:00:43.365: Sequence length that satisfies dependencies: 1
+2022-06-09 00:00:43.365: Rendering VALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'blockchain'
+		- restler_static_string: '/'
+		- restler_static_string: 'publish'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10063\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "deadline":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "dhSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "drSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "firstSignDate":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "firstSignature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataHolder":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataRequester":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idOrdinaryUser":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "originBody":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "originId":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "ouSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "secondSignDate":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "secondSignature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "signState":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "transactionHash":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 3 from scratch
+
+2022-06-09 00:00:43.385: Request 3
+2022-06-09 00:00:43.385: Endpoint - /blockchain/etherscanPrefix
+2022-06-09 00:00:43.386: Hex Def - c5499a15f8e66710194cc01c04fc09790e6b6fd3
+2022-06-09 00:00:43.386: Sequence length that satisfies dependencies: 1
+2022-06-09 00:00:43.386: Rendering VALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'blockchain'
+		- restler_static_string: '/'
+		- restler_static_string: 'etherscanPrefix'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10063\r\n'
+		- restler_static_string: '\r\n'
+
+2022-06-09 00:00:43.386: Generation: 1 / Sequences Collection Size: 3 
+(After directed-smoke-test Render)
+
+2022-06-09 00:00:43.387: Final Swagger spec coverage: 3 / 4
+2022-06-09 00:00:43.387: Rendered requests: 4 / 4
+2022-06-09 00:00:43.387: Rendered requests with "valid" status codes: 3 / 4
+2022-06-09 00:00:43.387: Num fully valid requests (no resource creation failures): 3
+2022-06-09 00:00:43.387: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 00:00:43.387: Num invalid requests caused by failed resource creations: 0
+2022-06-09 00:00:43.387: Total Creations of Dyn Objects: 0
+2022-06-09 00:00:43.387: Total Requests Sent: {'gc': 0, 'main_driver': 4}
+2022-06-09 00:00:43.387: Bug Buckets: {'main_driver_500': 1}
+
+Testing completed -- below are the final stats:
+
+2022-06-09 00:00:43.391: Final Swagger spec coverage: 3 / 4
+2022-06-09 00:00:43.391: Rendered requests: 4 / 4
+2022-06-09 00:00:43.391: Rendered requests with "valid" status codes: 3 / 4
+2022-06-09 00:00:43.391: Num fully valid requests (no resource creation failures): 3
+2022-06-09 00:00:43.391: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 00:00:43.391: Num invalid requests caused by failed resource creations: 0
+2022-06-09 00:00:43.391: Total Creations of Dyn Objects: 0
+2022-06-09 00:00:43.391: Total Requests Sent: {'gc': 0, 'main_driver': 4}
+2022-06-09 00:00:43.391: Bug Buckets: {'main_driver_500': 1}

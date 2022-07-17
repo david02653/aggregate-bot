@@ -1,0 +1,37 @@
+version: "3.0"
+
+services:
+  msdobot:
+    image: msdobot/msdobot:v1
+    container_name: msdobot
+#    restart: always
+    networks: ["msdobot"]
+    depends_on:
+      - rabbitmq
+      - outer_api
+    ports:
+      - 8888:8888
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: msdobot-rabbitmq
+#    restart: always
+    networks: ["msdobot"]
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  outer_api:
+    image: msdobot/outer:v0
+    container_name: msdobot-outer-api
+#    restart: always
+    networks: ["msdobot"]
+    ports:
+      - 10001:10001
+
+networks:
+  msdobot:
+    name: msdobot

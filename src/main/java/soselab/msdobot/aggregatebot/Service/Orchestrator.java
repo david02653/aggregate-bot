@@ -37,6 +37,8 @@ public class Orchestrator {
     // previous aggregate result, use sorted server + sorted context + sorted property hash as key
     public static ConcurrentHashMap<String, String> aggregateDataMap;
     private final String expireTrigger;
+    private final String exceptionTrigger;
+    private final String fallbackTrigger;
     private final ConfigLoader configLoader;
     private final RenderingService renderingService;
 
@@ -45,7 +47,9 @@ public class Orchestrator {
         generalSessionData = new ConcurrentHashMap<>();
         missingConfigMap = new ConcurrentHashMap<>();
         aggregateDataMap = new ConcurrentHashMap<>();
-        expireTrigger = env.getProperty("bot.session.expire.trigger");
+        expireTrigger = env.getProperty("bot.intent.expire.trigger");
+        exceptionTrigger = env.getProperty("bot.intent.exception.trigger");
+        fallbackTrigger = env.getProperty("bot.intent.fallback.trigger");
         this.configLoader = configLoader;
         this.renderingService = new RenderingService();
     }
@@ -67,11 +71,32 @@ public class Orchestrator {
             // extract service
             jobName = null;
         }
-        // check if try to expire session
+
+        /* expire session intent handle */
         if(intentName.equals(expireTrigger)){
             expireAllSessionData();
-            return RenderingService.createSimpleMessage("ok, all current session data removed.");
+            return RenderingService.createDefaultMessage("ok, all current session data removed.");
         }
+        /* out-of-scope intent handle */
+        if(intentName.equals(exceptionTrigger)){
+            if(jobName.equals("greet")){
+                // greeting message
+                return RenderingService.createSimpleMessage("Hi :grinning:");
+            }
+            else if(jobName.equals("bye")){
+                // goodbye message
+                return RenderingService.createSimpleMessage("Bye :slight_smile:");
+            }
+            else{
+                // normal out-of-scope message
+                return RenderingService.createSimpleMessage("Sorry, I can only recognize limited types of intent for now. Maybe I just misjudged your message, can you please try to speak in other words? thanks. :smiling_face_with_tear:");
+            }
+        }
+        /* fallback intent handle */
+        if(intentName.equals(fallbackTrigger)){
+            return RenderingService.createSimpleMessage("Sorry, I'm not pretty sure what you mean, Can you please try to speak in other words? thanks. :thinking:");
+        }
+
         Gson gson = new Gson();
         final ExecutorService executor = Executors.newFixedThreadPool(5);
         final List<Future<CapabilityReport>> futures = new ArrayList<>();
@@ -81,7 +106,7 @@ public class Orchestrator {
         ArrayList<Capability> capabilityList = getCorrespondCapabilityList(intentName);
         if(capabilityList == null || capabilityList.isEmpty()) {
             System.out.println(">> [DEBUG] No available capability found.");
-            return RenderingService.createSimpleMessage("No available capability found.");
+            return RenderingService.createDefaultMessage("No available capability found.");
         }
         System.out.println("[DEBUG] available capability detected : " + gson.toJson(capabilityList));
 
@@ -95,7 +120,7 @@ public class Orchestrator {
         System.out.println("[DEBUG] todo subService list: " + gson.toJson(serviceList));
         if(serviceList.isEmpty()) {
             System.out.println("[DEBUG] target service not exist.");
-            return RenderingService.createSimpleMessage("No correspond service found.");
+            return RenderingService.createDefaultMessage("No correspond service found.");
 //            return finalReport;
         }
 
@@ -178,7 +203,7 @@ public class Orchestrator {
                     RenderingService rendering = new RenderingService(serviceList, aggregateReport);
                     String resultTable = rendering.parseToSimpleAsciiArtTable();
                     // return default rendering result
-                    defaultMessage = RenderingService.createSimpleMessage(resultTable);
+                    defaultMessage = RenderingService.createDefaultMessage(resultTable);
                     System.out.println("=====");
                 }
                 futures.clear();
@@ -1098,6 +1123,10 @@ public class Orchestrator {
         String capabilityContext = capability.context;
         StoredData storedData = capability.storedData;
         CapabilityReport report = new CapabilityReport(capability.name, service.name);
+        /* store service name data in temporary storage anyway */
+        if(inputConfig.containsKey("Api.serviceName")){
+            addServiceSessionConfig(service.name, "general", "Api.serviceName", service.name);
+        }
         /* check stored data */
         if(storedData == null)
             return report;

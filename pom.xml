@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>soselab.msdobot</groupId>
-    <artifactId>aggregate-bot</artifactId>
+    <artifactId>msdobot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>aggregate-bot</name>
     <description>aggregate-bot</description>

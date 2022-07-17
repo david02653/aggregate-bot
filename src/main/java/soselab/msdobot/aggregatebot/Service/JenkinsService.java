@@ -112,6 +112,29 @@ public class JenkinsService {
         }
     }
 
+    /**
+     * get job git information from jenkins of given build number
+     * @param config jenkins config, expect build number and jenkins account data
+     * @param targetService service name
+     * @return target jenkins job git information
+     */
+    public String getJenkinsGitInfo(JsonObject config, String targetService){
+        String requestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/" + config.get("Api.buildNumber").getAsString() + "/git/api/json";
+        System.out.println("[DEBUG][git info] received config : " + config);
+        System.out.println("[DEBUG][git info] try to request git info data from " + requestUrl);
+        try{
+            ResponseEntity<String> resp = basicJenkinsRequest(requestUrl, config.get("User.username").getAsString(), config.get("Api.accessToken").getAsString());
+            Gson gson = new Gson();
+            JsonObject body = gson.fromJson(resp.getBody(), JsonObject.class);
+            System.out.println(gson.toJson(body));
+            return gson.toJson(body);
+        }catch (RequestException je){
+            je.printStackTrace();
+            System.out.println("[DEBUG] failed requesting jenkins git info");
+            return "error occurred while requesting git info data";
+        }
+    }
+
     public String getDirectJenkinsTestReport(JsonObject config, String targetService){
         // retrieve the latest build number
         String buildStatusRequestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";

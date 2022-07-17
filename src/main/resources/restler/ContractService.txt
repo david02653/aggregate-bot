@@ -1,0 +1,355 @@
+Setting fuzzing schemes: directed-smoke-test
+2022-06-09 01:15:04.109: Going to fuzz a set with 11 requests
+2022-06-09 01:15:04.109: Request-0: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-1: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-2: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-3: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-4: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-5: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-6: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-7: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-8: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-9: Value Combinations: 1
+2022-06-09 01:15:04.109: Request-10: Value Combinations: 1
+2022-06-09 01:15:04.109: Avg. Value Combinations per Request: 1
+2022-06-09 01:15:04.109: Median Value Combinations per Request: 1
+2022-06-09 01:15:04.109: Min Value Combinations per Request: 1
+2022-06-09 01:15:04.109: Max Value Combinations per Request: 1
+2022-06-09 01:15:04.109: Total dependencies: 0
+
+2022-06-09 01:15:04.111: Generation: 1 / Sequences Collection Size: 11 
+(After directed-smoke-test Extend)
+
+Rendering request 0 from scratch
+
+2022-06-09 01:15:04.132: Request 0
+2022-06-09 01:15:04.133: Endpoint - /user/finishedContractInfo
+2022-06-09 01:15:04.133: Hex Def - 3655ac65c2a5c7dddb5863b6dd1ce1a542fa7bcb
+2022-06-09 01:15:04.133: Sequence length that satisfies dependencies: 1
+2022-06-09 01:15:04.133: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'finishedContractInfo'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 1 from scratch
+
+2022-06-09 01:15:04.159: Request 1
+2022-06-09 01:15:04.159: Endpoint - /user/sign-contract/{cid}
+2022-06-09 01:15:04.159: Hex Def - 4d4fa5ed1292150bb497790301f9b8b3f23e9dc2
+2022-06-09 01:15:04.159: Sequence length that satisfies dependencies: 1
+2022-06-09 01:15:04.159: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'sign-contract'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "certB64":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "signature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 2 from scratch
+
+2022-06-09 01:15:04.185: Request 2
+2022-06-09 01:15:04.185: Endpoint - /user/contractPdf/{cid}
+2022-06-09 01:15:04.185: Hex Def - 537adf4f65c9617fae18fe9f1d121853109b2fe1
+2022-06-09 01:15:04.185: Sequence length that satisfies dependencies: 1
+2022-06-09 01:15:04.185: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'contractPdf'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\r\n'
+
+Rendering request 3 from scratch
+
+2022-06-09 01:15:04.217: Request 3
+2022-06-09 01:15:04.217: Endpoint - /internal/contract/{cid}
+2022-06-09 01:15:04.217: Hex Def - 6481619ec0f5eebf49a118552804e73286ef1f32
+2022-06-09 01:15:04.217: Sequence length that satisfies dependencies: 1
+2022-06-09 01:15:04.217: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 4 from scratch
+
+2022-06-09 01:16:04.354: Request 4
+2022-06-09 01:16:04.354: Endpoint - /internal/contract/contract
+2022-06-09 01:16:04.354: Hex Def - 743cdd452882ccf894a4c796bddb5f68aa9bdfe0
+2022-06-09 01:16:04.354: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.354: Rendering VALID
+		- restler_static_string: 'PUT '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "deadline":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "dhSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "drSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "firstSignDate":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "firstSignature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "id":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataHolder":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataRequester":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idOrdinaryUser":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "originBody":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "originId":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "ouSerialNumber":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "secondSignDate":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "secondSignature":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "signState":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "transactionHash":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 5 from scratch
+
+2022-06-09 01:16:04.379: Request 5
+2022-06-09 01:16:04.379: Endpoint - /user/contractInfo/canSign/{cid}
+2022-06-09 01:16:04.379: Hex Def - a565451fb9fda8f578818ee9fee47dc022ebfe27
+2022-06-09 01:16:04.379: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.379: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'contractInfo'
+		- restler_static_string: '/'
+		- restler_static_string: 'canSign'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 6 from scratch
+
+2022-06-09 01:16:04.439: Request 6
+2022-06-09 01:16:04.439: Endpoint - /internal/contract/init
+2022-06-09 01:16:04.439: Hex Def - b3a7e1e565a91b85029af1a46267d119360d060f
+2022-06-09 01:16:04.439: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.439: Rendering VALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: '/'
+		- restler_static_string: 'init'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "contractBody":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "deadline":'
+		- restler_fuzzable_int: '1'
+		- restler_static_string: ',\n    "idDataHolder":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idDataRequester":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "idOrdinaryUsers":\n    [\n        '
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '\n    ]}'
+		- restler_static_string: '\r\n'
+
+Rendering request 7 from scratch
+
+2022-06-09 01:16:04.506: Request 7
+2022-06-09 01:16:04.506: Endpoint - /internal/contract/origin/{originId}
+2022-06-09 01:16:04.506: Hex Def - b404bc0b8334fe42ba75bc9b60f9d66b39ee9628
+2022-06-09 01:16:04.506: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.506: Rendering VALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: '/'
+		- restler_static_string: 'origin'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 8 from scratch
+
+2022-06-09 01:16:04.528: Request 8
+2022-06-09 01:16:04.528: Endpoint - /user/contractList
+2022-06-09 01:16:04.528: Hex Def - b51bddfde716167fbdc4dabf1960aa14e979101e
+2022-06-09 01:16:04.528: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.528: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'contractList'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 9 from scratch
+
+2022-06-09 01:16:04.559: Request 9
+2022-06-09 01:16:04.559: Endpoint - /user/contractInfo/canView/{cid}
+2022-06-09 01:16:04.559: Hex Def - be4e83a0cb59c2a85642cf0d08553be29f71ac44
+2022-06-09 01:16:04.559: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.559: Rendering INVALID
+		- restler_static_string: 'GET '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'user'
+		- restler_static_string: '/'
+		- restler_static_string: 'contractInfo'
+		- restler_static_string: '/'
+		- restler_static_string: 'canView'
+		- restler_static_string: '/'
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: 'authTok: '
+		- restler_fuzzable_string: 'fuzzstring'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+
+Rendering request 10 from scratch
+
+2022-06-09 01:16:04.736: Request 10
+2022-06-09 01:16:04.736: Endpoint - /internal/contract/clear
+2022-06-09 01:16:04.736: Hex Def - d29f87c3cb698ece6d250009964a831dab42e3a8
+2022-06-09 01:16:04.736: Sequence length that satisfies dependencies: 1
+2022-06-09 01:16:04.736: Rendering VALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'internal'
+		- restler_static_string: '/'
+		- restler_static_string: 'contract'
+		- restler_static_string: '/'
+		- restler_static_string: 'clear'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10065\r\n'
+		- restler_static_string: '\r\n'
+
+2022-06-09 01:16:04.737: Generation: 1 / Sequences Collection Size: 4 
+(After directed-smoke-test Render)
+
+2022-06-09 01:16:04.737: Final Swagger spec coverage: 4 / 11
+2022-06-09 01:16:04.737: Rendered requests: 11 / 11
+2022-06-09 01:16:04.737: Rendered requests with "valid" status codes: 4 / 11
+2022-06-09 01:16:04.737: Num fully valid requests (no resource creation failures): 4
+2022-06-09 01:16:04.737: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 01:16:04.737: Num invalid requests caused by failed resource creations: 0
+2022-06-09 01:16:04.737: Total Creations of Dyn Objects: 0
+2022-06-09 01:16:04.737: Total Requests Sent: {'gc': 0, 'main_driver': 11}
+2022-06-09 01:16:04.737: Bug Buckets: {}
+
+Testing completed -- below are the final stats:
+
+2022-06-09 01:16:04.741: Final Swagger spec coverage: 4 / 11
+2022-06-09 01:16:04.741: Rendered requests: 11 / 11
+2022-06-09 01:16:04.741: Rendered requests with "valid" status codes: 4 / 11
+2022-06-09 01:16:04.741: Num fully valid requests (no resource creation failures): 4
+2022-06-09 01:16:04.741: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 01:16:04.741: Num invalid requests caused by failed resource creations: 0
+2022-06-09 01:16:04.741: Total Creations of Dyn Objects: 0
+2022-06-09 01:16:04.741: Total Requests Sent: {'gc': 0, 'main_driver': 11}
+2022-06-09 01:16:04.741: Bug Buckets: {}

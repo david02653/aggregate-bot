@@ -679,7 +679,7 @@
   accessLevel: service
   method: POST
   atomicIntent: check-actuator-health
-  apiEndpoint: http://msdobot-outer-api:10001/actuatorHealth
+  apiEndpoint: http://localhost:10001/actuatorHealth
   input:
     - Api.serviceName
     - Api.endpoint
@@ -706,7 +706,7 @@
   accessLevel: service
   method: POST
   atomicIntent: check-actuator-info
-  apiEndpoint: http://msdobot-outer-api:10001/actuatorInfo
+  apiEndpoint: http://localhost:10001/actuatorInfo
   input:
     - Api.serviceName
     - Api.endpoint
@@ -733,7 +733,7 @@
   accessLevel: service
   method: POST
   atomicIntent: check-swagger-api-list
-  apiEndpoint: http://msdobot-outer-api:10001/swaggerApiList
+  apiEndpoint: http://localhost:10001/swaggerApiList
   input:
     - Api.serviceName
     - Api.endpoint
@@ -757,7 +757,7 @@
   description: render actuator health/info and swagger api list
   method: POST
   atomicIntent: none
-  apiEndpoint: http://msdobot-outer-api:10001/renderServiceInfo
+  apiEndpoint: http://localhost:10001/renderServiceInfo
   input:
   output:
   renderingDetail:
@@ -795,7 +795,7 @@
   accessLevel: service
   method: POST
   atomicIntent: check-kmamiz-struct
-  apiEndpoint: http://msdobot-outer-api:10001/kmamizStruct
+  apiEndpoint: http://localhost:10001/kmamizStruct
   input:
     - Api.endpoint
     - Api.serviceName
@@ -819,7 +819,7 @@
   accessLevel: service
   method: POST
   atomicIntent: check-kmamiz-monitor
-  apiEndpoint: http://msdobot-outer-api:10001/kmamizMonitor
+  apiEndpoint: http://localhost:10001/kmamizMonitor
   input:
     - Api.serviceName
   output:
@@ -842,7 +842,7 @@
   description: aggregate kmamiz highest service risk
   method: POST
   atomicIntent: none
-  apiEndpoint: http://msdobot-outer-api:10001/kmamizRiskAnalyze
+  apiEndpoint: http://localhost:10001/kmamizRiskAnalyze
   input:
   output:
   aggregateDetail:
@@ -867,7 +867,7 @@
   description: render kmamiz service monitor data
   method: POST
   atomicIntent: none
-  apiEndpoint: http://msdobot-outer-api:10001/renderKmamizService
+  apiEndpoint: http://localhost:10001/renderKmamizService
   input:
   output:
   renderingDetail:
@@ -890,7 +890,7 @@
   description: render actuator health/info and swagger api list
   method: POST
   atomicIntent: none
-  apiEndpoint: http://msdobot-outer-api:10001/renderRiskServiceInfo
+  apiEndpoint: http://localhost:10001/renderRiskServiceInfo
   input:
   output:
   renderingDetail:

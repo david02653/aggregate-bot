@@ -9,6 +9,15 @@ crossCapabilityList:
       - name: Jenkins-semi-test-report
         order: 1
         description: get latest job test report
+  - name: test-jenkins-git-info
+    upperIntent: test-jenkins-git-info
+    sequencedCapabilityList:
+      - name: Jenkins-latest-build-number
+        order: 0
+        description: get latest job build number
+      - name: Jenkins-semi-git-info
+        order: 1
+        description: get latest job git repo
   # todo: add all multi-capability upper intent test case
   # todo: single/multi service - multi step - multi context (cross context aggregate)
   # multi-step / multi-context (not cross context)

@@ -81,6 +81,13 @@ public class CapabilityController {
         return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(requestObj, requestObj.get("Api.serviceName").getAsString()));
     }
 
+    @PostMapping(value = "/jenkins-git-semi")
+    public ResponseEntity<String> requestJenkinsSemiGitInfo(@RequestBody String requestBody){
+        JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
+        System.out.println(gson.toJson(requestBody));
+        return ResponseEntity.ok(jenkinsService.getJenkinsGitInfo(requestObj, requestObj.get("Api.serviceName").getAsString()));
+    }
+
     /**
      * fake get method skill, expect request url with parameter concat by '?'
      * @param username
