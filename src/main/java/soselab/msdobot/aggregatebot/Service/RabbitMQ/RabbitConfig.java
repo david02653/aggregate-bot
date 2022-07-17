@@ -11,6 +11,7 @@ import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 /**
  * this class controls connection with rabbitMQ server<br>
@@ -30,10 +31,12 @@ public class RabbitConfig {
     private final RabbitMessageHandler rabbitMessageHandler;
 
     // todo: maybe exchange, queue and routing key could be read from application properties
-    public RabbitConfig(RabbitMessageHandler rabbitMessageHandler){
+    public RabbitConfig(RabbitMessageHandler rabbitMessageHandler, Environment env){
         this.rabbitMessageHandler = rabbitMessageHandler;
-        this.JENKINS_EXCHANGE = "jenkins";
-        this.JENKINS_QUEUE = "jChannel";
+//        this.JENKINS_EXCHANGE = "jenkins";
+//        this.JENKINS_QUEUE = "jChannel";
+        this.JENKINS_EXCHANGE = env.getProperty("discord.rabbitmq.exchange");
+        this.JENKINS_QUEUE = env.getProperty("discord.rabbitmq.queue");
     }
 
     public final String JENKINS_EXCHANGE;
