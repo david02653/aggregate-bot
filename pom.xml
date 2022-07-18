@@ -11,8 +11,8 @@
     <groupId>soselab.msdobot</groupId>
     <artifactId>msdobot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>aggregate-bot</name>
-    <description>aggregate-bot</description>
+    <name>msdobot</name>
+    <description>msdobot</description>
     <properties>
         <java.version>11</java.version>
     </properties>

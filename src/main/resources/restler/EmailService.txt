@@ -1,0 +1,93 @@
+Setting fuzzing schemes: directed-smoke-test
+2022-06-09 01:44:40.370: Going to fuzz a set with 2 requests
+2022-06-09 01:44:40.370: Request-0: Value Combinations: 1
+2022-06-09 01:44:40.370: Request-1: Value Combinations: 1
+2022-06-09 01:44:40.370: Avg. Value Combinations per Request: 1
+2022-06-09 01:44:40.370: Median Value Combinations per Request: 1.0
+2022-06-09 01:44:40.370: Min Value Combinations per Request: 1
+2022-06-09 01:44:40.370: Max Value Combinations per Request: 1
+2022-06-09 01:44:40.370: Total dependencies: 0
+
+2022-06-09 01:44:40.371: Generation: 1 / Sequences Collection Size: 2 
+(After directed-smoke-test Extend)
+
+Rendering request 0 from scratch
+
+2022-06-09 01:44:40.967: Request 0
+2022-06-09 01:44:40.968: Endpoint - /email/verify
+2022-06-09 01:44:40.968: Hex Def - 2ab1a3ec2dc2067da3ff9625da727de84b43f1d7
+2022-06-09 01:44:40.968: Sequence length that satisfies dependencies: 1
+2022-06-09 01:44:40.968: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'email'
+		- restler_static_string: '/'
+		- restler_static_string: 'verify'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10061\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "url":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+Rendering request 1 from scratch
+
+2022-06-09 01:44:41.129: Request 1
+2022-06-09 01:44:41.130: Endpoint - /email/reset
+2022-06-09 01:44:41.130: Hex Def - 72c17636a410d98f60b382ce8a3c48701044830b
+2022-06-09 01:44:41.130: Sequence length that satisfies dependencies: 1
+2022-06-09 01:44:41.130: Rendering INVALID
+		- restler_static_string: 'POST '
+		- restler_static_string: ''
+		- restler_static_string: '/'
+		- restler_static_string: 'email'
+		- restler_static_string: '/'
+		- restler_static_string: 'reset'
+		- restler_static_string: ' HTTP/1.1\r\n'
+		- restler_static_string: 'Accept: application/json\r\n'
+		- restler_static_string: 'Host: 140.121.196.23:10061\r\n'
+		- restler_static_string: 'Content-Type: '
+		- restler_static_string: 'application/json'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '\r\n'
+		- restler_static_string: '{'
+		- restler_static_string: '\n    "email":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: ',\n    "url":'
+		- restler_fuzzable_string: '"fuzzstring"'
+		- restler_static_string: '}'
+		- restler_static_string: '\r\n'
+
+2022-06-09 01:44:41.131: Generation: 1 / Sequences Collection Size: 0 
+(After directed-smoke-test Render)
+
+2022-06-09 01:44:41.131: Final Swagger spec coverage: 0 / 2
+2022-06-09 01:44:41.131: Rendered requests: 2 / 2
+2022-06-09 01:44:41.131: Rendered requests with "valid" status codes: 0 / 2
+2022-06-09 01:44:41.131: Num fully valid requests (no resource creation failures): 0
+2022-06-09 01:44:41.131: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 01:44:41.131: Num invalid requests caused by failed resource creations: 0
+2022-06-09 01:44:41.131: Total Creations of Dyn Objects: 0
+2022-06-09 01:44:41.131: Total Requests Sent: {'gc': 0, 'main_driver': 2}
+2022-06-09 01:44:41.131: Bug Buckets: {'main_driver_500': 2}
+
+Testing completed -- below are the final stats:
+
+2022-06-09 01:44:41.133: Final Swagger spec coverage: 0 / 2
+2022-06-09 01:44:41.133: Rendered requests: 2 / 2
+2022-06-09 01:44:41.133: Rendered requests with "valid" status codes: 0 / 2
+2022-06-09 01:44:41.133: Num fully valid requests (no resource creation failures): 0
+2022-06-09 01:44:41.133: Num requests not rendered due to invalid sequence re-renders: 0
+2022-06-09 01:44:41.133: Num invalid requests caused by failed resource creations: 0
+2022-06-09 01:44:41.133: Total Creations of Dyn Objects: 0
+2022-06-09 01:44:41.133: Total Requests Sent: {'gc': 0, 'main_driver': 2}
+2022-06-09 01:44:41.133: Bug Buckets: {'main_driver_500': 2}

@@ -27,6 +27,8 @@ public class JDAConnect {
     private DiscordGeneralEventListener generalEventListener;
     private DiscordSlashCommandListener slashCommandListener;
     private final String appToken;
+    private final String serverId;
+    private final String testChannelId;
 
     @Autowired
     public JDAConnect(Environment env, DiscordOnMessageListener onMessageListener, DiscordGeneralEventListener generalEventListener, DiscordSlashCommandListener slashCommandListener){
@@ -35,6 +37,8 @@ public class JDAConnect {
         this.generalEventListener = generalEventListener;
         this.slashCommandListener = slashCommandListener;
         this.appToken = env.getProperty("discord.bot.token");
+        this.serverId = env.getProperty("discord.server.id");
+        this.testChannelId = env.getProperty("discord.testChannel.id");
     }
 
     /**
@@ -90,14 +94,14 @@ public class JDAConnect {
      */
     public void send(Message msg){
         System.out.println("[DEBUG] send msg");
-        JDA.getGuildById("737233839709225001").getTextChannelById("966378622560665610").sendMessage(msg).queue();
+        JDA.getGuildById(serverId).getTextChannelById(testChannelId).sendMessage(msg).queue();
 //        }
     }
 
     public void send(ArrayList<Message> msgList){
         System.out.println("[DEBUG] send msg");
         msgList.forEach(msg -> {
-            JDA.getGuildById("737233839709225001").getTextChannelById("966378622560665610").sendMessage(msg).queue();
+            JDA.getGuildById(serverId).getTextChannelById(testChannelId).sendMessage(msg).queue();
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -115,12 +119,12 @@ public class JDAConnect {
      */
     public void send(Message msg, String channelId){
         System.out.println("[DEBUG] send msg to channel '" + channelId + "'");
-        JDA.getGuildById("737233839709225001").getTextChannelById(channelId).sendMessage(msg).queue();
+        JDA.getGuildById(serverId).getTextChannelById(channelId).sendMessage(msg).queue();
     }
     public void send(ArrayList<Message> msgList, String channelId){
         System.out.println("[DEBUG] send msg to channel '" + channelId + "'");
         msgList.forEach(msg -> {
-            JDA.getGuildById("737233839709225001").getTextChannelById(channelId).sendMessage(msg).queue();
+            JDA.getGuildById(serverId).getTextChannelById(channelId).sendMessage(msg).queue();
 
             try {
                 Thread.sleep(500);

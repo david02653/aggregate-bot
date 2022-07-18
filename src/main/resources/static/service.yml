@@ -231,6 +231,26 @@ serviceList:
             properties:
               - name: Api.endpoint
                 value: http://140.121.196.23:10068
+      - name: EmailService
+        type: service
+        description: pdas-eureka-email-service
+        config:
+          - context: actuator
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10061/actuator
+          - context: swagger
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10061/v2/api-docs
+          - context: Kmamiz
+            properties:
+              - name: Api.endpoint
+                value: https://kmamiz-pdas-demo.stw.tw/?s=ZW1haWwtc2VydmljZQlwZGFz
+          - context: general
+            properties:
+              - name: Api.endpoint
+                value: http://140.121.196.23:10061
 #      - name: SignVerificationMethodRegistry
 #        type: service
 #        description: pdas-eureka-verification-service
@@ -243,18 +263,6 @@ serviceList:
 #            properties:
 #              - name: Api.endpoint
 #                value: http://140.121.196.23:10060
-#      - name: EmailService
-#        type: service
-#        description: pdas-eureka-email-service
-#        config:
-#          - context: actuator
-#            properties:
-#              - name: Api.endpoint
-#                value: http://140.121.196.23:10061/actuator
-#          - context: general
-#            properties:
-#              - name: Api.endpoint
-#                value: http://140.121.196.23:10061
 #      - name: EurekaServer
 #        type: service
 #        description: pdas-eureka-eureka-server

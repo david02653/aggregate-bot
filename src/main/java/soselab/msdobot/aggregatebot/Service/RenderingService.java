@@ -200,11 +200,11 @@ public class RenderingService implements RenderingTemplate {
             String current = "";
             for(String tok: token){
                 var test = current + tok;
-                if(test.length() <= 1900){
+                if(test.length() <= 1800){
                     current += tok + "\n";
                 }else{
                     msgList.add(current);
-                    current = "";
+                    current = tok + "\n";
                 }
             }
             msgList.add(current);
