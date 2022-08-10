@@ -982,6 +982,14 @@ public class Orchestrator {
         return parseRequestResult(capability, service, requiredConfig, resp.getBody());
     }
 
+    /**
+     * unused, use collectRequiredAggregateConfig() instead
+     * @param requestConfig
+     * @param capability
+     * @param serviceName
+     * @param serviceConfigMap
+     * @param propertyKey
+     */
     // todo: refactor
     private void gatherRequestPropertiesConfig(JsonObject requestConfig, Capability capability, String serviceName, HashMap<String, HashMap<String, String>> serviceConfigMap, String propertyKey){
         String capabilityContext = capability.context;

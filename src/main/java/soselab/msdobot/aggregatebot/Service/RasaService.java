@@ -79,6 +79,11 @@ public class RasaService {
         return intentSet;
     }
 
+    /**
+     * send message to rasa endpoint to analyze intent
+     * @param utterance
+     * @return
+     */
     public String analyze(String utterance){
         RestTemplate template = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -92,6 +97,11 @@ public class RasaService {
         return resp.getBody();
     }
 
+    /**
+     * parse analyzed rasa intent
+     * @param raw
+     * @return
+     */
     public RasaIntent directParse(String raw){
 //        System.out.println("[dirPar]");
 //        System.out.println(raw);

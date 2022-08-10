@@ -4,23 +4,26 @@ import com.google.gson.GsonBuilder;
 
 import java.util.ArrayList;
 
+/**
+ * capability data format, consider Polymorphism ?
+ */
 public class Capability {
-    public String name;
-    public String context;
+    public String name; // what is this capability
+    public String context; // what tools is used
     public boolean isAggregateMethod; // determine whether this is an aggregate method
     public boolean isRenderingMethod; // determine whether this is a rendering method
-    public String accessLevel;
+    public String accessLevel; // do this capability works on a single service or a system
     public String order; // attribute of upperIntent
-    public String description;
-    public String method;
-    public String atomicIntent;
-    public String apiEndpoint;
-    public ArrayList<String> input;
-    public CapabilityOutput output;
-    public ArrayList<CustomMapping> usedMappingList;
-    public StoredData storedData;
-    public AggregateDetail aggregateDetail;
-    public RenderingDetail renderingDetail;
+    public String description; // what is this capability
+    public String method; // what RESTful method should be used
+    public String atomicIntent; // intent used to trigger current capability
+    public String apiEndpoint; // endpoint of this capability
+    public ArrayList<String> input; // what data should be used to call the endpoint
+    public CapabilityOutput output; // what data should the endpoint response
+    public ArrayList<CustomMapping> usedMappingList; // used specific mapping input data
+    public StoredData storedData; // what data should be stored
+    public AggregateDetail aggregateDetail; // what data is used to call this aggregate capability
+    public RenderingDetail renderingDetail; // what data is used to call this rendering capability
 
     public void setAggregateMethod(boolean aggregateMethod) {
         isAggregateMethod = aggregateMethod;

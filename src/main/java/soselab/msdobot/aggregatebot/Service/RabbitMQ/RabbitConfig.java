@@ -54,15 +54,29 @@ public class RabbitConfig {
 //    Binding binding(Queue q, TopicExchange topicExchange){
 //        return BindingBuilder.bind(q).to(topicExchange).with("dog.#");
 //    }
-    
+
+    /**
+     * create jenkins queue
+     * @return
+     */
     @Bean
     Queue createJenkinsQueue(){
         return new Queue(JENKINS_QUEUE, true);
     }
+
+    /**
+     * create jenkins exchange
+     * @return
+     */
     @Bean
     TopicExchange exchangeJenkins(){
         return new TopicExchange(JENKINS_EXCHANGE);
     }
+
+    /**
+     * bind jenkins queue to exchange
+     * @return
+     */
     @Bean
     Binding bindJenkins(){
         return BindingBuilder.bind(createJenkinsQueue()).to(exchangeJenkins()).with("jenkins.*");

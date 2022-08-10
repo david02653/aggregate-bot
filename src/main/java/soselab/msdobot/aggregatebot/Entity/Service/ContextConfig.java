@@ -4,8 +4,8 @@ import com.google.gson.GsonBuilder;
 
 public class ContextConfig {
 
-    public String name;
-    public String value;
+    public String name; // config name
+    public String value; // config value
 
     public ContextConfig(){
     }

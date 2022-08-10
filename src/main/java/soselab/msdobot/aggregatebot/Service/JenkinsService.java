@@ -135,6 +135,13 @@ public class JenkinsService {
         }
     }
 
+    /**
+     * get jenkins test report<br>
+     * this function contains getting the latest build number and retrieve correspond report
+     * @param config
+     * @param targetService
+     * @return
+     */
     public String getDirectJenkinsTestReport(JsonObject config, String targetService){
         // retrieve the latest build number
         String buildStatusRequestUrl = config.get("Api.endpoint").getAsString() + "/job/" + targetService + "/api/json?depth=2&tree=lastBuild[number]";
@@ -177,6 +184,11 @@ public class JenkinsService {
         return resultReport;
     }
 
+    /**
+     * get jenkins view list
+     * @param config
+     * @return
+     */
     public String getJenkinsViewList(String config){
         System.out.println("[DEBUG] received config " + config);
         Gson gson = new Gson();

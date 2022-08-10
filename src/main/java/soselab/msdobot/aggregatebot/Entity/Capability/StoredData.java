@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class StoredData {
 
-    public ArrayList<DataLabel> input;
-    public ArrayList<DataLabel> output;
+    public ArrayList<DataLabel> input; // what should be stored from input data
+    public ArrayList<DataLabel> output; // what should be stored from output data
 
     public StoredData(){
     }

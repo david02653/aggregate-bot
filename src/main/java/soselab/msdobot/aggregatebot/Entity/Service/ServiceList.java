@@ -6,6 +6,9 @@ import com.google.gson.GsonBuilder;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+/**
+ * available service list
+ */
 public class ServiceList {
     public ArrayList<ServiceSystem> serviceList;
     public HashMap<String, Service> serviceMap;

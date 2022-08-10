@@ -2,6 +2,9 @@ package soselab.msdobot.aggregatebot.Entity.Service;
 
 import java.util.ArrayList;
 
+/**
+ * raw data read from service config
+ */
 public class ServiceSystem {
     public String name;
     public String type;

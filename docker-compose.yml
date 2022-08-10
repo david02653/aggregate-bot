@@ -4,7 +4,7 @@ services:
   msdobot:
     image: msdobot/msdobot:v1
     container_name: msdobot
-#    restart: always
+    restart: always
     networks: ["msdobot"]
     depends_on:
       - rabbitmq
@@ -27,7 +27,7 @@ services:
   outer_api:
     image: msdobot/outer:v0
     container_name: msdobot-outer-api
-#    restart: always
+    restart: always
     networks: ["msdobot"]
     ports:
       - 10001:10001

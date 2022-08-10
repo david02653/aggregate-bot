@@ -13,6 +13,11 @@ public class UpperIntentList {
     public UpperIntentList(){
     }
 
+    /**
+     * get upper intent capability list
+     * @param intent
+     * @return
+     */
     public ArrayList<Capability> getSemiCapabilityList(String intent){
         for(UpperIntent upperIntent : crossCapabilityList){
             if(upperIntent.upperIntent.equals(intent)) {

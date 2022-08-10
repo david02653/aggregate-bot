@@ -30,6 +30,12 @@ public class PseudoService {
         gson = new Gson();
     }
 
+    /**
+     * DEPRECATED<br>
+     * fake api, return fake service detail
+     * @param request
+     * @return
+     */
     public String getServiceDetailPartA(String request){
         JsonObject requestObj = gson.fromJson(request, JsonObject.class);
         String serviceName = requestObj.get("Api.serviceName").getAsString();
@@ -43,9 +49,12 @@ public class PseudoService {
         return "ERROR";
     }
 
-    public void getServiceDetailPartB(){
-    }
-
+    /**
+     * DEPRECATED<br>
+     * fake api, return fake service api detail
+     * @param request
+     * @return
+     */
     public String getServiceApiData(String request){
         JsonObject requestObj = gson.fromJson(request, JsonObject.class);
         String serviceName = requestObj.get("Api.serviceName").getAsString();
@@ -59,9 +68,12 @@ public class PseudoService {
         return "0";
     }
 
-    public void analyzeServiceApiData(){
-    }
-
+    /**
+     * DEPRECATED<br>
+     * fake api, aggregate fake service detail
+     * @param request
+     * @return
+     */
     public String aggregateServiceDetail(String request){
         JsonObject requestObj = gson.fromJson(request, JsonObject.class);
         String rawServiceDetails = requestObj.get("serviceDetail").getAsString();
@@ -86,14 +98,19 @@ public class PseudoService {
         return gson.toJson(report);
     }
 
+    /**
+     * DEPRECATED<br>
+     * handle fake service detail
+     * @param detail
+     * @param apiDetail
+     * @return
+     */
     private String combinePseudoServiceDetail(String detail, String apiDetail){
         return detail + " , has " + apiDetail + " kinds of api";
     }
 
-    public void renderServiceDetail(){
-    }
-
     /**
+     * DEPRECATED<br>
      * testing method to print request input
      * @param requestBody
      * @return
@@ -116,6 +133,11 @@ public class PseudoService {
         return requestBody;
     }
 
+    /**
+     * read data from restler test report
+     * @param requestBody
+     * @return
+     */
     public String checkRESTlerInfo(String requestBody){
         var flag = false;
         JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
@@ -140,6 +162,11 @@ public class PseudoService {
         return result;
     }
 
+    /**
+     * extract restler test execute result
+     * @param raw
+     * @return
+     */
     public String extractRestlerInfo(String raw){
         Pattern pattern = Pattern.compile("^[\\d-]{10} [\\d:.]{13} (.*)");
         Matcher matcher = pattern.matcher(raw);

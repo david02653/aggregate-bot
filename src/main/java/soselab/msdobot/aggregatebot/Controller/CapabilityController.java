@@ -81,6 +81,11 @@ public class CapabilityController {
         return ResponseEntity.ok(jenkinsService.getJenkinsTestReport(requestObj, requestObj.get("Api.serviceName").getAsString()));
     }
 
+    /**
+     * request jenkins git information
+     * @param requestBody
+     * @return
+     */
     @PostMapping(value = "/jenkins-git-semi")
     public ResponseEntity<String> requestJenkinsSemiGitInfo(@RequestBody String requestBody){
         JsonObject requestObj = gson.fromJson(requestBody, JsonObject.class);
@@ -89,6 +94,7 @@ public class CapabilityController {
     }
 
     /**
+     * DEPRECATED<br>
      * fake get method skill, expect request url with parameter concat by '?'
      * @param username
      * @param accessToken
@@ -100,7 +106,8 @@ public class CapabilityController {
     }
 
     /**
-     * fake get method skill, expect request url with parameter display in url
+     * DEPRECATED<br>
+     * fake get method capability, expect request url with parameter display in url
      * @param username
      * @return
      */
@@ -120,18 +127,36 @@ public class CapabilityController {
         return ResponseEntity.ok(jenkinsService.getJenkinsViewList(requestBody));
     }
 
+    /**
+     * DEPRECATED<br>
+     * fake api, testing only, get fake service detail
+     * @param requestBody
+     * @return
+     */
     @PostMapping(value = "/pseudo-detail")
     public ResponseEntity<String> requestPseudoServiceDetail(@RequestBody String requestBody){
         System.out.println("[DEBUG][controller] pseudo-detail triggered");
         return ResponseEntity.ok(pseudoService.getServiceDetailPartA(requestBody));
     }
 
+    /**
+     * DEPRECATED<br>
+     * fake api, testing only, get fake service api detail
+     * @param requestBody
+     * @return
+     */
     @PostMapping(value = "/pseudo-api")
     public ResponseEntity<String> requestPseudoServiceAPI(@RequestBody String requestBody){
         System.out.println("[DEBUG][controller] pseudo-api triggered");
         return ResponseEntity.ok(pseudoService.getServiceApiData(requestBody));
     }
 
+    /**
+     * DEPRECATED<br>
+     * fake api, testing only, aggregate fake service detail
+     * @param requestBody
+     * @return
+     */
     @PostMapping(value = "/pseudo-aggregate")
     public ResponseEntity<String> aggregatePseudoServiceDetail(@RequestBody String requestBody){
         System.out.println("[DEBUG][controller] pseudo-aggregate triggered");
@@ -139,6 +164,7 @@ public class CapabilityController {
     }
 
     /**
+     * DEPRECATED<br>
      * testing method to print rendering endpoint request body
      * @param requestBody
      * @return
@@ -152,6 +178,11 @@ public class CapabilityController {
         return ResponseEntity.ok(pseudoService.printInput(requestBody));
     }
 
+    /**
+     * check restler simple test result
+     * @param requestBody
+     * @return
+     */
     @PostMapping(value = "/restler")
     public ResponseEntity<String> restler(@RequestBody String requestBody){
         System.out.println("[DEBUG][restler] restler method triggered");

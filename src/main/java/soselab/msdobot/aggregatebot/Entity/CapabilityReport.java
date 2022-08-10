@@ -39,6 +39,11 @@ public class CapabilityReport {
         return this.missingContextProperty.size() > 0;
     }
 
+    /**
+     * add new property
+     * @param contextName
+     * @param property
+     */
     public void addProperty(String contextName, String property){
         HashSet<String> temp;
         if(missingContextProperty.containsKey(contextName)){
@@ -50,6 +55,10 @@ public class CapabilityReport {
         this.missingContextProperty.put(contextName, temp);
     }
 
+    /**
+     * add multiple properties
+     * @param properties
+     */
     public void mergeProperty(HashMap<String, HashSet<String>> properties){
         for(Map.Entry<String, HashSet<String>> entry: properties.entrySet()){
             for(String propertyName: entry.getValue()){
